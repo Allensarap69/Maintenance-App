@@ -479,12 +479,11 @@ $login_button_text = 'Login';
         .why-item { text-align: center; padding: 10px 16px; height: 100%; }
         .why-icon {
             width: 54px; height: 54px;
-            background: var(--mev-yellow);
+            background: transparent;
             border-radius: 14px;
             display: flex; align-items: center; justify-content: center;
             margin: 0 auto 16px;
             color: var(--mev-navy);
-            box-shadow: 0 8px 18px rgba(251, 191, 36, 0.3);
             transition: transform 0.25s;
         }
         .why-item:hover .why-icon { transform: translateY(-4px) rotate(-4deg); }
@@ -526,9 +525,8 @@ $login_button_text = 'Login';
         }
         .service-img .s-icon {
             width: 52px; height: 52px;
-            background: rgba(255, 255, 255, 0.16);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: transparent;
+            border: none;
             border-radius: 14px;
             display: flex; align-items: center; justify-content: center;
             color: #ffffff;
@@ -596,8 +594,8 @@ $login_button_text = 'Login';
             position: relative;
             z-index: 1;
         }
-        .step-icon.blue { background: var(--mev-blue-soft); color: var(--mev-blue); }
-        .step-icon.yellow { background: var(--mev-yellow-soft); color: var(--mev-yellow-dark); }
+        .step-icon.blue { background: transparent; color: var(--mev-blue); }
+        .step-icon.yellow { background: transparent; color: var(--mev-yellow-dark); }
         .step-icon i { width: 22px; height: 22px; }
         .step-title { font-weight: 700; font-size: 0.95rem; color: var(--mev-navy); margin-bottom: 6px; }
         .step-title .s-num { color: var(--mev-blue); margin-right: 4px; }
@@ -668,7 +666,7 @@ $login_button_text = 'Login';
         .h-bar-icon {
             width: 34px; height: 34px;
             flex: none;
-            background: var(--mev-blue-soft);
+            background: transparent;
             border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
             color: var(--mev-blue);
@@ -710,7 +708,7 @@ $login_button_text = 'Login';
         .track-card-head .t-icon {
             width: 40px; height: 40px;
             flex: none;
-            background: var(--mev-blue-soft);
+            background: transparent;
             border-radius: 11px;
             display: flex; align-items: center; justify-content: center;
             color: var(--mev-blue);
@@ -754,13 +752,12 @@ $login_button_text = 'Login';
             font-weight: 700;
         }
         .track-node i { width: 16px; height: 16px; }
-        .track-step.done .track-node { background: var(--mev-green); color: #fff; }
+        .track-step.done .track-node { background: transparent; color: var(--mev-green); }
         .track-step.current .track-node {
-            background: var(--mev-yellow);
-            color: var(--mev-navy);
-            box-shadow: 0 0 0 5px rgba(251, 191, 36, 0.25);
+            background: transparent;
+            color: var(--mev-yellow-dark);
         }
-        .track-step.todo .track-node { background: #e2e8f0; color: var(--mev-faint); }
+        .track-step.todo .track-node { background: transparent; color: var(--mev-faint); }
         .track-label { font-size: 0.66rem; font-weight: 600; color: var(--mev-muted); line-height: 1.35; }
         .track-step.done .track-label { color: var(--mev-navy); }
         .track-step.current .track-label { color: var(--mev-navy); font-weight: 700; }
@@ -771,7 +768,7 @@ $login_button_text = 'Login';
         .reminder-icon {
             width: 46px; height: 46px;
             flex: none;
-            background: var(--mev-yellow-soft);
+            background: transparent;
             border-radius: 13px;
             display: flex; align-items: center; justify-content: center;
             color: var(--mev-yellow-dark);
@@ -799,8 +796,8 @@ $login_button_text = 'Login';
             border-radius: 11px;
             display: flex; align-items: center; justify-content: center;
         }
-        .reminder-card .rc-icon.blue { background: var(--mev-blue-soft); color: var(--mev-blue); }
-        .reminder-card .rc-icon.yellow { background: var(--mev-yellow-soft); color: var(--mev-yellow-dark); }
+        .reminder-card .rc-icon.blue { background: transparent; color: var(--mev-blue); }
+        .reminder-card .rc-icon.yellow { background: transparent; color: var(--mev-yellow-dark); }
         .reminder-card .rc-icon i { width: 18px; height: 18px; }
         .rc-label { font-size: 0.66rem; font-weight: 600; color: var(--mev-muted); text-transform: uppercase; letter-spacing: 0.05em; }
         .rc-value { font-size: 0.85rem; font-weight: 700; color: var(--mev-navy); line-height: 1.3; }
@@ -860,7 +857,7 @@ $login_button_text = 'Login';
         .social-links { display: flex; gap: 10px; }
         .social-links a {
             width: 36px; height: 36px;
-            background: rgba(255, 255, 255, 0.07);
+            background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
@@ -936,11 +933,10 @@ $login_button_text = 'Login';
         .auth-logo {
             width: 44px; height: 44px;
             margin: 0 auto 10px;
-            background: linear-gradient(135deg, var(--mev-yellow) 0%, var(--mev-yellow-dark) 100%);
+            background: transparent;
             border-radius: 13px;
             display: flex; align-items: center; justify-content: center;
             color: var(--mev-navy);
-            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.35);
         }
         .auth-logo i { width: 22px; height: 22px; }
         .auth-brand-name { font-weight: 700; color: var(--mev-navy); font-size: 0.95rem; line-height: 1.3; }
@@ -1351,7 +1347,7 @@ $login_button_text = 'Login';
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(246, 198, 20, 0.18);
+            background: transparent;
             color: var(--mf-yellow-dark);
             border-radius: 11px;
         }
@@ -1419,8 +1415,8 @@ $login_button_text = 'Login';
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--mf-yellow);
-            color: var(--mf-navy);
+            background: transparent;
+            color: var(--mf-yellow);
             border-radius: 7px;
         }
         .dash-brand-mark i { width: 14px; height: 14px; }
@@ -1500,7 +1496,7 @@ $login_button_text = 'Login';
             align-items: center;
             justify-content: center;
             border-radius: 8px;
-            background: var(--mf-soft);
+            background: transparent;
             color: var(--mf-blue);
         }
         .stat-icon i { width: 15px; height: 15px; }
@@ -1603,7 +1599,7 @@ $login_button_text = 'Login';
             align-items: center;
             justify-content: center;
             border-radius: 7px;
-            background: #eef4ff;
+            background: transparent;
             color: var(--mf-blue);
         }
         .quick-action strong { display: block; color: var(--mf-navy); font-size: 0.58rem; }
@@ -1679,7 +1675,7 @@ $login_button_text = 'Login';
             justify-content: center;
             margin-bottom: 15px;
             border-radius: 10px;
-            background: rgba(246, 198, 20, 0.18);
+            background: transparent;
             color: var(--mf-yellow-dark);
         }
         .feature-card-icon i { width: 19px; height: 19px; }
@@ -1759,8 +1755,8 @@ $login_button_text = 'Login';
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            background: var(--mf-yellow);
-            color: var(--mf-navy);
+            background: transparent;
+            color: var(--mf-yellow);
         }
         .benefit-icon i { width: 20px; height: 20px; }
         .benefit-item strong {
@@ -1856,8 +1852,8 @@ $login_button_text = 'Login';
             align-items: center;
             justify-content: center;
             border-radius: 12px;
-            background: var(--mf-yellow);
-            color: var(--mf-navy);
+            background: transparent;
+            color: var(--mf-yellow);
         }
         .auth-visual-logo i { width: 22px; height: 22px; }
         .auth-visual-name {

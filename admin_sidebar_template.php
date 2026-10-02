@@ -437,8 +437,9 @@ $adminNotifIcons = [
             bottom: 0;
             left: 0;
             right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent 0%, #3b82f6 25%, #FACC15 75%, transparent 100%);
+            height: 2px;
+            background: linear-gradient(90deg, #FACC15 0%, #FDE047 100%);
+            box-shadow: 0 2px 12px rgba(250, 204, 21, 0.35);
         }
 
         .sidebar-brand {
@@ -508,9 +509,9 @@ $adminNotifIcons = [
 
         .menu-title {
             color: rgba(255, 255, 255, 0.8);
-            font-size: 0.7rem;
+            font-size: 0.72rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             margin-bottom: 10px;
             padding-left: 15px;
             position: sticky;
@@ -564,30 +565,24 @@ $adminNotifIcons = [
         }
 
         .menu-item i,
-        .menu-item svg { width: 20px; height: 20px; flex-shrink: 0; }
-        .menu-item span { font-size: 0.85rem; font-weight: 500; }
+        .menu-item svg { width: 21px; height: 21px; flex-shrink: 0; }
+        .menu-item span { font-size: 0.88rem; font-weight: 500; }
         .menu-title { color: rgba(255, 255, 255, 0.5); font-size: 0.75rem; font-weight: 700; }
 
         .menu-badge {
             margin-left: auto;
             background: #FACC15;
             color: #111827;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        .menu-item[href*="manage_bookings.php"] .menu-badge {
-            background: #ef4444;
-            color: #ffffff;
-            padding: 1px 6px;
-            font-size: 0.65rem;
-        }
-        .menu-item[href*="admin_emergency_requests"] .menu-badge {
-            background: #ef4444;
-            color: #ffffff;
-            padding: 1px 6px;
-            font-size: 0.65rem;
+            min-width: 24px;
+            height: 24px;
+            padding: 0 7px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(250, 204, 21, 0.35);
         }
 
         /* ===== Collapsible parent menus ===== */
@@ -1221,7 +1216,7 @@ $adminNotifIcons = [
         .menu-subtitle::after { content: ''; flex: 1; height: 1px; background: rgba(255, 255, 255, 0.07); }
         .menu-section + .menu-section { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 14px; }
         .menu-item { color: rgba(255, 255, 255, 0.85) !important; transition: transform 0.2s ease; }
-        .menu-item i, .menu-item svg { color: rgba(255, 255, 255, 0.55) !important;  }
+        .menu-item i, .menu-item svg { color: rgba(255, 255, 255, 0.65) !important; transition: color 0.2s ease; }
         .menu-item:hover { color: #ffffff !important; background: rgba(255, 255, 255, 0.08) !important; transform: translateX(3px) !important; }
         .menu-item:hover i, .menu-item:hover svg { color: #FACC15 !important; }
         .menu-item.active {
@@ -1900,8 +1895,7 @@ $adminNotifIcons = [
             </div>
 
             <div class="menu-section">
-
-                <div class="menu-subtitle">Fleet &amp; Customers</div>
+                <div class="menu-title">Fleet &amp; Customers</div>
                 <a href="manage_customers_motorcycles.php" class="menu-item <?= $currentPage == 'manage_customers_motorcycles' ? 'active' : '' ?>">
                     <i data-lucide="users"></i>
                     <span>Customers</span>
@@ -1922,8 +1916,10 @@ $adminNotifIcons = [
                     <i data-lucide="history"></i>
                     <span>Maintenance History</span>
                 </a>
+            </div>
 
-                <div class="menu-subtitle">Operations &amp; Staff</div>
+            <div class="menu-section">
+                <div class="menu-title">Operations &amp; Staff</div>
                 <a href="manage_mechanics.php" class="menu-item <?= $currentPage == 'manage_mechanics' ? 'active' : '' ?>">
                     <i data-lucide="wrench"></i>
                     <span>Mechanics</span>
@@ -1936,8 +1932,10 @@ $adminNotifIcons = [
                     <i data-lucide="calendar-days"></i>
                     <span>Availability</span>
                 </a>
+            </div>
 
-                <div class="menu-subtitle">Catalog &amp; Services</div>
+            <div class="menu-section">
+                <div class="menu-title">Catalog &amp; Services</div>
                 <a href="services.php" class="menu-item <?= $currentPage == 'services' ? 'active' : '' ?>">
                     <i data-lucide="settings"></i>
                     <span>Services</span>

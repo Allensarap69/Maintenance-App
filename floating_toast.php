@@ -101,6 +101,8 @@ $__toast_type = isset($toast_type) ? (string)$toast_type : 'success';
     window.showToast = function (message, type, duration) {
         type = GLYPHS[type] ? type : 'info';
         duration = duration || ((type === 'error' || type === 'danger') ? 6000 : 4000);
+        // Strip leading status emojis — the toast badge already shows the glyph
+        message = String(message).replace(/^[\u2705\u274C\u26A0\u2139\u{1F512}\u{1F4A1}\u{1F6A8}\u{1F514}\u{1F389}\u{26D4}\u{2757}\u{2753}\uFE0F\u00A0\s]+/u, '');
         var toast = document.createElement('div');
         toast.className = 'ftc-toast ftc-' + type;
         var badge = document.createElement('span');

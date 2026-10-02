@@ -241,23 +241,36 @@ try {
 
 // --- Build Query for Displaying Motorcycles ---
 try {
-    $query = "SELECT m.*, u.username as customer_name, u.email as customer_email 
-              FROM motorcycles m 
-              JOIN users u ON m.user_id = u.id 
-              WHERE 1=1";
-    
+    // Same WHERE for the count query and the page query
+    $where = " FROM motorcycles m
+               JOIN users u ON m.user_id = u.id
+               WHERE 1=1";
+
     // Apply status filter
     if ($current_status !== 'All') {
-        $query .= " AND m.status = :status";
+        $where .= " AND m.status = :status";
     }
-    
+
     // Apply search filter
     if (!empty($search)) {
-        $query .= " AND (m.brand LIKE :search OR m.model LIKE :search OR m.plate_number LIKE :search OR u.username LIKE :search)";
+        $where .= " AND (m.brand LIKE :search OR m.model LIKE :search OR m.plate_number LIKE :search OR u.username LIKE :search)";
     }
-    
-    $query .= " ORDER BY m.brand ASC, m.model ASC";
-    
+
+    // Pagination: count matching rows first, then fetch this page only
+    require_once __DIR__ . '/pagination_helper.php';
+    $count_stmt = $pdo->prepare("SELECT COUNT(*)" . $where);
+    if ($current_status !== 'All') {
+        $count_stmt->bindValue(':status', $current_status);
+    }
+    if (!empty($search)) {
+        $count_stmt->bindValue(':search', "%$search%");
+    }
+    $count_stmt->execute();
+    $pg = paginate((int)$count_stmt->fetchColumn(), 10);
+
+    $query = "SELECT m.*, u.username as customer_name, u.email as customer_email" . $where
+           . " ORDER BY m.brand ASC, m.model ASC LIMIT {$pg['per_page']} OFFSET {$pg['offset']}";
+
     $stmt = $pdo->prepare($query);
     
     if ($current_status !== 'All') {
@@ -275,6 +288,8 @@ try {
 } catch (PDOException $e) {
     error_log("Error fetching motorcycles: " . $e->getMessage());
     $motorcycles = [];
+    require_once __DIR__ . '/pagination_helper.php';
+    $pg = paginate(0, 10);
 }
 
 $pageTitle = "Motorcycle Management";
@@ -1048,6 +1063,7 @@ require 'admin_sidebar_template.php';
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
+    <?= render_pagination($pg) ?>
 </div>
 
 <!-- Add Motorcycle Modal -->

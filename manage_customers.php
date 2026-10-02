@@ -271,8 +271,20 @@ if ($current_status !== 'All' && array_key_exists($current_status, $status_list)
     $where_clause .= " AND u.archived = 0";
 }
 
+// Pagination: count rows matching the same filters, then limit this page
+require_once __DIR__ . '/pagination_helper.php';
+$pg = paginate(0, 10);
+try {
+    $count_stmt = $pdo->prepare("SELECT COUNT(*) FROM users u WHERE u.role = 'customer'" . $where_clause);
+    $count_stmt->execute($params);
+    $pg = paginate((int)$count_stmt->fetchColumn(), 10);
+} catch (PDOException $e) {
+    error_log("Error counting customers: " . $e->getMessage());
+}
+
 // GROUP BY is necessary because we use the COUNT aggregate function
-$sql .= $where_clause . " GROUP BY u.id ORDER BY u.created_at DESC";
+$sql .= $where_clause . " GROUP BY u.id ORDER BY u.created_at DESC"
+      . " LIMIT {$pg['per_page']} OFFSET {$pg['offset']}";
 
 try {
     $stmt = $pdo->prepare($sql);
@@ -467,6 +479,7 @@ $pageTitle = 'Manage Customers';
             </tbody>
         </table>
     </div>
+    <?= render_pagination($pg) ?>
 </div>
 
 <form id="deleteForm" method="POST" action="manage_customers.php" style="display: none;">

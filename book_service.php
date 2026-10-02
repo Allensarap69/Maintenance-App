@@ -462,7 +462,17 @@ foreach ($packages as $pkg) {
             border-color: var(--accent-color);
             background-color: rgba(249, 115, 22, 0.03);
         }
-        .custom-control input { display: none; }
+        .custom-control input {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+        .custom-control input:focus-visible + label {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
+        }
         .custom-control input:checked + label {
             border-color: var(--accent-color);
             background-color: rgba(249, 115, 22, 0.05);
@@ -797,7 +807,19 @@ foreach ($packages as $pkg) {
             .container {
                 padding: 0 10px;
             }
-            
+
+            /* Tabs split the full width instead of overflowing */
+            .service-tabs {
+                padding: 0;
+            }
+            .service-tab {
+                flex: 1 1 0;
+                min-width: 0;
+                padding: 10px 8px;
+                font-size: 0.85rem;
+                text-align: center;
+            }
+
             .navbar-custom {
                 padding: 6px 0;
             }

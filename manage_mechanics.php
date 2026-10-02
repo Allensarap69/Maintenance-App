@@ -1392,4 +1392,12 @@ $pageTitle = 'Manage Mechanics';
     });
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.attachPager) {
+        attachPager({ items: '.mechanic-row', container: '.mechanic-list', perPage: 12 });
+    }
+});
+</script>
+
 <?php require 'admin_sidebar_footer.php'; ?>

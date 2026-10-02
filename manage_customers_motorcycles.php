@@ -1733,4 +1733,12 @@ document.addEventListener('click', function(e) {
 })();
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.attachPager) {
+        attachPager({ items: '.customer-row', container: '#customerRows', perPage: 15 });
+    }
+});
+</script>
+
 <?php require 'admin_sidebar_footer.php'; ?>

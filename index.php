@@ -66,16 +66,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
 
     // Verify CSRF token
     if (!verify_csrf_token()) {
-        $msg = "❌ Security validation failed. Please refresh the page and try again.";
+        $msg = "Security validation failed. Please refresh the page and try again.";
     } else {
         // Check progressive login delay
         $delay_info = check_login_delay();
         
         // If account is locked, show error
         if ($delay_info['locked']) {
-            $msg = "❌ " . $delay_info['message'];
+            $msg = $delay_info['message'];
         } elseif (empty($_POST['email']) || empty($_POST['password'])) {
-            $msg = "❌ Please enter both email and password.";
+            $msg = "Please enter both email and password.";
         } else {
             $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
             $password = $_POST['password'];
@@ -115,9 +115,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
                     $delay_info = check_login_delay();
                     
                     if ($delay_info['delay'] > 0) {
-                        $msg = "❌ Invalid credentials. " . $delay_info['message'];
+                        $msg = "Invalid credentials. " . $delay_info['message'];
                     } else {
-                        $msg = "❌ Invalid email or password.";
+                        $msg = "Invalid email or password.";
                     }
                 }
             } catch (PDOException $e) {
@@ -135,9 +135,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submit'])) {
 
     // Verify CSRF token
     if (!verify_csrf_token()) {
-        $msg = "❌ Security validation failed. Please refresh the page and try again.";
+        $msg = "Security validation failed. Please refresh the page and try again.";
     } elseif (empty($_POST['reg_password']) || empty($_POST['reg_username']) || empty($_POST['reg_email']) || empty($_POST['reg_phone']) || empty($_POST['reg_address'])) {
-        $msg = "❌ Please fill in all required fields.";
+        $msg = "Please fill in all required fields.";
     } else {
         $username = $_POST['reg_username'];
         $email    = $_POST['reg_email'];
@@ -147,19 +147,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submit'])) {
         $address  = sanitize_input($_POST['reg_address']);
 
         if (!preg_match('/^09\d{9}$/', $phone)) {
-            $msg = "❌ Please enter a valid 11-digit mobile number starting with 09 (e.g., 0917 123 4567).";
+            $msg = "Please enter a valid 11-digit mobile number starting with 09 (e.g., 0917 123 4567).";
         } else {
         try {
             $check = $pdo->prepare("SELECT id FROM users WHERE email=?");
             $check->execute([$email]);
 
             if ($check->rowCount() > 0) {
-                $msg = "❌ Email already registered. Please use a different email or login.";
+                $msg = "Email already registered. Please use a different email or login.";
             } else {
                 $stmt = $pdo->prepare("INSERT INTO users (username,email,password,phone,address,role) VALUES (?,?,?,?,?,'customer')");
                 $stmt->execute([$username, $email, $password, $phone, $address]);
                 
-                $msg = "✅ Registration successful! You can now login.";
+                $msg = "Registration successful! You can now login.";
                 $registration_success = true;
                 
                 // Clear values on success
@@ -204,6 +204,7 @@ $login_button_text = 'Login';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="assets/css/ui.css">
     <noscript><style>[data-reveal]{opacity:1!important;transform:none!important}.bar-fill{width:var(--w)!important}</style></noscript>
     <style>
         /* === Mindanao Eversure — Landing UI (light theme) === */
@@ -2839,7 +2840,7 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
             </div>
 
             <?php if ($msg && $login_attempt): ?>
-                <div class="alert alert-warning alert-dismissible fade show mb-3 py-2 px-2" role="alert">
+                <div class="alert alert-danger alert-dismissible fade show mb-3 py-2 px-2" role="alert">
                     <?= htmlspecialchars($msg) ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 2px 6px; font-size: 0.7rem;"></button>
                 </div>
@@ -2927,7 +2928,7 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
             </div>
 
             <?php if ($msg && $register_attempt): ?>
-                <div class="alert alert-<?= $registration_success ? 'success' : 'warning' ?> alert-dismissible fade show mb-3 py-2 px-2" role="alert">
+                <div class="alert alert-<?= $registration_success ? 'success' : 'danger' ?> alert-dismissible fade show mb-3 py-2 px-2" role="alert">
                     <?= htmlspecialchars($msg) ?>
                     <?php if ($registration_success): ?>
                         <a href="#" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#loginModal">Login →</a>

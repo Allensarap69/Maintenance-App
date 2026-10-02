@@ -16,6 +16,17 @@ if (!isset($totalUpcoming)) $totalUpcoming = 0;
 if (!isset($show_badge)) $show_badge = $totalUpcoming > 0;
 if (!isset($active_page)) $active_page = basename($_SERVER['PHP_SELF']);
 
+require_once __DIR__ . '/status_helper.php';
+require_once __DIR__ . '/pagination_helper.php';
+
+// Shared UI layer — emitted here (body partial) since customer pages
+// each own their <head>. Guarded against double-inclusion.
+if (!defined('ACPC_UI_ASSETS')) {
+    define('ACPC_UI_ASSETS', true);
+    echo '<link rel="stylesheet" href="assets/css/ui.css">' . "\n";
+    echo '<script src="assets/js/pager.js" defer></script>' . "\n";
+}
+
 $healthScoreNotificationCount = 0;
 $unreadHealthCount = 0;
 $customerNotificationItems = [];

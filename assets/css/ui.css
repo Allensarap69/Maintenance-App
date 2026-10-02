@@ -1,0 +1,237 @@
+/* ==========================================================
+   Shared UI layer — loaded on every portal page via the
+   sidebar templates (admin / mechanic / customer).
+
+   Contains:
+   1. Canonical status color tokens (single source of truth)
+   2. .st-badge component + status_key() classes from
+      status_helper.php
+   3. Legacy .status-* class normalization so every page
+      renders the same palette
+   4. Accessibility: :focus-visible ring, mobile tap targets,
+      input anti-zoom
+   5. Pagination controls (.pager / .pg-*), used by
+      pagination_helper.php and assets/js/pager.js
+   ========================================================== */
+
+/* ---------- 1. Canonical status tokens ---------- */
+:root {
+    --st-pending-bg:  #fef3c7; --st-pending-fg:  #b45309;
+    --st-progress-bg: #dbeafe; --st-progress-fg: #1d4ed8;
+    --st-success-bg:  #d1fae5; --st-success-fg:  #047857;
+    --st-danger-bg:   #fee2e2; --st-danger-fg:   #b91c1c;
+    --st-warning-bg:  #ffedd5; --st-warning-fg:  #c2410c;
+    --st-neutral-bg:  #e2e8f0; --st-neutral-fg:  #475569;
+}
+
+html[data-theme="dark"] {
+    --st-pending-bg:  rgba(234, 179, 8, .15);  --st-pending-fg:  #fde047;
+    --st-progress-bg: rgba(59, 130, 246, .18); --st-progress-fg: #93c5fd;
+    --st-success-bg:  rgba(16, 185, 129, .15); --st-success-fg:  #34d399;
+    --st-danger-bg:   rgba(239, 68, 68, .15);  --st-danger-fg:   #f87171;
+    --st-warning-bg:  rgba(249, 115, 22, .18); --st-warning-fg:  #fdba74;
+    --st-neutral-bg:  rgba(148, 163, 184, .15); --st-neutral-fg: #cbd5e1;
+}
+
+/* ---------- 2. Canonical badge component ---------- */
+.st-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .3rem .7rem;
+    border-radius: 999px;
+    font-size: .78rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+}
+.st-badge .st-dot {
+    width: .45rem;
+    height: .45rem;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+.st-pending  { background: var(--st-pending-bg)  !important; color: var(--st-pending-fg)  !important; }
+.st-progress { background: var(--st-progress-bg) !important; color: var(--st-progress-fg) !important; }
+.st-success  { background: var(--st-success-bg)  !important; color: var(--st-success-fg)  !important; }
+.st-danger   { background: var(--st-danger-bg)   !important; color: var(--st-danger-fg)   !important; }
+.st-warning  { background: var(--st-warning-bg)  !important; color: var(--st-warning-fg)  !important; }
+.st-neutral  { background: var(--st-neutral-bg)  !important; color: var(--st-neutral-fg)  !important; }
+
+/* ---------- 3. Legacy .status-* normalization ----------
+   Pages define their own pill styles with inconsistent
+   colors. The !important bindings below enforce the
+   canonical palette everywhere. */
+.status-pending,
+.status-unassigned,
+.status-awaiting-deposit,
+.status-deposit-submitted,
+.status-for-verification {
+    background: var(--st-pending-bg)  !important;
+    color: var(--st-pending-fg)       !important;
+    border-color: var(--st-pending-fg) !important;
+}
+.status-accepted,
+.status-approved,
+.status-assigned,
+.status-confirmed,
+.status-in-progress,
+.status-ongoing,
+.status-scheduled,
+.status-rescheduled,
+.status-low {
+    background: var(--st-progress-bg) !important;
+    color: var(--st-progress-fg)      !important;
+    border-color: var(--st-progress-fg) !important;
+}
+.status-completed,
+.status-active,
+.status-available,
+.status-paid,
+.status-good,
+.status-excellent,
+.status-claimed {
+    background: var(--st-success-bg)  !important;
+    color: var(--st-success-fg)       !important;
+    border-color: var(--st-success-fg) !important;
+}
+.status-rejected,
+.status-deposit-rejected,
+.status-cancelled,
+.status-canceled,
+.status-declined,
+.status-failed,
+.status-poor,
+.status-critical,
+.status-emergency,
+.status-overdue {
+    background: var(--st-danger-bg)   !important;
+    color: var(--st-danger-fg)        !important;
+    border-color: var(--st-danger-fg) !important;
+}
+.status-attention,
+.status-needs-attention,
+.status-warning,
+.status-fair,
+.status-medium,
+.status-high,
+.status-busy,
+.status-for-approval {
+    background: var(--st-warning-bg)  !important;
+    color: var(--st-warning-fg)       !important;
+    border-color: var(--st-warning-fg) !important;
+}
+.status-expired,
+.status-inactive,
+.status-archived,
+.status-draft,
+.status-void,
+.status-closed {
+    background: var(--st-neutral-bg)  !important;
+    color: var(--st-neutral-fg)       !important;
+    border-color: var(--st-neutral-fg) !important;
+}
+
+/* ---------- 4. Accessibility + mobile ---------- */
+:focus-visible {
+    outline: 2px solid #f59e0b;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+.btn:focus-visible,
+.nav-link:focus-visible,
+a:focus-visible {
+    outline-offset: 3px;
+}
+
+@media (max-width: 576px) {
+    /* Stop iOS auto-zoom on form focus */
+    input:not([type="checkbox"]):not([type="radio"]),
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+    /* Minimum comfortable tap targets */
+    .btn { min-height: 44px; }
+    .btn-sm, .btn-group-sm > .btn { min-height: 36px; }
+    /* Long unbroken strings (emails, plates) never overflow */
+    .card, .table td { overflow-wrap: anywhere; }
+}
+
+/* ---------- 5. Pagination controls ---------- */
+.pager {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+    padding: .25rem 0;
+}
+.pager-info {
+    font-size: .85rem;
+    color: var(--text-light, #64748b);
+}
+html[data-theme="dark"] .pager-info { color: #94a3b8; }
+
+.pager-nav {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    flex-wrap: wrap;
+}
+.pager-btn,
+.pager-page {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 0 .65rem;
+    border-radius: 8px;
+    border: 1px solid var(--card-border, #e2e8f0);
+    background: var(--card-bg, #fff);
+    color: var(--text-dark, #1e293b);
+    font-size: .85rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.pager-btn:hover,
+.pager-page:hover {
+    border-color: #f59e0b;
+    color: #b45309;
+}
+.pager-page.pg-current,
+.pager-page.pg-current:hover {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    border-color: #0f172a;
+    color: #fff;
+    cursor: default;
+}
+.pager-btn.pg-disabled {
+    opacity: .4;
+    pointer-events: none;
+}
+.pager-ellipsis {
+    padding: 0 .25rem;
+    color: #94a3b8;
+    font-size: .85rem;
+    user-select: none;
+}
+html[data-theme="dark"] .pager-btn,
+html[data-theme="dark"] .pager-page {
+    background: #16233f;
+    border-color: rgba(255, 255, 255, .09);
+    color: #e2e8f0;
+}
+html[data-theme="dark"] .pager-page.pg-current {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border-color: #f59e0b;
+    color: #0f172a;
+}
+
+/* Client-side pager hide (assets/js/pager.js) */
+.pg-off { display: none !important; }

@@ -1199,6 +1199,14 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
     </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.attachPager) {
+        attachPager({ items: '.mb-booking-card', container: '#bookingGrid', perPage: 12 });
+    }
+});
+</script>
+
 <?php require 'admin_sidebar_footer.php'; ?>
 
 <!-- Lucide Icons Script -->

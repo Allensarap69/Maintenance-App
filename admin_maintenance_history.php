@@ -687,12 +687,12 @@ $pageTitle = 'Maintenance History Management';
     /* Dark mode overrides */
     html.dark-mode .mh-content .table { color: #e2e8f0 !important; }
     html.dark-mode .mh-content .table thead th {
-        background-color: #1a2540 !important;
+        background-color: #22335a !important;
         color: #93c5fd !important;
         border-bottom-color: rgba(255, 255, 255, 0.12) !important;
     }
     html.dark-mode .mh-content .table tbody tr {
-        background: #151f36 !important;
+        background: #1a2b4f !important;
         border-bottom-color: rgba(255, 255, 255, 0.08) !important;
     }
     html.dark-mode .mh-content,

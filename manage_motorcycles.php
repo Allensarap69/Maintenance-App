@@ -891,9 +891,9 @@ require 'admin_sidebar_template.php';
     }
 
     /* Dark mode overrides */
-    html.dark-mode .moto-card { background: #151f36 !important; border-color: rgba(255, 255, 255, 0.12) !important; color: #e2e8f0 !important; }
+    html.dark-mode .moto-card { background: #1a2b4f !important; border-color: rgba(255, 255, 255, 0.12) !important; color: #e2e8f0 !important; }
     html.dark-mode .moto-list-header {
-        background: #1a2540 !important;
+        background: #22335a !important;
         color: #93c5fd !important;
         border-bottom-color: rgba(255, 255, 255, 0.09) !important;
     }
@@ -908,20 +908,20 @@ require 'admin_sidebar_template.php';
     html.dark-mode .moto-status.archived { background: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
 
     /* Model picker dropdown */
-    html.dark-mode .model-picker-toggle { background: #0f1a30 !important; border-color: #33415f !important; color: #e2e8f0 !important; }
+    html.dark-mode .model-picker-toggle { background: #16233f !important; border-color: #3b4d7d !important; color: #e2e8f0 !important; }
     html.dark-mode .model-picker-toggle:hover,
     html.dark-mode .model-picker-toggle.open { border-color: #FACC15 !important; }
     html.dark-mode .model-picker-caret { color: #94a3b8 !important; }
-    html.dark-mode .model-picker-menu { background: #1a2540 !important; border-color: rgba(255, 255, 255, 0.1) !important; }
-    html.dark-mode .model-picker-option { background: #1a2540 !important; color: #e2e8f0 !important; }
-    html.dark-mode .model-picker-option:hover { background: #22304f !important; }
+    html.dark-mode .model-picker-menu { background: #22335a !important; border-color: rgba(255, 255, 255, 0.1) !important; }
+    html.dark-mode .model-picker-option { background: #22335a !important; color: #e2e8f0 !important; }
+    html.dark-mode .model-picker-option:hover { background: #2a3d6b !important; }
     html.dark-mode .model-picker-option .model-picker-other-icon { color: #94a3b8 !important; }
     html.dark-mode .model-picker-thumb,
-    html.dark-mode .model-picker-option img { mix-blend-mode: normal; }
+    html.dark-mode .model-picker-option img { mix-blend-mode: normal; background: transparent; }
 
     /* Motorcycle photo thumbs */
     html.dark-mode .moto-thumb, html.dark-mode .view-moto-image img,
-    html.dark-mode .edit-moto-preview { mix-blend-mode: normal; }
+    html.dark-mode .edit-moto-preview { mix-blend-mode: normal; background: transparent; }
 
     /* Floating alerts */
     html.dark-mode .floating-alert.success { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; border-color: rgba(16, 185, 129, 0.35) !important; }

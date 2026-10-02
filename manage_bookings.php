@@ -922,8 +922,8 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
     html.dark-mode .mb-search,
     html.dark-mode .mb-filter-bar select,
     html.dark-mode .mb-filter-bar input[type="date"] {
-        background: #0f1a30;
-        border-color: #33415f;
+        background: #16233f;
+        border-color: #3b4d7d;
         color: #e2e8f0;
     }
     html.dark-mode .mb-search input { color: #e2e8f0; }
@@ -950,14 +950,14 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
     html.dark-mode .mb-action-btn.primary { color: #60a5fa; }
 
     html.dark-mode .modal-header.glass-modal-header {
-        background: #1a2540 !important;
+        background: #22335a !important;
         color: #e2e8f0;
         border-bottom-color: rgba(255, 255, 255, 0.09) !important;
     }
     html.dark-mode .modal-header.glass-modal-header .modal-title,
     html.dark-mode .modal-header.glass-modal-header h5 { color: #e2e8f0; }
     html.dark-mode .glass-modal .btn-close { filter: invert(1); opacity: 0.8; }
-    html.dark-mode .modal-detail-card { background: #0f1a30; border-color: rgba(255, 255, 255, 0.09); }
+    html.dark-mode .modal-detail-card { background: #16233f; border-color: rgba(255, 255, 255, 0.09); }
 </style>
 
 <div class="manage-bookings-page">

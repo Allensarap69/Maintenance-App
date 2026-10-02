@@ -625,7 +625,7 @@ $pageTitle = 'Mechanic Assignment';
     }
     #mechanicStatsModal .workload-rows::-webkit-scrollbar { width: 6px; }
     #mechanicStatsModal .workload-rows::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); border-radius: 3px; }
-    html.dark-mode #mechanicStatsModal .workload-rows::-webkit-scrollbar-thumb { background: #33415f; }
+    html.dark-mode #mechanicStatsModal .workload-rows::-webkit-scrollbar-thumb { background: #3b4d7d; }
 </style>
 
 <div class="container-fluid">

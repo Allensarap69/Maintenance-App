@@ -1873,6 +1873,110 @@ $alerts = array_slice($alerts, 0, 5);
             .veh-chip { min-width: 100%; }
             .vov-ring { width: 95px; height: 95px; }
         }
+
+        /* ===== Dark mode overrides ===== */
+        /* Stat / quick-link cards */
+        html.dark-mode .dc-card.dc-navy,
+        html.dark-mode .dc-card.dc-gold,
+        html.dark-mode .dc-card.dc-amber,
+        html.dark-mode .dc-card.dc-blue {
+            background: linear-gradient(135deg, #22335a 0%, #1a2b4f 100%) !important;
+        }
+        html.dark-mode .dc-icon, html.dark-mode .dc-arrow { background: #22335a !important; }
+        html.dark-mode .dc-navy .dc-icon, html.dark-mode .dc-navy .dc-arrow { color: #93c5fd !important; }
+        html.dark-mode .dc-title { color: #cbd5e1 !important; }
+        html.dark-mode .dc-moto-bg { color: rgba(255, 255, 255, 0.05) !important; }
+
+        /* Vehicle switcher chips */
+        html.dark-mode .veh-switch-head h2 { color: #e2e8f0 !important; }
+        html.dark-mode .veh-switch-link { color: #94a3b8 !important; }
+        html.dark-mode .veh-switch-link:hover { color: #FDE047 !important; }
+        html.dark-mode .veh-chip { background: #1a2b4f !important; border-color: rgba(255, 255, 255, 0.12) !important; }
+        html.dark-mode .veh-chip:hover { border-color: rgba(59, 130, 246, 0.5) !important; }
+        html.dark-mode .veh-chip.selected { border-color: #FACC15 !important; background: rgba(250, 204, 21, 0.08) !important; }
+        html.dark-mode .veh-chip-img { background: transparent !important; color: #94a3b8 !important; }
+        html.dark-mode .veh-chip-img img { mix-blend-mode: normal; }
+        html.dark-mode .veh-chip-name { color: #e2e8f0 !important; }
+        html.dark-mode .veh-chip-plate { color: #94a3b8 !important; }
+        html.dark-mode .veh-chip-badge { background: rgba(250, 204, 21, 0.2) !important; color: #FDE047 !important; }
+        html.dark-mode .veh-chip-caret { color: #64748b !important; }
+        html.dark-mode .veh-chip-add { color: #93c5fd !important; }
+        html.dark-mode .veh-chip-add:hover { border-color: #93c5fd !important; }
+
+        /* Vehicle overview card */
+        html.dark-mode .vov-card, html.dark-mode .stl-card,
+        html.dark-mode .ua-card, html.dark-mode .al-card,
+        html.dark-mode .tip-card, html.dark-mode .qa-bar,
+        html.dark-mode .no-motorcycles {
+            background: #1a2b4f !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: #e2e8f0 !important;
+        }
+        html.dark-mode .vov-head h3, html.dark-mode .stl-head h3,
+        html.dark-mode .ua-head h3, html.dark-mode .al-head h3,
+        html.dark-mode .vov-comps-title, html.dark-mode .vov-bike-name,
+        html.dark-mode .vov-comp-name, html.dark-mode .ua-service-name,
+        html.dark-mode .al-title, html.dark-mode .tip-text strong,
+        html.dark-mode .stl-type, html.dark-mode .vov-ring span,
+        html.dark-mode .no-motorcycles h3 { color: #e2e8f0 !important; }
+        html.dark-mode .vov-bike-plate, html.dark-mode .vov-type,
+        html.dark-mode .vov-health-label, html.dark-mode .vov-ring small,
+        html.dark-mode .stl-date, html.dark-mode .stl-sub,
+        html.dark-mode .stl-empty, html.dark-mode .ua-service-bike,
+        html.dark-mode .ua-meta, html.dark-mode .ua-empty,
+        html.dark-mode .al-sub, html.dark-mode .tip-text p,
+        html.dark-mode .no-motorcycles p { color: #94a3b8 !important; }
+        html.dark-mode .ua-head-ico, html.dark-mode .al-head-ico,
+        html.dark-mode .ua-link, html.dark-mode .stl-link { color: #93c5fd !important; }
+        html.dark-mode .ua-link:hover, html.dark-mode .stl-link:hover { color: #FDE047 !important; }
+        html.dark-mode .ua-body { background: #16233f !important; }
+        html.dark-mode .ua-service-ico { background: rgba(59, 130, 246, 0.15) !important; }
+        html.dark-mode .vov-bike-img { background: transparent !important; }
+        html.dark-mode .vov-bike-img img { mix-blend-mode: normal; }
+        html.dark-mode .vov-status { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+        html.dark-mode .vov-health-cond.good { color: #34d399 !important; }
+        html.dark-mode .vov-health-cond.fair { color: #FDE047 !important; }
+        html.dark-mode .vov-health-cond.bad { color: #f87171 !important; }
+        html.dark-mode .vov-comp { border-color: rgba(255, 255, 255, 0.09) !important; }
+        html.dark-mode .vov-comp-ico.good { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+        html.dark-mode .vov-comp-ico.fair { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
+        html.dark-mode .vov-comp-ico.bad { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+        html.dark-mode .vov-comp-pill.good { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+        html.dark-mode .vov-comp-pill.fair { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
+        html.dark-mode .vov-comp-pill.bad { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+        html.dark-mode .vov-comp-caret, html.dark-mode .al-caret { color: #64748b !important; }
+
+        /* Service timeline */
+        html.dark-mode .stl-head-ico { background: #22335a !important; color: #93c5fd !important; }
+        html.dark-mode .stl-item::before { background: #3b4d7d !important; }
+        html.dark-mode .stl-item.completed::before { background: #10B981 !important; }
+        html.dark-mode .stl-dot { box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2) !important; }
+        html.dark-mode .stl-item.upcoming .stl-dot { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important; }
+        html.dark-mode .stl-item.current .stl-dot { box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.25) !important; }
+        html.dark-mode .stl-item.upcoming .stl-type { color: #94a3b8 !important; }
+        html.dark-mode .stl-pill { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+        html.dark-mode .stl-pill.upcoming { background: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; }
+        html.dark-mode .stl-pill.current { background: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
+
+        /* Alerts & tip cards */
+        html.dark-mode .al-count { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+        html.dark-mode .al-item { background: #22335a !important; border-color: rgba(255, 255, 255, 0.09) !important; }
+        html.dark-mode .al-ico.red { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+        html.dark-mode .al-ico.amber { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
+        html.dark-mode .tip-ico { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
+
+        /* Health ring inner disc + track */
+        html.dark-mode .vov-ring {
+            background:
+                radial-gradient(closest-side, #1a2b4f 80%, transparent 81% 100%),
+                conic-gradient(var(--c, #10B981) calc(var(--p, 0) * 1%), #3b4d7d 0) !important;
+        }
+
+        /* Quick action bar */
+        html.dark-mode .qa-label { color: #e2e8f0 !important; }
+        html.dark-mode .qa-item { color: #cbd5e1 !important; }
+        html.dark-mode .qa-item i { color: #94a3b8 !important; }
+        html.dark-mode .qa-item:hover { background: #2a3d6b !important; color: #FDE047 !important; }
     </style>
 </head>
 <body>

@@ -844,7 +844,7 @@ $pageTitle = 'Maintenance Management';
     html.dark-mode .vehicle-header { color: #cbd5e1 !important; }
     html.dark-mode .vehicle-header:hover { color: #e2e8f0 !important; }
     html.dark-mode .vehicle-header.active { background: #FACC15 !important; color: #111827 !important; }
-    html.dark-mode .timeline-track::before { background: #33415f !important; }
+    html.dark-mode .timeline-track::before { background: #3b4d7d !important; }
     html.dark-mode .service-card .type { color: #e2e8f0 !important; }
     html.dark-mode .service-card .plate { color: #94a3b8 !important; }
     html.dark-mode .service-card .badge-completed { background: rgba(34, 197, 94, 0.15) !important; color: #4ade80 !important; }
@@ -855,10 +855,10 @@ $pageTitle = 'Maintenance Management';
     html.dark-mode .action-card.overdue { background: rgba(239, 68, 68, 0.08) !important; }
     html.dark-mode .action-card .meta { color: #94a3b8 !important; }
     html.dark-mode .empty-state { color: #94a3b8 !important; }
-    html.dark-mode .customer-motorcycle { background: #1a2540 !important; }
-    html.dark-mode .maintenance-timeline .timeline-content { background: #151f36 !important; }
+    html.dark-mode .customer-motorcycle { background: #22335a !important; }
+    html.dark-mode .maintenance-timeline .timeline-content { background: #1a2b4f !important; }
     html.dark-mode .maintenance-timeline .timeline-dot,
-    html.dark-mode .maintenance-timeline .timeline-item.scheduled .timeline-dot { background: #151f36 !important; }
+    html.dark-mode .maintenance-timeline .timeline-item.scheduled .timeline-dot { background: #1a2b4f !important; }
     html.dark-mode .maintenance-timeline .timeline-badge.current { background: rgba(255, 255, 255, 0.12) !important; color: #e2e8f0 !important; }
 </style>
 

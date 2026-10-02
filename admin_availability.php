@@ -303,27 +303,27 @@ $pageTitle = 'Availability Setup';
 
     /* Dark mode overrides */
     html.dark-mode .date-header {
-        background-color: #1a2540 !important;
+        background-color: #22335a !important;
         color: #93c5fd !important;
         border-bottom-color: rgba(255, 255, 255, 0.09) !important;
     }
     html.dark-mode .time-segment {
-        background: #151f36 !important;
+        background: #1a2b4f !important;
         border-bottom-color: rgba(255, 255, 255, 0.09) !important;
         color: #e2e8f0 !important;
     }
-    html.dark-mode .time-segment:hover { background: #1a2540 !important; }
+    html.dark-mode .time-segment:hover { background: #22335a !important; }
     html.dark-mode .month-filter-container {
-        background: #151f36 !important;
+        background: #1a2b4f !important;
         border-bottom-color: rgba(255, 255, 255, 0.09) !important;
     }
     html.dark-mode .month-btn {
-        background: #1a2540 !important;
+        background: #22335a !important;
         color: #94a3b8 !important;
-        border-color: #33415f !important;
+        border-color: #3b4d7d !important;
     }
-    html.dark-mode .month-btn:hover { background: #22304f !important; }
-    html.dark-mode .month-btn.active { background: #22304f !important; color: #FDE047 !important; border-color: #33415f !important; }
+    html.dark-mode .month-btn:hover { background: #2a3d6b !important; }
+    html.dark-mode .month-btn.active { background: #2a3d6b !important; color: #FDE047 !important; border-color: #3b4d7d !important; }
     html.dark-mode .main-content .card-setup h5,
     html.dark-mode .card-setup input[name="date_type"]:checked + .form-check-label { color: #e2e8f0 !important; }
     html.dark-mode .av-card-header { color: #e2e8f0 !important; }

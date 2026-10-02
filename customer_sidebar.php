@@ -143,6 +143,13 @@ $healthScoreNotificationCount = $unreadHealthCount;
 $totalNotificationCount = count($customerNotificationItems);
 ?>
 
+<script>
+    // Apply saved theme before the page paints to avoid a light-theme flash
+    if (localStorage.getItem('customerDarkMode') === '1') {
+        document.documentElement.classList.add('dark-mode');
+    }
+</script>
+
 <!-- Sidebar CSS -->
 <style>
     /* --- Global Styles --- */
@@ -1059,6 +1066,502 @@ $totalNotificationCount = count($customerNotificationItems);
     .dropdown-header-name { font-size: 0.82rem; }
     .dropdown-header-role { font-size: 0.68rem; }
     .top-bar-user-dropdown .dropdown-item { font-size: 0.8rem; }
+
+    /* ===== DARK MODE ===== */
+    .dark-mode-toggle {
+        background: transparent;
+        border: none;
+        color: var(--text-dark, #1e293b);
+        font-size: 1.15rem;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        margin-right: 4px;
+    }
+    .dark-mode-toggle:hover {
+        background: rgba(148, 163, 184, 0.28);
+        transform: translateY(-1px);
+    }
+    html.dark-mode .dark-mode-toggle { color: #FACC15; }
+    html.dark-mode .dark-mode-toggle:hover { background: rgba(250, 204, 21, 0.12); }
+
+    html.dark-mode {
+        color-scheme: dark;
+        --bg-light: #101f3c;
+        --bg-dark: #101f3c;
+        --bg-card: #1a2b4f;
+        --card-bg: #1a2b4f;
+        --bg-darker: #16233f;
+        --text-dark: #e2e8f0;
+        --text-light: #94a3b8;
+        --text-muted: #94a3b8;
+        --text-main: #e2e8f0;
+        --text-sub: #94a3b8;
+        --card-border: rgba(255, 255, 255, 0.09);
+        --border-color: rgba(255, 255, 255, 0.09);
+        --border-highlight: rgba(250, 204, 21, 0.35);
+        --bg-canvas: #101f3c;
+        --bg-card-hover: #22335a;
+    }
+
+    html.dark-mode body { background: #101f3c !important; color: #e2e8f0 !important; }
+    html.dark-mode .main-content { background: #101f3c !important; }
+    html.dark-mode body .main-content { color: #e2e8f0 !important; }
+    html.dark-mode .content-area { background: #101f3c !important; }
+
+    /* Sidebar - blends seamlessly into the page background */
+    html.dark-mode .sidebar {
+        background: #101f3c !important;
+        box-shadow: none !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.07) !important;
+    }
+    html.dark-mode .sidebar-footer { background: transparent !important; border-top-color: rgba(255, 255, 255, 0.07) !important; }
+
+    /* Top bar - same navy as sidebar for a unified frame */
+    html.dark-mode .top-bar { background: #101f3c !important; box-shadow: none !important; }
+    html.dark-mode .top-bar-title { color: #e2e8f0 !important; }
+    html.dark-mode .top-bar-user:hover { background: rgba(255, 255, 255, 0.06) !important; }
+    html.dark-mode .top-bar-user-name { color: #e2e8f0 !important; }
+    html.dark-mode .top-bar-user-role { color: #94a3b8 !important; }
+    html.dark-mode .top-bar-dropdown-btn { color: #94a3b8 !important; }
+    html.dark-mode .notification-bell { color: #e2e8f0 !important; }
+    html.dark-mode .notification-bell:hover { background: rgba(255, 255, 255, 0.08) !important; }
+    html.dark-mode .notification-bell .badge { border-color: #0f172a !important; }
+
+    /* Notification dropdown */
+    html.dark-mode .notification-dropdown {
+        background: #22335a !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6) !important;
+    }
+    html.dark-mode .notification-dropdown-header { background: #22335a !important; border-bottom-color: rgba(255, 255, 255, 0.09) !important; }
+    html.dark-mode .nd-title { color: #e2e8f0 !important; }
+    html.dark-mode .nd-link { color: #60a5fa !important; }
+    html.dark-mode .notification-item { border-bottom-color: rgba(255, 255, 255, 0.06) !important; }
+    html.dark-mode .notification-item:hover { background: rgba(255, 255, 255, 0.05) !important; }
+    html.dark-mode .notification-item-title { color: #e2e8f0 !important; }
+    html.dark-mode .notification-item-message { color: #94a3b8 !important; }
+    html.dark-mode .notification-item-time { color: #64748b !important; }
+    html.dark-mode .notification-empty { color: #64748b !important; }
+    html.dark-mode .notification-empty > i { color: #3b4d7d !important; }
+    html.dark-mode .notification-empty .ne-title { color: #cbd5e1 !important; }
+    html.dark-mode .notification-list::-webkit-scrollbar-thumb { background: #3b4d7d !important; }
+
+    /* User dropdown */
+    html.dark-mode .top-bar-user-dropdown { background: #22335a !important; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6) !important; }
+    html.dark-mode .top-bar-user-dropdown .dropdown-header { background: #22335a !important; border-bottom-color: rgba(255, 255, 255, 0.09) !important; }
+    html.dark-mode .dropdown-header-name { color: #e2e8f0 !important; }
+    html.dark-mode .dropdown-header-role { color: #94a3b8 !important; }
+    html.dark-mode .top-bar-user-dropdown .dropdown-item { color: #e2e8f0 !important; }
+    html.dark-mode .top-bar-user-dropdown .dropdown-item:hover { background: rgba(250, 204, 21, 0.12) !important; color: #FDE047 !important; }
+    html.dark-mode .dropdown-item.danger { color: #f87171 !important; border-top-color: rgba(255, 255, 255, 0.09) !important; }
+    html.dark-mode .dropdown-item.danger:hover { background: rgba(239, 68, 68, 0.15) !important; color: #ef4444 !important; }
+
+    /* Cards & surfaces */
+    html.dark-mode .main-content .card,
+    html.dark-mode .modern-card,
+    html.dark-mode .stat-card,
+    html.dark-mode .card-glass {
+        background: #1a2b4f !important;
+        border-color: rgba(255, 255, 255, 0.09) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
+        color: #e2e8f0 !important;
+    }
+    html.dark-mode .main-content .card:hover,
+    html.dark-mode .modern-card:hover,
+    html.dark-mode .stat-card:hover {
+        background: #22335a !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45) !important;
+    }
+    html.dark-mode .card-header, html.dark-mode .card-footer {
+        background: rgba(255, 255, 255, 0.03) !important;
+        border-color: rgba(255, 255, 255, 0.09) !important;
+        color: #e2e8f0 !important;
+    }
+    html.dark-mode .card-header-gradient, html.dark-mode .card-header-accent { color: #fff !important; }
+    html.dark-mode .list-group-item {
+        background: rgba(255, 255, 255, 0.04) !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+        color: #e2e8f0 !important;
+    }
+    html.dark-mode .list-group-item:hover { background: rgba(255, 255, 255, 0.07) !important; }
+
+    /* Text colors */
+    html.dark-mode .main-content h1,
+    html.dark-mode .main-content h2,
+    html.dark-mode .main-content h3,
+    html.dark-mode .main-content h4,
+    html.dark-mode .main-content h5,
+    html.dark-mode .main-content h6,
+    html.dark-mode .stat-value { color: #e2e8f0 !important; }
+    html.dark-mode .text-muted,
+    html.dark-mode .text-secondary,
+    html.dark-mode .stat-label { color: #94a3b8 !important; }
+    html.dark-mode .text-dark { color: #e2e8f0 !important; }
+    html.dark-mode .bg-white, html.dark-mode .bg-light { background-color: #1a2b4f !important; }
+    html.dark-mode .border, html.dark-mode .border-top, html.dark-mode .border-bottom,
+    html.dark-mode .border-start, html.dark-mode .border-end, html.dark-mode hr { border-color: rgba(255, 255, 255, 0.09) !important; }
+    html.dark-mode hr { opacity: 0.4; }
+
+    /* Tables */
+    html.dark-mode .table {
+        --bs-table-color: #e2e8f0;
+        --bs-table-bg: transparent;
+        --bs-table-border-color: rgba(255, 255, 255, 0.09);
+        --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
+        --bs-table-striped-color: #e2e8f0;
+        --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
+        --bs-table-hover-color: #e2e8f0;
+        --bs-table-active-bg: rgba(255, 255, 255, 0.07);
+        --bs-table-active-color: #e2e8f0;
+        color: #e2e8f0;
+    }
+    html.dark-mode .table th, html.dark-mode .table td { color: #e2e8f0; border-color: rgba(255, 255, 255, 0.09); }
+
+    /* Forms */
+    html.dark-mode .form-control,
+    html.dark-mode .form-select,
+    html.dark-mode .form-control-modern,
+    html.dark-mode input[type="text"],
+    html.dark-mode input[type="email"],
+    html.dark-mode input[type="password"],
+    html.dark-mode input[type="number"],
+    html.dark-mode input[type="date"],
+    html.dark-mode input[type="time"],
+    html.dark-mode input[type="tel"],
+    html.dark-mode textarea,
+    html.dark-mode select {
+        background-color: #16233f !important;
+        color: #e2e8f0 !important;
+        border-color: #3b4d7d !important;
+    }
+    html.dark-mode .form-control::placeholder, html.dark-mode textarea::placeholder,
+    html.dark-mode .form-control-modern::placeholder { color: #64748b; }
+    html.dark-mode .form-control:focus, html.dark-mode .form-select:focus, html.dark-mode .form-control-modern:focus {
+        background-color: #132140 !important;
+        color: #e2e8f0 !important;
+        border-color: #FACC15 !important;
+        box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.15) !important;
+    }
+    html.dark-mode .form-control:disabled, html.dark-mode .form-control[readonly] { background-color: #22335a !important; color: #94a3b8 !important; }
+    html.dark-mode .form-check-input { background-color: #16233f; border-color: #3b4d7d; }
+    html.dark-mode .form-check-input:checked { background-color: #FACC15; border-color: #FACC15; }
+    html.dark-mode .form-label, html.dark-mode .form-check-label, html.dark-mode .form-text,
+    html.dark-mode .form-label-modern { color: #e2e8f0 !important; }
+    html.dark-mode .input-group-text { background-color: #22335a !important; color: #94a3b8 !important; border-color: #3b4d7d !important; }
+
+    /* Bootstrap dropdowns, modals, pagination, tabs */
+    html.dark-mode .dropdown-menu { background-color: #22335a; border-color: rgba(255, 255, 255, 0.1); }
+    html.dark-mode .dropdown-menu .dropdown-item { color: #e2e8f0; }
+    html.dark-mode .dropdown-menu .dropdown-item:hover,
+    html.dark-mode .dropdown-menu .dropdown-item:focus { background: rgba(250, 204, 21, 0.12); color: #FDE047; }
+    html.dark-mode .dropdown-menu .dropdown-divider { border-color: rgba(255, 255, 255, 0.09); }
+    html.dark-mode .modal-content { background-color: #1a2b4f; color: #e2e8f0; border-color: rgba(255, 255, 255, 0.1); }
+    html.dark-mode .modal-header { background: #1a2b4f !important; color: #e2e8f0 !important; }
+    html.dark-mode .modal-header .modal-title, html.dark-mode .modal-title { color: #e2e8f0 !important; }
+    html.dark-mode .modal-header, html.dark-mode .modal-footer { border-color: rgba(255, 255, 255, 0.09); }
+    html.dark-mode .btn-close { filter: invert(1); }
+    html.dark-mode .page-link { background-color: #22335a; border-color: rgba(255, 255, 255, 0.1); color: #e2e8f0; }
+    html.dark-mode .page-link:hover { background-color: #2a3d6b; color: #FDE047; }
+    html.dark-mode .page-item.active .page-link { background-color: #FACC15; border-color: #FACC15; color: #111827; }
+    html.dark-mode .page-item.disabled .page-link { background-color: #1a2b4f; color: #475569; border-color: rgba(255, 255, 255, 0.09); }
+    html.dark-mode .nav-tabs { border-color: rgba(255, 255, 255, 0.09); }
+    html.dark-mode .nav-tabs .nav-link { color: #94a3b8; }
+    html.dark-mode .nav-tabs .nav-link:hover { border-color: rgba(255, 255, 255, 0.15); color: #e2e8f0; }
+    html.dark-mode .nav-tabs .nav-link.active { background-color: #1a2b4f; color: #FACC15; border-color: rgba(255, 255, 255, 0.09) rgba(255, 255, 255, 0.09) #1a2b4f; }
+    html.dark-mode .accordion-item { background-color: #1a2b4f; color: #e2e8f0; border-color: rgba(255, 255, 255, 0.09); }
+    html.dark-mode .accordion-button { background-color: #22335a; color: #e2e8f0; }
+    html.dark-mode .accordion-button:not(.collapsed) { background-color: #2a3d6b; color: #FDE047; }
+    html.dark-mode .accordion-button::after { filter: invert(1); }
+    html.dark-mode .badge.bg-light, html.dark-mode .badge.text-bg-light { background-color: #2a3d6b !important; color: #cbd5e1 !important; }
+    html.dark-mode .badge.bg-secondary, html.dark-mode .badge.text-bg-secondary { background-color: #3b4d7d !important; }
+
+    /* Alerts */
+    html.dark-mode .alert-success { background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border-color: rgba(16, 185, 129, 0.3); }
+    html.dark-mode .alert-danger { background: rgba(239, 68, 68, 0.12); color: #fca5a5; border-color: rgba(239, 68, 68, 0.3); }
+    html.dark-mode .alert-warning { background: rgba(245, 158, 11, 0.12); color: #fcd34d; border-color: rgba(245, 158, 11, 0.3); }
+    html.dark-mode .alert-info { background: rgba(59, 130, 246, 0.12); color: #93c5fd; border-color: rgba(59, 130, 246, 0.3); }
+    html.dark-mode .alert-secondary { background: rgba(148, 163, 184, 0.12); color: #cbd5e1; border-color: rgba(148, 163, 184, 0.3); }
+
+    /* Customer template components */
+    html.dark-mode .navbar-custom { background: rgba(21, 31, 54, 0.95) !important; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5) !important; }
+    html.dark-mode .nav-link { color: #cbd5e1 !important; }
+    html.dark-mode .btn-outline-custom { border-color: #475569; color: #cbd5e1; }
+    html.dark-mode .btn-logout { border-color: #475569; color: #cbd5e1; }
+    html.dark-mode .btn-logout:hover { background: #dc3545; border-color: #dc3545; color: #fff; }
+
+    /* SweetAlert2 popup */
+    html.dark-mode .swal2-popup { background: #22335a; color: #e2e8f0; }
+    html.dark-mode .swal2-title, html.dark-mode .swal2-html-container { color: #e2e8f0; }
+    html.dark-mode .swal2-input, html.dark-mode .swal2-select, html.dark-mode .swal2-textarea {
+        background-color: #16233f; color: #e2e8f0; border-color: #3b4d7d;
+    }
+
+    /* ===== Module-wide surfaces (customer pages) ===== */
+    /* Card-level containers */
+    html.dark-mode .card-summary, html.dark-mode .payment-option-card,
+    html.dark-mode .booking-stepper, html.dark-mode .warranty-card,
+    html.dark-mode .claim-card, html.dark-mode .emergency-card,
+    html.dark-mode .emergency-table, html.dark-mode .empty-state,
+    html.dark-mode .card-custom, html.dark-mode .price-summary,
+    html.dark-mode .service-tabs, html.dark-mode .booking-list-item,
+    html.dark-mode .booking-box, html.dark-mode .vhealth-card,
+    html.dark-mode .action-card, html.dark-mode .service-record-card,
+    html.dark-mode .moto-list-item, html.dark-mode .timeline-content,
+    html.dark-mode .card-header-custom, html.dark-mode .health-card,
+    html.dark-mode .time-slot-card, html.dark-mode .transaction-ref-box,
+    html.dark-mode .schedule-box, html.dark-mode .view-toggle .btn,
+    html.dark-mode .service-card {
+        background: #1a2b4f !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        color: #e2e8f0 !important;
+    }
+    /* Inner chips/panels (sit inside cards) */
+    html.dark-mode .dc-icon, html.dark-mode .dc-arrow,
+    html.dark-mode .step-circle, html.dark-mode .factor-item,
+    html.dark-mode .breakdown-box, html.dark-mode .status-block,
+    html.dark-mode .sr-plate, html.dark-mode .timeline-dot,
+    html.dark-mode .vhealth-bar, html.dark-mode .booking-list-footer,
+    html.dark-mode .booking-box-footer, html.dark-mode .sr-media,
+    html.dark-mode .slot-panel-header, html.dark-mode #timeSlots,
+    html.dark-mode .progress-bar-custom, html.dark-mode .sr-btn,
+    html.dark-mode .vehicle-header {
+        background: #22335a !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        color: #e2e8f0 !important;
+    }
+    html.dark-mode .moto-list-item:hover { background: #22335a !important; }
+    html.dark-mode .moto-list-item.active { background: #3b82f6 !important; color: #fff !important; }
+
+    /* Hardcoded dark text -> light */
+    html.dark-mode .dc-title, html.dark-mode .dc-value,
+    html.dark-mode .vhealth-head h3, html.dark-mode .vh-name,
+    html.dark-mode .vhealth-cond-head, html.dark-mode .vhealth-bike,
+    html.dark-mode .vehicle-title, html.dark-mode .service-card .type,
+    html.dark-mode .service-card .mileage, html.dark-mode .moto-list-title,
+    html.dark-mode .timeline-badge.current {
+        color: #e2e8f0 !important;
+    }
+    html.dark-mode .booking-number { background: #FACC15 !important; color: #111827 !important; }
+    html.dark-mode .timeline-badge.current { background: rgba(255, 255, 255, 0.12) !important; }
+    html.dark-mode .dc-meta, html.dark-mode .vhealth-plate,
+    html.dark-mode .vehicle-meta, html.dark-mode .service-card .plate,
+    html.dark-mode .moto-list-subtitle, html.dark-mode .mechanic-names,
+    html.dark-mode .step-label { color: #94a3b8 !important; }
+    html.dark-mode .mechanic-names strong { color: #e2e8f0 !important; }
+    html.dark-mode .dc-navy .dc-icon, html.dark-mode .dc-navy .dc-arrow,
+    html.dark-mode .vhealth-link, html.dark-mode .slot-panel-header { color: #93c5fd !important; }
+    html.dark-mode .group-header { background-color: #22335a !important; color: #e2e8f0 !important; }
+    html.dark-mode .summary-title { color: #e2e8f0 !important; }
+    html.dark-mode .skills-link { color: #93c5fd !important; }
+    html.dark-mode .mechanic-selection input[type="checkbox"] { accent-color: #FACC15; }
+    html.dark-mode .vhealth-link { background: rgba(59, 130, 246, 0.15) !important; }
+    html.dark-mode .vhealth-link:hover { background: rgba(59, 130, 246, 0.25) !important; color: #93c5fd !important; }
+    html.dark-mode .vhealth-bar { background: #3b4d7d !important; }
+    html.dark-mode .vh-ico.good { background: rgba(16, 185, 129, 0.15) !important; }
+    html.dark-mode .vh-ico.fair { background: rgba(245, 158, 11, 0.15) !important; }
+    html.dark-mode .vh-ico.bad { background: rgba(239, 68, 68, 0.15) !important; }
+    html.dark-mode .timeline-track::before { background: #3b4d7d !important; }
+    html.dark-mode .service-card .badge-completed { background: rgba(34, 197, 94, 0.15) !important; color: #4ade80 !important; }
+    html.dark-mode .service-card .badge-pending { background: rgba(148, 163, 184, 0.15) !important; color: #cbd5e1 !important; }
+
+    /* Steppers (confirm_payment, view_availability) */
+    html.dark-mode .stepper-line { background: #3b4d7d !important; }
+    html.dark-mode .stepper-line-progress { background: #FACC15 !important; }
+    html.dark-mode .step-circle { color: #94a3b8 !important; }
+    html.dark-mode .step.active .step-circle { background: #FACC15 !important; border-color: #FACC15 !important; color: #111827 !important; }
+    html.dark-mode .step.completed .step-circle { background: #22335a !important; border-color: #3b4d7d !important; }
+    html.dark-mode .step.active .step-label, html.dark-mode .step.completed .step-label { color: #FDE047 !important; }
+
+    /* my_bookings specifics */
+    html.dark-mode .booking-list-header { border-bottom-color: rgba(255, 255, 255, 0.09) !important; }
+    html.dark-mode .service-package-item { color: #e2e8f0 !important; }
+    html.dark-mode .nav-tabs .nav-link { background-color: transparent !important; }
+    html.dark-mode .payment-pending-box { background: rgba(59, 130, 246, 0.12) !important; color: #93c5fd !important; }
+    html.dark-mode .view-toggle .btn.active { background: var(--primary-color, #FACC15) !important; color: #fff !important; border-color: var(--primary-color, #FACC15) !important; }
+    html.dark-mode .view-toggle .btn:hover:not(.active) { background: #2a3d6b !important; }
+
+    /* Priority / status pill pastels -> translucent dark */
+    html.dark-mode .priority-urgent { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+    html.dark-mode .priority-high { background: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
+    html.dark-mode .priority-medium { background: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; }
+    html.dark-mode .priority-low { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html.dark-mode .sr-status-pending { color: #FDE047 !important; }
+    html.dark-mode .timeline-badge.scheduled { background: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
+    html.dark-mode .timeline-badge.completed, html.dark-mode .timeline-badge.past { color: #4ade80 !important; }
+
+    /* FullCalendar (available.php) */
+    html.dark-mode .fc { --fc-page-bg-color: #101f3c; --fc-border-color: rgba(255, 255, 255, 0.12); --fc-neutral-bg-color: #22335a; --fc-today-bg-color: rgba(250, 204, 21, 0.08); color: #e2e8f0; }
+    html.dark-mode .fc .fc-daygrid-day-number, html.dark-mode .fc .fc-col-header-cell-cushion { color: #e2e8f0 !important; }
+    html.dark-mode .fc-toolbar-title { color: #e2e8f0 !important; }
+    html.dark-mode .fc-prev-button, html.dark-mode .fc-next-button,
+    html.dark-mode .fc .fc-button-group .fc-button,
+    html.dark-mode .fc .fc-button-group .fc-button-primary {
+        background-color: #22335a !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
+        color: #e2e8f0 !important;
+    }
+    html.dark-mode .fc-prev-button:hover, html.dark-mode .fc-next-button:hover,
+    html.dark-mode .fc .fc-button-group .fc-button:hover,
+    html.dark-mode .fc .fc-button-group .fc-button-primary:hover {
+        background-color: #FACC15 !important; border-color: #FACC15 !important; color: #111827 !important;
+    }
+    html.dark-mode .fc .fc-button-group .fc-button-active,
+    html.dark-mode .fc .fc-button-group .fc-button-primary:not(:disabled).fc-button-active {
+        background-color: #FACC15 !important; border-color: #FACC15 !important; color: #111827 !important;
+    }
+    html.dark-mode .service-time-display { color: #cbd5e1 !important; }
+    html.dark-mode .time-slot-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important; }
+    html.dark-mode #timeSlots::-webkit-scrollbar-thumb { background: #3b4d7d; }
+    html.dark-mode .initial-message { border-color: #10b981 !important; }
+    html.dark-mode .fc-day-unavailable, html.dark-mode .fc-day-past { background-color: rgba(255, 255, 255, 0.03) !important; }
+
+    /* book_service / select_mechanic options */
+    html.dark-mode .custom-control label { background-color: #1a2b4f !important; border-color: rgba(255, 255, 255, 0.12) !important; color: #e2e8f0 !important; }
+    html.dark-mode .custom-control label:hover { background-color: rgba(250, 204, 21, 0.1) !important; border-color: #FACC15 !important; }
+    html.dark-mode .custom-control input:checked + label,
+    html.dark-mode .package-checkbox:checked + label { background-color: rgba(250, 204, 21, 0.15) !important; border-color: #FACC15 !important; }
+    html.dark-mode .service-info .text-primary, html.dark-mode .text-primary { color: #60a5fa !important; }
+    html.dark-mode #servicesList::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+    html.dark-mode #servicesList::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); }
+    html.dark-mode .service-tab:hover { background: rgba(255, 255, 255, 0.05) !important; }
+    html.dark-mode .service-tab.active { background: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; border-bottom-color: #FACC15 !important; }
+    html.dark-mode .package-section-divider::after { background: #1a2b4f !important; }
+    html.dark-mode .slot-display { color: #e2e8f0 !important; }
+    html.dark-mode .initial-message { background: rgba(16, 185, 129, 0.1) !important; color: #6ee7b7 !important; }
+    html.dark-mode .btn-outline-accent { color: #cbd5e1 !important; border-color: #475569 !important; }
+    html.dark-mode .btn-outline-accent:hover, html.dark-mode .btn-outline-accent:focus { color: #fff !important; }
+
+    /* Remaining per-page leftovers */
+    html.dark-mode .filter-control { background: #1a2b4f !important; border-color: rgba(255, 255, 255, 0.12) !important; }
+    html.dark-mode .emergency-card .card-body > .row:first-of-type .col-md-3 > div,
+    html.dark-mode .contact-info { background: #22335a !important; border-color: rgba(255, 255, 255, 0.12) !important; color: #e2e8f0 !important; }
+    html.dark-mode .booking-box-header, html.dark-mode .info-row,
+    html.dark-mode .booking-list-header { border-bottom-color: rgba(255, 255, 255, 0.09) !important; }
+    html.dark-mode .nav-tabs .nav-link { border-color: rgba(255, 255, 255, 0.15) !important; }
+    html.dark-mode .nav-tabs .nav-link.active { border-color: rgba(255, 255, 255, 0.09) rgba(255, 255, 255, 0.09) #1a2b4f !important; }
+    html.dark-mode .coverage-badge { border-color: rgba(255, 255, 255, 0.15) !important; color: #cbd5e1 !important; }
+    html.dark-mode .total-amount { background: rgba(250, 204, 21, 0.1) !important; }
+    html.dark-mode .qr-code-card { background: #1a2b4f !important; border-color: rgba(255, 255, 255, 0.12) !important; }
+    html.dark-mode .btn-back { background: #22335a !important; color: #e2e8f0 !important; border-color: rgba(255, 255, 255, 0.2) !important; }
+    html.dark-mode .schedule-box { border-color: rgba(255, 255, 255, 0.12) !important; }
+    html.dark-mode .empty-state { border-color: rgba(255, 255, 255, 0.15) !important; }
+    html.dark-mode .empty-state i { color: #3b4d7d !important; }
+    html.dark-mode .service-card.active::before { border-color: #e2e8f0 !important; }
+    html.dark-mode .service-card.active::after { border-top-color: #94a3b8 !important; }
+    html.dark-mode .emergency-table tr:hover { background: rgba(255, 255, 255, 0.04) !important; }
+    html.dark-mode .sr-media-img { background: transparent !important; }
+    html.dark-mode .sr-media-img img { mix-blend-mode: normal !important; }
+    html.dark-mode .support-box { background-color: #1a2b4f !important; color: #e2e8f0 !important; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important; }
+    html.dark-mode .support-box .lead { color: #cbd5e1 !important; }
+    html.dark-mode .support-box h4 { color: #FDE047 !important; }
+
+    /* Booking-flow stepper -> brand yellow (both themes) */
+    .page-stepper .step-item i,
+    .page-stepper .step-item span,
+    .page-stepper .step-item.active i,
+    .page-stepper .step-item.active span {
+        color: #FACC15 !important;
+    }
+
+    /* Selection accents -> brand yellow (both themes) */
+    .custom-control label:hover,
+    .mechanic-selection label:hover { border-color: #FACC15 !important; }
+    .custom-control input:checked + label,
+    .package-checkbox:checked + label,
+    .mechanic-selection input[type="checkbox"]:checked + label {
+        border-color: #FACC15 !important;
+        background-color: rgba(250, 204, 21, 0.08) !important;
+    }
+    .service-tab.active {
+        color: #EAB308 !important;
+        border-bottom-color: #FACC15 !important;
+        background: rgba(250, 204, 21, 0.06) !important;
+    }
+
+    /* Booking action button: navy "Check Availability" -> green "Select Mechanic" */
+    #mainActionButton.btn-secondary {
+        background: linear-gradient(135deg, #2a4d80 0%, #1e3a5f 100%) !important;
+        border-color: #3b5d8f !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(42, 77, 128, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+    }
+    #mainActionButton.btn-secondary:hover,
+    #mainActionButton.btn-secondary:focus {
+        background: linear-gradient(135deg, #35598f 0%, #25476f 100%) !important;
+        border-color: #4a6da3 !important;
+        color: #ffffff !important;
+        box-shadow: 0 6px 18px rgba(42, 77, 128, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+    }
+
+    /* Back button on booking-flow pages - same highlighted navy */
+    .back-btn {
+        background: linear-gradient(135deg, #2a4d80 0%, #1e3a5f 100%) !important;
+        border-color: #3b5d8f !important;
+        color: #ffffff !important;
+        box-shadow: 0 3px 10px rgba(42, 77, 128, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+    }
+    .back-btn:hover,
+    .back-btn:focus {
+        background: linear-gradient(135deg, #35598f 0%, #25476f 100%) !important;
+        border-color: #4a6da3 !important;
+        color: #ffffff !important;
+        box-shadow: 0 5px 14px rgba(42, 77, 128, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+    }
+
+    /* Back / Proceed buttons on view_availability - same highlighted navy */
+    .btn-back, .btn-orange {
+        background: linear-gradient(135deg, #2a4d80 0%, #1e3a5f 100%) !important;
+        border-color: #3b5d8f !important;
+        color: #ffffff !important;
+        box-shadow: 0 3px 10px rgba(42, 77, 128, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+    }
+    .btn-back:hover, .btn-back:focus,
+    .btn-orange:hover, .btn-orange:focus {
+        background: linear-gradient(135deg, #35598f 0%, #25476f 100%) !important;
+        border-color: #4a6da3 !important;
+        color: #ffffff !important;
+        box-shadow: 0 5px 14px rgba(42, 77, 128, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+    }
+
+    /* Accent buttons (Back / Confirm) - same highlighted navy */
+    .btn-accent {
+        background: linear-gradient(135deg, #2a4d80 0%, #1e3a5f 100%) !important;
+        border-color: #3b5d8f !important;
+        color: #ffffff !important;
+        box-shadow: 0 3px 10px rgba(42, 77, 128, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+    }
+    .btn-accent:hover,
+    .btn-accent:focus {
+        background: linear-gradient(135deg, #35598f 0%, #25476f 100%) !important;
+        border-color: #4a6da3 !important;
+        color: #ffffff !important;
+        box-shadow: 0 5px 14px rgba(42, 77, 128, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+    }
+
+    /* ===== Light mode sidebar - light surface ===== */
+    html:not(.dark-mode) .sidebar {
+        background: #ffffff;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.06);
+        border-right: 1px solid #e2e8f0;
+    }
+    html:not(.dark-mode) .sidebar-brand,
+    html:not(.dark-mode) .sidebar-brand span { color: #0f172a; }
+    html:not(.dark-mode) .sidebar-collapse-btn { background: rgba(0, 0, 0, 0.05); border-color: rgba(0, 0, 0, 0.12); color: #334155; }
+    html:not(.dark-mode) .sidebar-collapse-btn:hover { background: rgba(0, 0, 0, 0.09); }
+    html:not(.dark-mode) .sidebar-section-title { color: #94a3b8; }
+    html:not(.dark-mode) .sidebar-nav-item { color: #334155; }
+    html:not(.dark-mode) .sidebar-nav-item:hover { background: rgba(0, 0, 0, 0.05); color: #0f172a; }
+    html:not(.dark-mode) .sidebar-nav-item.active { background: #FACC15; color: #111827 !important; }
+    html:not(.dark-mode) .sidebar-footer { background: #f8fafc; border-top-color: #e2e8f0; }
+    html:not(.dark-mode) .sidebar-footer-text { color: #334155; }
+    html:not(.dark-mode) .sidebar-footer-copyright { color: #94a3b8; }
+    html.dark-mode .user-avatar, html.dark-mode .top-bar-user-avatar { border: 2px solid rgba(255, 255, 255, 0.15); }
 </style>
 
 <!-- Sidebar Overlay for Mobile -->
@@ -1253,6 +1756,27 @@ $totalNotificationCount = count($customerNotificationItems);
             } else {
                 topBarUser.appendChild(notifWrapper);
             }
+
+            // Dark mode toggle (beside the notification bell)
+            const themeToggle = document.createElement('button');
+            themeToggle.type = 'button';
+            themeToggle.className = 'dark-mode-toggle';
+            themeToggle.title = 'Toggle dark mode';
+            themeToggle.setAttribute('aria-label', 'Toggle dark mode');
+            const renderToggleIcon = function () {
+                themeToggle.innerHTML = '<i class="bi ' +
+                    (document.documentElement.classList.contains('dark-mode') ? 'bi-sun-fill' : 'bi-moon-fill') +
+                    '"></i>';
+            };
+            renderToggleIcon();
+            themeToggle.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const isDark = document.documentElement.classList.toggle('dark-mode');
+                localStorage.setItem('customerDarkMode', isDark ? '1' : '0');
+                renderToggleIcon();
+                window.dispatchEvent(new CustomEvent('customerThemeChanged', { detail: { dark: isDark } }));
+            });
+            notifWrapper.parentNode.insertBefore(themeToggle, notifWrapper.nextSibling);
 
             bell.addEventListener('click', function(e) {
                 e.stopPropagation();

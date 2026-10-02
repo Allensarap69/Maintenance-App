@@ -300,7 +300,7 @@ $pageTitle = 'Manage Customers';
         border-radius: 16px;
         padding: 20px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         border: none;
         margin-bottom: 15px;
     }
@@ -325,7 +325,7 @@ $pageTitle = 'Manage Customers';
         padding: 8px 16px;
         font-size: 0.85rem;
         font-weight: 500;
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
     }
     .filter-btn.active {
         background: var(--accent-gradient);

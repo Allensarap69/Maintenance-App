@@ -6,7 +6,7 @@
 if (!isset($page_title)) $page_title = 'AutoCare Pro';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -60,7 +60,7 @@ if (!isset($page_title)) $page_title = 'AutoCare Pro';
             -webkit-backdrop-filter: blur(20px);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
             z-index: 1030;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             padding: 15px 0;
         }
 
@@ -106,7 +106,7 @@ if (!isset($page_title)) $page_title = 'AutoCare Pro';
             font-weight: 500;
             padding: 8px 20px;
             border-radius: 50px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         }
 
         .btn-logout:hover {
@@ -119,7 +119,7 @@ if (!isset($page_title)) $page_title = 'AutoCare Pro';
         .nav-link {
             font-weight: 500;
             color: var(--text-dark) !important;
-            transition: color 0.3s ease;
+            
             position: relative;
         }
 
@@ -131,7 +131,7 @@ if (!isset($page_title)) $page_title = 'AutoCare Pro';
             width: 0;
             height: 2px;
             background: var(--accent-color);
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             transform: translateX(-50%);
         }
 
@@ -237,7 +237,7 @@ if (!isset($page_title)) $page_title = 'AutoCare Pro';
             border-radius: 20px;
             border: none;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            transition: all 0.4s ease;
+            transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.4s ease, visibility 0.4s ease, max-height 0.4s ease;
             overflow: hidden;
         }
 
@@ -265,7 +265,7 @@ if (!isset($page_title)) $page_title = 'AutoCare Pro';
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            transition: all 0.4s ease;
+            transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.4s ease, visibility 0.4s ease, max-height 0.4s ease;
             position: relative;
             overflow: hidden;
             text-decoration: none;
@@ -332,7 +332,7 @@ if (!isset($page_title)) $page_title = 'AutoCare Pro';
             font-weight: 600;
             padding: 12px 30px;
             border-radius: 50px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             box-shadow: 0 4px 15px rgba(15, 23, 42, 0.3);
         }
 
@@ -349,7 +349,7 @@ if (!isset($page_title)) $page_title = 'AutoCare Pro';
             font-weight: 600;
             padding: 12px 30px;
             border-radius: 50px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
         }
 
@@ -366,7 +366,7 @@ if (!isset($page_title)) $page_title = 'AutoCare Pro';
             font-weight: 600;
             padding: 10px 25px;
             border-radius: 50px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         }
 
         .btn-outline-custom:hover {
@@ -382,7 +382,7 @@ if (!isset($page_title)) $page_title = 'AutoCare Pro';
             border-radius: 12px;
             padding: 12px 16px;
             font-size: 0.95rem;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         }
 
         .form-control-modern:focus {
@@ -431,7 +431,7 @@ if (!isset($page_title)) $page_title = 'AutoCare Pro';
         .footer-custom a {
             color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
-            transition: color 0.3s;
+            
         }
 
         .footer-custom a:hover {
@@ -453,7 +453,7 @@ if (!isset($page_title)) $page_title = 'AutoCare Pro';
         .reveal {
             opacity: 0;
             transform: translateY(30px);
-            transition: all 0.8s ease;
+            transition: transform 0.8s ease, box-shadow 0.8s ease, opacity 0.8s ease, visibility 0.8s ease, max-height 0.8s ease;
         }
 
         .reveal.active {

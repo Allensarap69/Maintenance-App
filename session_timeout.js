@@ -270,7 +270,7 @@
                 border-radius: 50px;
                 font-size: 1.05rem;
                 cursor: pointer;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1), max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 box-shadow: 
                     0 4px 15px rgba(245, 158, 11, 0.3),
                     0 0 0 1px rgba(245, 158, 11, 0.2),

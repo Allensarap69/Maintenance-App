@@ -484,7 +484,7 @@ $pageTitle = 'Manage Mechanics';
         border-radius: 16px;
         padding: 20px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         border: none;
         margin-bottom: 15px;
     }
@@ -510,7 +510,7 @@ $pageTitle = 'Manage Mechanics';
         font-size: 0.72rem !important;
         font-weight: 600 !important;
         text-transform: capitalize;
-        transition: box-shadow 0.2s ease, background 0.2s ease;
+        transition: box-shadow 0.2s ease;
         border: 1px solid rgba(0, 0, 0, 0.1) !important;
         background: transparent !important;
         color: var(--text-dark) !important;
@@ -625,7 +625,7 @@ $pageTitle = 'Manage Mechanics';
         border-radius: 12px;
         padding: 12px 16px;
         font-size: 0.9rem;
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
     }
     .form-control:focus, .form-select:focus {
         border-color: #FACC15;
@@ -650,7 +650,7 @@ $pageTitle = 'Manage Mechanics';
         padding: 0 24px;
         border-radius: 12px;
         font-weight: 600;
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         box-shadow: none !important;
         height: 38px;
         display: inline-flex;
@@ -668,7 +668,7 @@ $pageTitle = 'Manage Mechanics';
         border-radius: 12px;
         padding: 10px 24px;
         font-weight: 600;
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
     }
 
     /* Mechanic list view */
@@ -714,7 +714,7 @@ $pageTitle = 'Manage Mechanics';
     }
     .mechanic-row {
         border-bottom: 1px solid var(--card-border);
-        transition: background 0.15s ease;
+        
     }
     .mechanic-row:last-child { border-bottom: none; }
     .mechanic-row:hover { background: rgba(0, 0, 0, 0.02); }
@@ -763,7 +763,7 @@ $pageTitle = 'Manage Mechanics';
         font-size: 1rem;
         background: transparent;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         padding: 0;
         color: #FACC15;
     }
@@ -806,7 +806,7 @@ $pageTitle = 'Manage Mechanics';
         font-size: 0.85rem;
         background: #ffffff;
         color: #111827;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     .mechanic-search-input:focus {
         border-color: #FACC15;
@@ -829,7 +829,7 @@ $pageTitle = 'Manage Mechanics';
         width: 20px;
         height: 20px;
         border-radius: 50%;
-        transition: color 0.2s ease, background 0.2s ease;
+        
     }
     .mechanic-search-clear:hover {
         color: #ef4444;
@@ -843,10 +843,10 @@ $pageTitle = 'Manage Mechanics';
     .mechanic-row.hidden-match { display: none; }
 
     /* Dark mode overrides */
-    html.dark-mode .mechanic-specialties { background: rgba(14, 165, 233, 0.15) !important; color: #7dd3fc !important; }
-    html.dark-mode .mechanic-status.Available { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
-    html.dark-mode .mechanic-status.Busy { background: rgba(249, 115, 22, 0.15) !important; color: #fdba74 !important; }
-    html.dark-mode .mechanic-status.Unavailable { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+    html[data-theme="dark"] .mechanic-specialties { background: rgba(14, 165, 233, 0.15) !important; color: #7dd3fc !important; }
+    html[data-theme="dark"] .mechanic-status.Available { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html[data-theme="dark"] .mechanic-status.Busy { background: rgba(249, 115, 22, 0.15) !important; color: #fdba74 !important; }
+    html[data-theme="dark"] .mechanic-status.Unavailable { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
 </style>
 
 <div class="container-fluid">

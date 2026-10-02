@@ -423,7 +423,7 @@ $pageTitle = 'Emergency Service Requests Management';
         gap: 0.6rem;
         min-width: 110px;
         cursor: pointer;
-        transition: border-color 0.15s ease, background 0.15s ease;
+        
     }
     .stat-card:hover { border-color: #cbd5e1; background: #f8fafc; }
     .stat-card.active { border-color: #FACC15; background: #fffbeb; }
@@ -626,87 +626,87 @@ $pageTitle = 'Emergency Service Requests Management';
     .assign-modal .modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
 
     /* ===== Dark mode overrides ===== */
-    html.dark-mode .emergency-page { color: #e2e8f0; }
+    html[data-theme="dark"] .emergency-page { color: #e2e8f0; }
 
-    html.dark-mode .emergency-panel {
+    html[data-theme="dark"] .emergency-panel {
         background: #1a2b4f !important;
         border-color: rgba(255, 255, 255, 0.09);
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     }
-    html.dark-mode .emergency-panel .panel-header {
+    html[data-theme="dark"] .emergency-panel .panel-header {
         background: #1a2b4f;
         color: #e2e8f0;
         border-bottom-color: rgba(255, 255, 255, 0.09);
     }
-    html.dark-mode .panel-title { color: #e2e8f0; }
+    html[data-theme="dark"] .panel-title { color: #e2e8f0; }
 
-    html.dark-mode .stat-card { box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4); }
-    html.dark-mode .stat-card:hover { background: #22335a; border-color: #475569; }
-    html.dark-mode .stat-card.active { background: rgba(250, 204, 21, 0.08); border-color: #FACC15; }
-    html.dark-mode .stat-icon.all { background: #2a3d6b; color: #94a3b8; }
-    html.dark-mode .stat-icon.pending { background: rgba(250, 204, 21, 0.15); color: #FDE047; }
-    html.dark-mode .stat-icon.accepted { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-    html.dark-mode .stat-icon.declined { background: rgba(239, 68, 68, 0.15); color: #f87171; }
-    html.dark-mode .stat-icon.completed { background: rgba(59, 130, 246, 0.15); color: #93c5fd; }
-    html.dark-mode .stat-label { color: #94a3b8; }
-    html.dark-mode .stat-value { color: #e2e8f0; }
+    html[data-theme="dark"] .stat-card { box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4); }
+    html[data-theme="dark"] .stat-card:hover { background: #22335a; border-color: #475569; }
+    html[data-theme="dark"] .stat-card.active { background: rgba(250, 204, 21, 0.08); border-color: #FACC15; }
+    html[data-theme="dark"] .stat-icon.all { background: #2a3d6b; color: #94a3b8; }
+    html[data-theme="dark"] .stat-icon.pending { background: rgba(250, 204, 21, 0.15); color: #FDE047; }
+    html[data-theme="dark"] .stat-icon.accepted { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    html[data-theme="dark"] .stat-icon.declined { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+    html[data-theme="dark"] .stat-icon.completed { background: rgba(59, 130, 246, 0.15); color: #93c5fd; }
+    html[data-theme="dark"] .stat-label { color: #94a3b8; }
+    html[data-theme="dark"] .stat-value { color: #e2e8f0; }
 
-    html.dark-mode .filter-pills .nav-link {
+    html[data-theme="dark"] .filter-pills .nav-link {
         background: #1a2b4f;
         border-color: rgba(255, 255, 255, 0.09);
         color: #cbd5e1;
     }
-    html.dark-mode .filter-pills .nav-link.active { background: #FACC15; border-color: #FACC15; color: #111827; }
-    html.dark-mode .filter-pills .nav-link .pill-count { background: rgba(255, 255, 255, 0.1); }
-    html.dark-mode .filter-pills .nav-link.active .pill-count { background: rgba(0, 0, 0, 0.15); }
+    html[data-theme="dark"] .filter-pills .nav-link.active { background: #FACC15; border-color: #FACC15; color: #111827; }
+    html[data-theme="dark"] .filter-pills .nav-link .pill-count { background: rgba(255, 255, 255, 0.1); }
+    html[data-theme="dark"] .filter-pills .nav-link.active .pill-count { background: rgba(0, 0, 0, 0.15); }
 
-    html.dark-mode .emergency-card {
+    html[data-theme="dark"] .emergency-card {
         background: #16233f !important;
         border-color: rgba(255, 255, 255, 0.09);
     }
-    html.dark-mode .emergency-card:hover { border-color: #3b82f6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); }
-    html.dark-mode .emergency-card .ecard-header { background: #1a2b4f; border-bottom-color: rgba(255, 255, 255, 0.08); }
-    html.dark-mode .emergency-card .ecard-footer { background: #1a2b4f; border-top-color: rgba(255, 255, 255, 0.06); }
-    html.dark-mode .emergency-card .ecard-title,
-    html.dark-mode .emergency-card .ecard-value,
-    html.dark-mode .emergency-card .ecard-meta strong { color: #e2e8f0; }
-    html.dark-mode .emergency-card .ecard-meta { color: #94a3b8; }
-    html.dark-mode .emergency-card .details-inner { background: #1a2b4f; border-color: rgba(255, 255, 255, 0.09); }
-    html.dark-mode .emergency-card .action-bar { border-top-color: rgba(255, 255, 255, 0.09); }
-    html.dark-mode .emergency-list::-webkit-scrollbar-thumb { background: #3b4d7d; }
+    html[data-theme="dark"] .emergency-card:hover { border-color: #3b82f6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); }
+    html[data-theme="dark"] .emergency-card .ecard-header { background: #1a2b4f; border-bottom-color: rgba(255, 255, 255, 0.08); }
+    html[data-theme="dark"] .emergency-card .ecard-footer { background: #1a2b4f; border-top-color: rgba(255, 255, 255, 0.06); }
+    html[data-theme="dark"] .emergency-card .ecard-title,
+    html[data-theme="dark"] .emergency-card .ecard-value,
+    html[data-theme="dark"] .emergency-card .ecard-meta strong { color: #e2e8f0; }
+    html[data-theme="dark"] .emergency-card .ecard-meta { color: #94a3b8; }
+    html[data-theme="dark"] .emergency-card .details-inner { background: #1a2b4f; border-color: rgba(255, 255, 255, 0.09); }
+    html[data-theme="dark"] .emergency-card .action-bar { border-top-color: rgba(255, 255, 255, 0.09); }
+    html[data-theme="dark"] .emergency-list::-webkit-scrollbar-thumb { background: #3b4d7d; }
 
-    html.dark-mode .priority-urgent { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
-    html.dark-mode .priority-high { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-    html.dark-mode .priority-medium { background: rgba(59, 130, 246, 0.15); color: #93c5fd; }
-    html.dark-mode .priority-low { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; }
+    html[data-theme="dark"] .priority-urgent { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
+    html[data-theme="dark"] .priority-high { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    html[data-theme="dark"] .priority-medium { background: rgba(59, 130, 246, 0.15); color: #93c5fd; }
+    html[data-theme="dark"] .priority-low { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; }
 
-    html.dark-mode .status-pill.pending { background: rgba(250, 204, 21, 0.15); color: #FDE047; }
-    html.dark-mode .status-pill.accepted,
-    html.dark-mode .status-pill.completed { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-    html.dark-mode .status-pill.assigned { background: rgba(59, 130, 246, 0.15); color: #93c5fd; }
-    html.dark-mode .status-pill.in_progress { background: rgba(139, 92, 246, 0.15); color: #c4b5fd; }
-    html.dark-mode .status-pill.declined { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+    html[data-theme="dark"] .status-pill.pending { background: rgba(250, 204, 21, 0.15); color: #FDE047; }
+    html[data-theme="dark"] .status-pill.accepted,
+    html[data-theme="dark"] .status-pill.completed { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    html[data-theme="dark"] .status-pill.assigned { background: rgba(59, 130, 246, 0.15); color: #93c5fd; }
+    html[data-theme="dark"] .status-pill.in_progress { background: rgba(139, 92, 246, 0.15); color: #c4b5fd; }
+    html[data-theme="dark"] .status-pill.declined { background: rgba(239, 68, 68, 0.15); color: #f87171; }
 
-    html.dark-mode .assign-modal { background: #1a2b4f; color: #e2e8f0; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); }
-    html.dark-mode .assign-modal h5 { color: #e2e8f0; }
-    html.dark-mode .assign-modal .form-label { color: #94a3b8; }
+    html[data-theme="dark"] .assign-modal { background: #1a2b4f; color: #e2e8f0; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); }
+    html[data-theme="dark"] .assign-modal h5 { color: #e2e8f0; }
+    html[data-theme="dark"] .assign-modal .form-label { color: #94a3b8; }
 
-    html.dark-mode .btn-outline-secondary { color: #cbd5e1; border-color: #475569; }
-    html.dark-mode .btn-outline-secondary:hover { background: #2a3d6b; border-color: #64748b; color: #e2e8f0; }
-    html.dark-mode .btn-outline-primary { color: #93c5fd; border-color: #3b82f6; }
-    html.dark-mode .btn-outline-primary:hover { background: #3b82f6; color: #fff; }
+    html[data-theme="dark"] .btn-outline-secondary { color: #cbd5e1; border-color: #475569; }
+    html[data-theme="dark"] .btn-outline-secondary:hover { background: #2a3d6b; border-color: #64748b; color: #e2e8f0; }
+    html[data-theme="dark"] .btn-outline-primary { color: #93c5fd; border-color: #3b82f6; }
+    html[data-theme="dark"] .btn-outline-primary:hover { background: #3b82f6; color: #fff; }
 
     /* Leaflet controls */
-    html.dark-mode .leaflet-bar a,
-    html.dark-mode .leaflet-control-layers {
+    html[data-theme="dark"] .leaflet-bar a,
+    html[data-theme="dark"] .leaflet-control-layers {
         background: #22335a;
         color: #e2e8f0;
         border-color: rgba(255, 255, 255, 0.1);
     }
-    html.dark-mode .leaflet-bar a:hover { background: #2a3d6b; }
-    html.dark-mode .leaflet-control-attribution { background: rgba(21, 31, 54, 0.8); color: #64748b; }
-    html.dark-mode .leaflet-control-attribution a { color: #60a5fa; }
-    html.dark-mode .leaflet-tile { filter: brightness(0.85) saturate(0.85); }
+    html[data-theme="dark"] .leaflet-bar a:hover { background: #2a3d6b; }
+    html[data-theme="dark"] .leaflet-control-attribution { background: rgba(21, 31, 54, 0.8); color: #64748b; }
+    html[data-theme="dark"] .leaflet-control-attribution a { color: #60a5fa; }
+    html[data-theme="dark"] .leaflet-tile { filter: brightness(0.85) saturate(0.85); }
 </style>
 
 <div class="container-fluid emergency-page">

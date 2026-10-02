@@ -297,7 +297,7 @@ $pageTitle = 'Manage Services';
         border: 2px solid rgba(0,0,0,0.1);
         font-size: 0.85rem;
         background-color: #f8fafc;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     .service-form-card .form-control:focus,
     .service-form-card .form-select:focus {
@@ -399,11 +399,11 @@ $pageTitle = 'Manage Services';
     }
 
     /* Dark mode overrides */
-    html.dark-mode .specialty-tag { color: #93c5fd !important; }
-    html.dark-mode .service-form-header,
-    html.dark-mode .service-form-title { color: #e2e8f0 !important; }
-    html.dark-mode .main-content .service-form-card .form-label { color: #cbd5e1 !important; }
-    html.dark-mode .service-item-name { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .specialty-tag { color: #93c5fd !important; }
+    html[data-theme="dark"] .service-form-header,
+    html[data-theme="dark"] .service-form-title { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .main-content .service-form-card .form-label { color: #cbd5e1 !important; }
+    html[data-theme="dark"] .service-item-name { color: #e2e8f0 !important; }
 </style>
 
 <div class="container-fluid">

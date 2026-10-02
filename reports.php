@@ -90,7 +90,7 @@ foreach ($monthlyServiceCounts as $monthKey => $counts) {
 $monthlySales = array_reverse($monthlySales);
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <title>Reports & Analytics</title>

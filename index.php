@@ -176,12 +176,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submit'])) {
 $login_button_text = 'Login'; 
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Mindanao Eversure — Motorcycle Service Scheduling & Monitoring System. Book services, track maintenance, monitor motorcycle health, and get smart reminders.">
     <meta name="theme-color" content="#ffffff">
+    <script>
+        (function () {
+            var t = localStorage.getItem('theme');
+            if (t !== 'dark' && t !== 'light') {
+                t = localStorage.getItem('mev-theme');
+            }
+            if (t !== 'dark' && t !== 'light') {
+                t = (localStorage.getItem('adminDarkMode') === '1' || localStorage.getItem('customerDarkMode') === '1') ? 'dark'
+                    : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            }
+            localStorage.setItem('theme', t);
+            document.documentElement.setAttribute('data-theme', t);
+            var meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.setAttribute('content', t === 'dark' ? '#0b1220' : '#ffffff');
+        })();
+    </script>
     <title>Mindanao Eversure | Motor Maintenance System</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -292,7 +308,7 @@ $login_button_text = 'Login';
             font-size: 0.85rem;
             padding: 6px 12px !important;
             position: relative;
-            transition: color 0.2s;
+            
         }
         .navbar-custom .nav-link:hover { color: var(--mev-blue) !important; }
         .navbar-custom .nav-link.active { color: var(--mev-blue) !important; font-weight: 600; }
@@ -851,7 +867,7 @@ $login_button_text = 'Login';
             font-size: 0.82rem;
             font-weight: 500;
             padding: 4px 12px;
-            transition: color 0.2s;
+            
         }
         .footer-nav a:hover { color: var(--mev-yellow); }
         .social-links { display: flex; gap: 10px; }
@@ -1003,7 +1019,7 @@ $login_button_text = 'Login';
             height: 100%;
             width: 0;
             border-radius: 99px;
-            transition: width 0.3s ease, background 0.3s ease;
+            transition: width 0.3s ease;
         }
         .pw-hint { display: none; font-size: 0.7rem; color: var(--mev-muted); margin-top: 4px; }
         .pw-hint strong { font-weight: 600; }
@@ -1012,7 +1028,7 @@ $login_button_text = 'Login';
             border-radius: 12px;
             overflow: hidden;
             background: #f8fafc;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            transition: box-shadow 0.15s ease-in-out;
         }
         .modal-blur-effect .input-group:focus-within {
             border-color: var(--mev-blue);
@@ -1092,7 +1108,7 @@ $login_button_text = 'Login';
             opacity: 0;
             visibility: hidden;
             transform: translateY(10px);
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             z-index: 999;
             border: none;
             box-shadow: 0 10px 24px rgba(251, 191, 36, 0.4);
@@ -2072,6 +2088,178 @@ $login_button_text = 'Login';
             .modal-blur-effect .input-group .form-control { font-size: 16px; }
             .remember-row { flex-wrap: wrap; gap: 8px; }
         }
+
+        /* ---------- Dark mode ---------- */
+        html[data-theme="dark"] { color-scheme: dark; }
+        html[data-theme="dark"] body.mev-landing { background: #0b1220; color: #cbd5e1; }
+
+        .theme-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            background: transparent;
+            border: 1.5px solid var(--mf-line);
+            border-radius: 10px;
+            color: var(--mf-navy);
+            transition: 0.2s;
+        }
+        .theme-toggle:hover { border-color: var(--mf-yellow); color: var(--mf-yellow-dark); }
+        .theme-icon { width: 17px; height: 17px; }
+        .theme-icon-sun { display: none; }
+        html[data-theme="dark"] .theme-toggle { border-color: #2a3a58; color: var(--mf-yellow); }
+        html[data-theme="dark"] .theme-icon-sun { display: inline-block; }
+        html[data-theme="dark"] .theme-icon-moon { display: none; }
+
+        html[data-theme="dark"] .navbar-custom { background: rgba(11, 18, 32, 0.95); }
+        html[data-theme="dark"] .navbar-custom .navbar-brand { color: #f1f5f9 !important; }
+        html[data-theme="dark"] .navbar-custom .nav-link { color: #93a4c0 !important; }
+        html[data-theme="dark"] .navbar-custom .nav-link:hover,
+        html[data-theme="dark"] .navbar-custom .nav-link.active { color: var(--mf-yellow) !important; }
+        html[data-theme="dark"] .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        html[data-theme="dark"] .btn-mev-login { background: #182642; border-color: #2f4166; color: #ffffff; }
+        html[data-theme="dark"] .btn-mev-login:hover { background: var(--mf-navy-2); border-color: var(--mf-navy-2); }
+
+        html[data-theme="dark"] .hero-section { background: linear-gradient(180deg, #0d1526 0%, #0b1220 100%); }
+        html[data-theme="dark"] .hero-section::after { background: #101d38; }
+        html[data-theme="dark"] .features-section,
+        html[data-theme="dark"] .services-section,
+        html[data-theme="dark"] .how-section,
+        html[data-theme="dark"] .track-section,
+        html[data-theme="dark"] .reminder-section { background: #0b1220; }
+        html[data-theme="dark"] .health-section { background: #0d1526; }
+        html[data-theme="dark"] .benefits-strip { background: #081020; }
+        html[data-theme="dark"] .app-footer { background: #050d1d; }
+
+        html[data-theme="dark"] .hero-title,
+        html[data-theme="dark"] .section-title,
+        html[data-theme="dark"] .why-title,
+        html[data-theme="dark"] .step-title,
+        html[data-theme="dark"] .service-name,
+        html[data-theme="dark"] .service-price,
+        html[data-theme="dark"] .feature-card h4,
+        html[data-theme="dark"] .track-card-head .t-name,
+        html[data-theme="dark"] .reminder-title,
+        html[data-theme="dark"] .rc-value,
+        html[data-theme="dark"] .h-bar-label,
+        html[data-theme="dark"] .health-donut-num,
+        html[data-theme="dark"] .dash-greeting,
+        html[data-theme="dark"] .dash-user,
+        html[data-theme="dark"] .dash-panel-head,
+        html[data-theme="dark"] .upcoming-name,
+        html[data-theme="dark"] .quick-action strong,
+        html[data-theme="dark"] .stat-value,
+        html[data-theme="dark"] .hero-feature strong,
+        html[data-theme="dark"] .track-step.done .track-label,
+        html[data-theme="dark"] .track-step.current .track-label { color: #e8eef7; }
+
+        html[data-theme="dark"] .hero-subtitle,
+        html[data-theme="dark"] .section-subtitle,
+        html[data-theme="dark"] .why-desc,
+        html[data-theme="dark"] .step-desc,
+        html[data-theme="dark"] .service-desc,
+        html[data-theme="dark"] .feature-card p,
+        html[data-theme="dark"] .track-card-head .t-sub,
+        html[data-theme="dark"] .reminder-sub,
+        html[data-theme="dark"] .rc-label,
+        html[data-theme="dark"] .rc-sub,
+        html[data-theme="dark"] .track-label,
+        html[data-theme="dark"] .h-bar-value,
+        html[data-theme="dark"] .health-donut-label,
+        html[data-theme="dark"] .dash-greeting p,
+        html[data-theme="dark"] .upcoming-meta,
+        html[data-theme="dark"] .quick-action,
+        html[data-theme="dark"] .stat-label,
+        html[data-theme="dark"] .hero-feature small { color: #93a4c0; }
+
+        html[data-theme="dark"] .section-eyebrow,
+        html[data-theme="dark"] .step-title .s-num { color: #7aa5ff; }
+        html[data-theme="dark"] .feature-intro .section-eyebrow { color: #93a4c0; }
+        html[data-theme="dark"] .hero-eyebrow { background: rgba(246, 198, 20, 0.14); color: var(--mf-yellow); }
+
+        html[data-theme="dark"] .feature-card,
+        html[data-theme="dark"] .service-card,
+        html[data-theme="dark"] .track-card,
+        html[data-theme="dark"] .reminder-card,
+        html[data-theme="dark"] .stat-card,
+        html[data-theme="dark"] .dash-panel {
+            background: #131c31;
+            border-color: #22304a;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+        }
+        html[data-theme="dark"] .service-meta,
+        html[data-theme="dark"] .track-card-head { border-color: #22304a; }
+        html[data-theme="dark"] .track-pill { background: rgba(246, 198, 20, 0.14); color: var(--mf-yellow); }
+
+        html[data-theme="dark"] .why-icon,
+        html[data-theme="dark"] .step-icon.blue,
+        html[data-theme="dark"] .h-bar-icon,
+        html[data-theme="dark"] .track-card-head .t-icon,
+        html[data-theme="dark"] .reminder-card .rc-icon.blue,
+        html[data-theme="dark"] .stat-icon,
+        html[data-theme="dark"] .upcoming-icon,
+        html[data-theme="dark"] .quick-action i { color: #7aa5ff; }
+
+        html[data-theme="dark"] .dashboard-preview { background: #131c31; box-shadow: 0 26px 70px rgba(0, 0, 0, 0.55); }
+        html[data-theme="dark"] .dashboard-main { background: #0d1526; }
+        html[data-theme="dark"] .dashboard-sidebar { background: #0a1428; }
+        html[data-theme="dark"] .status-pill.scheduled { background: rgba(251, 191, 36, 0.16); color: #fbbf24; }
+        html[data-theme="dark"] .status-pill.upcoming { background: rgba(59, 130, 246, 0.16); color: #93c5fd; }
+
+        html[data-theme="dark"] .health-donut { background: conic-gradient(var(--mev-green) 0 92%, #22304a 92% 100%); }
+        html[data-theme="dark"] .health-donut-inner { background: #131c31; }
+        html[data-theme="dark"] .h-bar-track { background: #22304a; }
+        html[data-theme="dark"] .track-step::before { background: #22304a; }
+        html[data-theme="dark"] .track-step.done::before,
+        html[data-theme="dark"] .track-step.current::before { background: var(--mev-green); }
+        html[data-theme="dark"] .step-item:not(:last-child)::after { border-top-color: #2a3a58; }
+        html[data-theme="dark"] .health-bike-wrap::before { border-color: rgba(122, 165, 255, 0.3); }
+
+        html[data-theme="dark"] .btn-cta-outline { color: #dbe4f0; }
+        html[data-theme="dark"] .btn-cta-outline:hover { color: #93b4ff; background: transparent; }
+        html[data-theme="dark"] .btn-cta-outline-yellow { background: #131c31; color: var(--mf-yellow); }
+        html[data-theme="dark"] .btn-cta-outline-yellow:hover { background: var(--mf-yellow); color: var(--mf-navy); }
+        html[data-theme="dark"] .service-book { color: var(--mf-yellow); }
+
+        html[data-theme="dark"] .modal-blur-effect .modal-content { background: #131c31; color: #dbe4f0; }
+        html[data-theme="dark"] .auth-shell,
+        html[data-theme="dark"] .auth-panel { background: #131c31; }
+        html[data-theme="dark"] .auth-panel .auth-heading h4,
+        html[data-theme="dark"] .auth-brand-name { color: #f1f5f9; }
+        html[data-theme="dark"] .auth-panel .auth-heading p,
+        html[data-theme="dark"] .pw-hint { color: #93a4c0; }
+        html[data-theme="dark"] .auth-panel .auth-field > label { color: #cbd5e1; }
+        html[data-theme="dark"] .modal-blur-effect .input-group { background: #0d1526; border-color: #22304a; }
+        html[data-theme="dark"] .modal-blur-effect .input-group:focus-within {
+            background: #0d1526;
+            border-color: #7aa5ff;
+            box-shadow: 0 0 0 4px rgba(122, 165, 255, 0.12);
+        }
+        html[data-theme="dark"] .modal-blur-effect .input-group .form-control { color: #e8eef7; }
+        html[data-theme="dark"] .modal-blur-effect .input-group .form-control::placeholder { color: #5b6b85; }
+        html[data-theme="dark"] .modal-blur-effect .input-icon { color: #7aa5ff; }
+        html[data-theme="dark"] .auth-panel .auth-switch { background: #0d1526; border-color: #22304a; color: #93a4c0; }
+        html[data-theme="dark"] .auth-panel .auth-switch a,
+        html[data-theme="dark"] .modal-blur-effect .forgot-link { color: #93b4ff; }
+        html[data-theme="dark"] .auth-panel .auth-switch a:hover,
+        html[data-theme="dark"] .modal-blur-effect .forgot-link:hover { color: #b8ccff; }
+        html[data-theme="dark"] .auth-secure { color: #5b6b85; }
+        html[data-theme="dark"] .modal-blur-effect .form-check-input { background-color: #0d1526; border-color: #2a3a58; }
+        html[data-theme="dark"] .modal-blur-effect .form-check-label { color: #93a4c0; }
+        html[data-theme="dark"] .modal-blur-effect .modal-close { background-color: #22304a; border-color: #2a3a58; filter: invert(1); }
+        html[data-theme="dark"] .modal-blur-effect .modal-close:hover { background-color: #2a3a58; }
+        html[data-theme="dark"] .pw-meter { background: #22304a; }
+        html[data-theme="dark"] .modal-blur-effect .alert-warning { background: #3a2f10; border-color: #6b5518; color: #fde68a; }
+        html[data-theme="dark"] .modal-blur-effect .alert-success { background: #0d3325; border-color: #14532d; color: #a7f3d0; }
+        html[data-theme="dark"] .text-brand { color: var(--mf-yellow); }
+
+        @media (max-width: 991px) {
+            html[data-theme="dark"] .navbar-collapse { background: #111a2e; border-color: #22304a; }
+        }
     </style>
 </head>
 <?php 
@@ -2102,6 +2290,12 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
                 <li class="nav-item"><a class="nav-link" href="#service-list">Services</a></li>
                 <li class="nav-item"><a class="nav-link" href="#how-it-works">How It Works</a></li>
                 <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                <li class="nav-item ms-lg-2 mt-2 mt-lg-0 d-flex align-items-center justify-content-center">
+                    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" aria-pressed="false" title="Toggle dark mode">
+                        <i data-lucide="moon" class="theme-icon theme-icon-moon"></i>
+                        <i data-lucide="sun" class="theme-icon theme-icon-sun"></i>
+                    </button>
+                </li>
                 <li class="nav-item ms-lg-3 mt-2 mt-lg-0 d-flex flex-column flex-lg-row gap-2">
                     <a href="#" class="btn btn-mev-login" data-bs-toggle="modal" data-bs-target="#loginModal"><i data-lucide="user-round" class="me-1" style="width:14px;height:14px;"></i>Login</a>
                     <a href="#" class="btn btn-mev-register" data-bs-toggle="modal" data-bs-target="#registerModal">Get Started</a>
@@ -2841,6 +3035,28 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
         <?php if ($register_attempt && $msg): ?>
             new bootstrap.Modal(document.getElementById('registerModal')).show();
         <?php endif; ?>
+
+        // Dark mode toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeMeta = document.querySelector('meta[name="theme-color"]');
+        if (themeToggle) {
+            const applyTheme = (theme) => {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                themeToggle.setAttribute('aria-pressed', theme === 'dark');
+                if (themeMeta) themeMeta.setAttribute('content', theme === 'dark' ? '#0b1220' : '#ffffff');
+            };
+            themeToggle.setAttribute('aria-pressed', document.documentElement.getAttribute('data-theme') === 'dark');
+            themeToggle.addEventListener('click', () => {
+                const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (!reduceMotion && document.startViewTransition) {
+                    document.startViewTransition(() => applyTheme(theme));
+                } else {
+                    applyTheme(theme);
+                }
+            });
+        }
 
         // Navbar scrolled state + scroll-to-top visibility
         const navbar = document.querySelector('.navbar-custom');

@@ -181,8 +181,19 @@ $start_time_display = date('h:i A', strtotime($start_time)); // e.g., 06:00 AM
 $end_time_display = date('h:i A', strtotime($end_time)); // e.g., 09:30 AM
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
+    <script>
+        // Global theme state: apply saved theme before first paint to avoid a light-theme flash
+        (function () {
+            var t = localStorage.getItem('theme');
+            if (t !== 'dark' && t !== 'light') {
+                t = (localStorage.getItem('adminDarkMode') === '1' || localStorage.getItem('customerDarkMode') === '1') ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirm Booking Details</title>
@@ -314,7 +325,7 @@ $end_time_display = date('h:i A', strtotime($end_time)); // e.g., 09:30 AM
             -webkit-backdrop-filter: blur(20px);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
             z-index: 1030;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             padding: 15px 0;
         }
 
@@ -399,7 +410,7 @@ $end_time_display = date('h:i A', strtotime($end_time)); // e.g., 09:30 AM
             justify-content: center;
             font-size: 1.3rem;
             color: #94a3b8;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             margin-bottom: 8px;
         }
 
@@ -481,7 +492,7 @@ $end_time_display = date('h:i A', strtotime($end_time)); // e.g., 09:30 AM
             align-items: center;
             gap: 8px;
             opacity: 0.4;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         }
         .page-stepper .step-item.active {
             opacity: 1;

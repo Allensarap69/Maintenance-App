@@ -515,7 +515,7 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
         padding: 1rem;
         position: relative;
         overflow: hidden;
-        transition: border-color 0.2s ease, transform 0.2s ease;
+        transition: transform 0.2s ease;
     }
 
     .mb-stat-card:hover {
@@ -594,7 +594,7 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
         font-weight: 600;
         font-size: 0.82rem;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         border: none;
     }
 
@@ -626,7 +626,7 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
         flex-direction: column;
         justify-content: space-between;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-        transition: border-color 0.2s ease, transform 0.2s ease;
+        transition: transform 0.2s ease;
     }
 
     .mb-booking-card:hover {
@@ -682,7 +682,7 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
         width: 40px;
         height: 40px;
         border-radius: 10px;
-        background: rgba(245, 158, 11, 0.15);
+        background: transparent;
         color: var(--accent-orange);
         display: flex;
         align-items: center;
@@ -779,7 +779,7 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
         font-size: 0.7rem;
         font-weight: 700;
         text-decoration: none !important;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         border: 1px solid transparent;
         cursor: pointer;
         min-height: 26px;
@@ -909,55 +909,55 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
     }
 
     /* ===== Dark mode overrides ===== */
-    html.dark-mode .mb-booking-card { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
-    html.dark-mode .mb-booking-card:hover { border-color: #3b82f6; }
+    html[data-theme="dark"] .mb-booking-card { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
+    html[data-theme="dark"] .mb-booking-card:hover { border-color: #3b82f6; }
 
-    html.dark-mode .mb-customer-name,
-    html.dark-mode .mb-customer-meta,
-    html.dark-mode .mb-info-item,
-    html.dark-mode .mb-info-label,
-    html.dark-mode .mb-info-val,
-    html.dark-mode .mb-payment-method { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .mb-customer-name,
+    html[data-theme="dark"] .mb-customer-meta,
+    html[data-theme="dark"] .mb-info-item,
+    html[data-theme="dark"] .mb-info-label,
+    html[data-theme="dark"] .mb-info-val,
+    html[data-theme="dark"] .mb-payment-method { color: #e2e8f0 !important; }
 
-    html.dark-mode .mb-search,
-    html.dark-mode .mb-filter-bar select,
-    html.dark-mode .mb-filter-bar input[type="date"] {
+    html[data-theme="dark"] .mb-search,
+    html[data-theme="dark"] .mb-filter-bar select,
+    html[data-theme="dark"] .mb-filter-bar input[type="date"] {
         background: #16233f;
         border-color: #3b4d7d;
         color: #e2e8f0;
     }
-    html.dark-mode .mb-search input { color: #e2e8f0; }
-    html.dark-mode .mb-search input::placeholder { color: #64748b; }
-    html.dark-mode .mb-search i { color: #94a3b8; }
+    html[data-theme="dark"] .mb-search input { color: #e2e8f0; }
+    html[data-theme="dark"] .mb-search input::placeholder { color: #64748b; }
+    html[data-theme="dark"] .mb-search i { color: #94a3b8; }
 
-    html.dark-mode .mb-active-badge { background: rgba(255, 255, 255, 0.05); }
-    html.dark-mode .mb-clear-btn { background: rgba(255, 255, 255, 0.08); color: #cbd5e1; }
-    html.dark-mode .mb-clear-btn:hover { background: rgba(255, 255, 255, 0.14); }
+    html[data-theme="dark"] .mb-active-badge { background: rgba(255, 255, 255, 0.05); }
+    html[data-theme="dark"] .mb-clear-btn { background: rgba(255, 255, 255, 0.08); color: #cbd5e1; }
+    html[data-theme="dark"] .mb-clear-btn:hover { background: rgba(255, 255, 255, 0.14); }
 
-    html.dark-mode .mb-avatar { background: rgba(250, 204, 21, 0.15); color: #FACC15; }
+    html[data-theme="dark"] .mb-avatar { background: transparent; color: #FACC15; }
 
-    html.dark-mode .status-pending,
-    html.dark-mode .status-awaiting-deposit { color: #FDE047; }
-    html.dark-mode .status-assigned { color: #93c5fd; }
-    html.dark-mode .status-approved,
-    html.dark-mode .status-accepted { color: #34d399; }
-    html.dark-mode .status-rejected { color: #f87171; }
+    html[data-theme="dark"] .status-pending,
+    html[data-theme="dark"] .status-awaiting-deposit { color: #FDE047; }
+    html[data-theme="dark"] .status-assigned { color: #93c5fd; }
+    html[data-theme="dark"] .status-approved,
+    html[data-theme="dark"] .status-accepted { color: #34d399; }
+    html[data-theme="dark"] .status-rejected { color: #f87171; }
 
-    html.dark-mode .mb-action-btn.ghost { border-color: rgba(255, 255, 255, 0.15); }
-    html.dark-mode .mb-action-btn.ghost:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.25); }
-    html.dark-mode .mb-action-btn.success { color: #34d399; }
-    html.dark-mode .mb-action-btn.danger { color: #f87171; }
-    html.dark-mode .mb-action-btn.primary { color: #60a5fa; }
+    html[data-theme="dark"] .mb-action-btn.ghost { border-color: rgba(255, 255, 255, 0.15); }
+    html[data-theme="dark"] .mb-action-btn.ghost:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.25); }
+    html[data-theme="dark"] .mb-action-btn.success { color: #34d399; }
+    html[data-theme="dark"] .mb-action-btn.danger { color: #f87171; }
+    html[data-theme="dark"] .mb-action-btn.primary { color: #60a5fa; }
 
-    html.dark-mode .modal-header.glass-modal-header {
+    html[data-theme="dark"] .modal-header.glass-modal-header {
         background: #22335a !important;
         color: #e2e8f0;
         border-bottom-color: rgba(255, 255, 255, 0.09) !important;
     }
-    html.dark-mode .modal-header.glass-modal-header .modal-title,
-    html.dark-mode .modal-header.glass-modal-header h5 { color: #e2e8f0; }
-    html.dark-mode .glass-modal .btn-close { filter: invert(1); opacity: 0.8; }
-    html.dark-mode .modal-detail-card { background: #16233f; border-color: rgba(255, 255, 255, 0.09); }
+    html[data-theme="dark"] .modal-header.glass-modal-header .modal-title,
+    html[data-theme="dark"] .modal-header.glass-modal-header h5 { color: #e2e8f0; }
+    html[data-theme="dark"] .glass-modal .btn-close { filter: invert(1); opacity: 0.8; }
+    html[data-theme="dark"] .modal-detail-card { background: #16233f; border-color: rgba(255, 255, 255, 0.09); }
 </style>
 
 <div class="manage-bookings-page">

@@ -153,7 +153,7 @@ $pageIcons = [
 $pageIcon = $pageIcons[$currentPage] ?? 'bi-speedometer2';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -322,7 +322,7 @@ $pageIcon = $pageIcons[$currentPage] ?? 'bi-speedometer2';
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.7);
             box-shadow: 0 4px 24px rgba(30, 41, 59, 0.1);
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             color: #1e293b;
         }
 
@@ -446,7 +446,7 @@ $pageIcon = $pageIcons[$currentPage] ?? 'bi-speedometer2';
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         }
 
         .sidebar-collapse-btn:hover {
@@ -499,7 +499,7 @@ $pageIcon = $pageIcons[$currentPage] ?? 'bi-speedometer2';
             text-decoration: none;
             border-radius: 12px;
             margin: 4px 15px;
-            transition: background 0.3s ease, color 0.3s ease;
+            
             position: relative;
             overflow: hidden;
         }
@@ -598,7 +598,7 @@ $pageIcon = $pageIcons[$currentPage] ?? 'bi-speedometer2';
             border-radius: 10px;
             font-size: 0.8rem;
             font-weight: 500;
-            transition: background 0.2s ease, color 0.2s ease;
+            
             position: relative;
         }
         .submenu-item::before {
@@ -753,7 +753,7 @@ $pageIcon = $pageIcons[$currentPage] ?? 'bi-speedometer2';
             cursor: pointer;
             padding: 4px 10px;
             border-radius: 12px;
-            transition: background 0.3s ease;
+            
             z-index: 2;
         }
 
@@ -778,7 +778,7 @@ $pageIcon = $pageIcons[$currentPage] ?? 'bi-speedometer2';
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             z-index: 1050;
             overflow: hidden;
         }
@@ -814,7 +814,7 @@ $pageIcon = $pageIcons[$currentPage] ?? 'bi-speedometer2';
             padding: 8px 14px;
             color: var(--text-dark);
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             cursor: pointer;
             font-size: 0.8rem;
         }
@@ -944,7 +944,7 @@ $pageIcon = $pageIcons[$currentPage] ?? 'bi-speedometer2';
             cursor: pointer;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             z-index: 99;
             box-shadow: 0 4px 15px rgba(30, 58, 95, 0.4);
         }
@@ -971,7 +971,7 @@ $pageIcon = $pageIcons[$currentPage] ?? 'bi-speedometer2';
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            transition: all 0.25s ease;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease, visibility 0.25s ease, max-height 0.25s ease;
         }
 
         .notification-bell:hover {
@@ -1071,7 +1071,7 @@ $pageIcon = $pageIcons[$currentPage] ?? 'bi-speedometer2';
             text-decoration: none;
             color: inherit;
             border-bottom: 1px solid #f8fafc;
-            transition: background 0.15s ease;
+            
         }
 
         .notification-item:last-child { border-bottom: none; }

@@ -450,7 +450,7 @@ $pageTitle = 'Bookings Status';
         font-weight: 700;
         color: var(--text-main);
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     .ab-back-btn:hover { background: rgba(0, 0, 0, 0.08); color: var(--text-main); }
     .ab-back-btn i { width: 13px; height: 13px; }
@@ -475,7 +475,7 @@ $pageTitle = 'Bookings Status';
         font-weight: 700;
         color: var(--text-main);
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     .ab-tab i { width: 14px; height: 14px; }
     .ab-tab:hover { border-color: #1e3a5f; }
@@ -522,7 +522,7 @@ $pageTitle = 'Bookings Status';
         padding: 0.7rem 0.85rem;
         color: var(--text-main);
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         cursor: pointer;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
     }
@@ -611,7 +611,7 @@ $pageTitle = 'Bookings Status';
         font-weight: 800;
         color: var(--text-main);
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     .ab-action-btn:hover { background: rgba(0, 0, 0, 0.08); color: var(--text-main); }
     .ab-action-btn i { width: 12px; height: 12px; }
@@ -896,7 +896,7 @@ $pageTitle = 'Bookings Status';
         padding: 0.75rem;
         color: var(--text-main);
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         cursor: pointer;
     }
     .ab-list-item:hover { border-color: #1e3a5f; }
@@ -1030,7 +1030,7 @@ $pageTitle = 'Bookings Status';
         font-size: 0.72rem;
         font-weight: 800;
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     .ab-action-btn:hover { background: rgba(0, 0, 0, 0.08); color: var(--text-main); }
     .ab-action-btn i { width: 14px; height: 14px; }

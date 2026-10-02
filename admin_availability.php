@@ -200,7 +200,7 @@ $pageTitle = 'Availability Setup';
         padding: 8px 15px;
         border-bottom: 1px solid #f8f9fa;
         background-color: white;
-        transition: background-color 0.2s;
+        
     }
     .time-segment:hover {
         background-color: #eef7ff;
@@ -223,7 +223,7 @@ $pageTitle = 'Availability Setup';
         margin: 0 2px;
         font-size: 0.85rem;
         border-radius: 8px;
-        transition: all 0.2s;
+        transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s, visibility 0.2s, max-height 0.2s;
         cursor: pointer;
         display: inline-block;
     }
@@ -302,31 +302,31 @@ $pageTitle = 'Availability Setup';
     }
 
     /* Dark mode overrides */
-    html.dark-mode .date-header {
+    html[data-theme="dark"] .date-header {
         background-color: #22335a !important;
         color: #93c5fd !important;
         border-bottom-color: rgba(255, 255, 255, 0.09) !important;
     }
-    html.dark-mode .time-segment {
+    html[data-theme="dark"] .time-segment {
         background: #1a2b4f !important;
         border-bottom-color: rgba(255, 255, 255, 0.09) !important;
         color: #e2e8f0 !important;
     }
-    html.dark-mode .time-segment:hover { background: #22335a !important; }
-    html.dark-mode .month-filter-container {
+    html[data-theme="dark"] .time-segment:hover { background: #22335a !important; }
+    html[data-theme="dark"] .month-filter-container {
         background: #1a2b4f !important;
         border-bottom-color: rgba(255, 255, 255, 0.09) !important;
     }
-    html.dark-mode .month-btn {
+    html[data-theme="dark"] .month-btn {
         background: #22335a !important;
         color: #94a3b8 !important;
         border-color: #3b4d7d !important;
     }
-    html.dark-mode .month-btn:hover { background: #2a3d6b !important; }
-    html.dark-mode .month-btn.active { background: #2a3d6b !important; color: #FDE047 !important; border-color: #3b4d7d !important; }
-    html.dark-mode .main-content .card-setup h5,
-    html.dark-mode .card-setup input[name="date_type"]:checked + .form-check-label { color: #e2e8f0 !important; }
-    html.dark-mode .av-card-header { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .month-btn:hover { background: #2a3d6b !important; }
+    html[data-theme="dark"] .month-btn.active { background: #2a3d6b !important; color: #FDE047 !important; border-color: #3b4d7d !important; }
+    html[data-theme="dark"] .main-content .card-setup h5,
+    html[data-theme="dark"] .card-setup input[name="date_type"]:checked + .form-check-label { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .av-card-header { color: #e2e8f0 !important; }
 </style>
 
 <div class="container-fluid">

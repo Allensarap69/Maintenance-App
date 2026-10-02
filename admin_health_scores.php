@@ -219,7 +219,7 @@ $pageTitle = 'Motorcycle Health Scores';
         border: 1px solid #e2e8f0;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         text-align: center;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     .hs-stat-card:hover {
         border-color: #d1d5db;
@@ -248,7 +248,7 @@ $pageTitle = 'Motorcycle Health Scores';
         display: flex;
         align-items: center;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     .customer-row:hover {
         background: #fffbeb;
@@ -312,7 +312,7 @@ $pageTitle = 'Motorcycle Health Scores';
         font-size: 0.85rem;
         background: #ffffff;
         color: #111827;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     .customer-search-input:focus {
         border-color: #3b82f6;
@@ -335,7 +335,7 @@ $pageTitle = 'Motorcycle Health Scores';
         width: 20px;
         height: 20px;
         border-radius: 50%;
-        transition: color 0.2s ease, background 0.2s ease;
+        
     }
     .customer-search-clear:hover {
         color: #ef4444;
@@ -363,7 +363,7 @@ $pageTitle = 'Motorcycle Health Scores';
         cursor: pointer;
         color: #111827;
         font-size: 0.82rem;
-        transition: background 0.15s ease;
+        
     }
     .customer-suggestions .list-group-item:last-child {
         border-bottom: none;
@@ -398,7 +398,7 @@ $pageTitle = 'Motorcycle Health Scores';
         margin-bottom: 0.75rem;
         color: #111827;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     .health-event-card:hover {
         border-color: #d1d5db;
@@ -646,52 +646,52 @@ $pageTitle = 'Motorcycle Health Scores';
     }
 
     /* Dark mode overrides */
-    html.dark-mode .hs-content, html.dark-mode body .main-content .hs-content { color: #e2e8f0 !important; }
-    html.dark-mode .hs-stat-card { border-color: rgba(255, 255, 255, 0.12); }
-    html.dark-mode .hs-stat-label { color: #94a3b8; }
-    html.dark-mode .customer-row { border-color: rgba(250, 204, 21, 0.4); }
-    html.dark-mode .customer-row:hover { background: #22335a !important; border-color: #3b82f6; }
-    html.dark-mode .customer-name { color: #e2e8f0; }
-    html.dark-mode .customer-count { color: #94a3b8; }
-    html.dark-mode .customer-row.customer-row-alert { background: rgba(239, 68, 68, 0.08) !important; border-color: rgba(239, 68, 68, 0.5); }
-    html.dark-mode .customer-row.customer-row-alert:hover { background: rgba(239, 68, 68, 0.12) !important; }
-    html.dark-mode .customer-alert-badge { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.4); }
-    html.dark-mode .health-event-card.cond-fair { background: #1a2b4f; border-color: rgba(250, 204, 21, 0.4); }
-    html.dark-mode .health-event-card.cond-poor { background: #1a1525; border-color: rgba(239, 68, 68, 0.5); }
-    html.dark-mode .event-icon { background: rgba(250, 204, 21, 0.15); }
-    html.dark-mode .event-icon.icon-attention { background: rgba(239, 68, 68, 0.15); }
-    html.dark-mode .event-icon.icon-needs { background: rgba(250, 204, 21, 0.15); }
-    html.dark-mode .event-title { color: #e2e8f0; }
-    html.dark-mode .event-info-tag { background: #16233f; border-color: rgba(255, 255, 255, 0.12); color: #94a3b8; }
-    html.dark-mode .event-subtitle, html.dark-mode .event-subtitle i { color: #94a3b8; }
-    html.dark-mode .status-needs { background: rgba(250, 204, 21, 0.15); color: #FDE047; }
-    html.dark-mode .status-good { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-    html.dark-mode .status-attention { background: rgba(239, 68, 68, 0.15); color: #f87171; }
-    html.dark-mode .event-meta { border-left-color: rgba(255, 255, 255, 0.12); }
-    html.dark-mode .event-meta-label { color: #94a3b8; }
-    html.dark-mode .event-meta-value { color: #e2e8f0; }
-    html.dark-mode .btn-coaching-notes { background: rgba(250, 204, 21, 0.12); border-color: rgba(250, 204, 21, 0.4); color: #FDE047; }
-    html.dark-mode .btn-coaching-notes:hover { background: rgba(250, 204, 21, 0.25); color: #FDE047; }
-    html.dark-mode .customer-suggestions .list-group-item { border-bottom-color: rgba(255, 255, 255, 0.09); }
-    html.dark-mode .customer-suggestions .list-group-item:hover,
-    html.dark-mode .customer-suggestions .list-group-item.active { background: rgba(250, 204, 21, 0.12); color: #FDE047; }
-    html.dark-mode .detail-row { border-bottom-color: rgba(255, 255, 255, 0.09); }
-    html.dark-mode .detail-label { color: #94a3b8; }
-    html.dark-mode .detail-value { color: #e2e8f0; }
-    html.dark-mode .detail-gauge-marker { background: #1a2b4f; border-color: #475569; }
-    html.dark-mode .hs-moto-thumb { mix-blend-mode: normal; }
+    html[data-theme="dark"] .hs-content, html[data-theme="dark"] body .main-content .hs-content { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .hs-stat-card { border-color: rgba(255, 255, 255, 0.12); }
+    html[data-theme="dark"] .hs-stat-label { color: #94a3b8; }
+    html[data-theme="dark"] .customer-row { border-color: rgba(250, 204, 21, 0.4); }
+    html[data-theme="dark"] .customer-row:hover { background: #22335a !important; border-color: #3b82f6; }
+    html[data-theme="dark"] .customer-name { color: #e2e8f0; }
+    html[data-theme="dark"] .customer-count { color: #94a3b8; }
+    html[data-theme="dark"] .customer-row.customer-row-alert { background: rgba(239, 68, 68, 0.08) !important; border-color: rgba(239, 68, 68, 0.5); }
+    html[data-theme="dark"] .customer-row.customer-row-alert:hover { background: rgba(239, 68, 68, 0.12) !important; }
+    html[data-theme="dark"] .customer-alert-badge { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.4); }
+    html[data-theme="dark"] .health-event-card.cond-fair { background: #1a2b4f; border-color: rgba(250, 204, 21, 0.4); }
+    html[data-theme="dark"] .health-event-card.cond-poor { background: #1a1525; border-color: rgba(239, 68, 68, 0.5); }
+    html[data-theme="dark"] .event-icon { background: rgba(250, 204, 21, 0.15); }
+    html[data-theme="dark"] .event-icon.icon-attention { background: rgba(239, 68, 68, 0.15); }
+    html[data-theme="dark"] .event-icon.icon-needs { background: rgba(250, 204, 21, 0.15); }
+    html[data-theme="dark"] .event-title { color: #e2e8f0; }
+    html[data-theme="dark"] .event-info-tag { background: #16233f; border-color: rgba(255, 255, 255, 0.12); color: #94a3b8; }
+    html[data-theme="dark"] .event-subtitle, html[data-theme="dark"] .event-subtitle i { color: #94a3b8; }
+    html[data-theme="dark"] .status-needs { background: rgba(250, 204, 21, 0.15); color: #FDE047; }
+    html[data-theme="dark"] .status-good { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    html[data-theme="dark"] .status-attention { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+    html[data-theme="dark"] .event-meta { border-left-color: rgba(255, 255, 255, 0.12); }
+    html[data-theme="dark"] .event-meta-label { color: #94a3b8; }
+    html[data-theme="dark"] .event-meta-value { color: #e2e8f0; }
+    html[data-theme="dark"] .btn-coaching-notes { background: rgba(250, 204, 21, 0.12); border-color: rgba(250, 204, 21, 0.4); color: #FDE047; }
+    html[data-theme="dark"] .btn-coaching-notes:hover { background: rgba(250, 204, 21, 0.25); color: #FDE047; }
+    html[data-theme="dark"] .customer-suggestions .list-group-item { border-bottom-color: rgba(255, 255, 255, 0.09); }
+    html[data-theme="dark"] .customer-suggestions .list-group-item:hover,
+    html[data-theme="dark"] .customer-suggestions .list-group-item.active { background: rgba(250, 204, 21, 0.12); color: #FDE047; }
+    html[data-theme="dark"] .detail-row { border-bottom-color: rgba(255, 255, 255, 0.09); }
+    html[data-theme="dark"] .detail-label { color: #94a3b8; }
+    html[data-theme="dark"] .detail-value { color: #e2e8f0; }
+    html[data-theme="dark"] .detail-gauge-marker { background: #1a2b4f; border-color: #475569; }
+    html[data-theme="dark"] .hs-moto-thumb { mix-blend-mode: normal; }
 
     /* Inline-style fixes (readonly inputs, recommendation boxes) */
-    html.dark-mode .main-content [style*="color: #111827"],
-    html.dark-mode .main-content [style*="color:#111827"],
-    html.dark-mode .modal [style*="color: #111827"],
-    html.dark-mode .modal [style*="color:#111827"] { color: #e2e8f0 !important; }
-    html.dark-mode .main-content [style*="background: #fffbeb"],
-    html.dark-mode .main-content [style*="background:#fffbeb"] { background: rgba(250, 204, 21, 0.08) !important; }
-    html.dark-mode .main-content [style*="background: #fee2e2"],
-    html.dark-mode .main-content [style*="background:#fee2e2"] { background: rgba(239, 68, 68, 0.1) !important; }
-    html.dark-mode .modal [style*="background: #ffffff"],
-    html.dark-mode .modal [style*="background:#ffffff"] { background: #16233f !important; }
+    html[data-theme="dark"] .main-content [style*="color: #111827"],
+    html[data-theme="dark"] .main-content [style*="color:#111827"],
+    html[data-theme="dark"] .modal [style*="color: #111827"],
+    html[data-theme="dark"] .modal [style*="color:#111827"] { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .main-content [style*="background: #fffbeb"],
+    html[data-theme="dark"] .main-content [style*="background:#fffbeb"] { background: rgba(250, 204, 21, 0.08) !important; }
+    html[data-theme="dark"] .main-content [style*="background: #fee2e2"],
+    html[data-theme="dark"] .main-content [style*="background:#fee2e2"] { background: rgba(239, 68, 68, 0.1) !important; }
+    html[data-theme="dark"] .modal [style*="background: #ffffff"],
+    html[data-theme="dark"] .modal [style*="background:#ffffff"] { background: #16233f !important; }
 </style>
 
 <div class="container-fluid hs-content">

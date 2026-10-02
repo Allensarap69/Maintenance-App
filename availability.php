@@ -147,7 +147,7 @@ if (!$is_admin) {
 
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <title><?= $is_admin ? 'Admin: Set Availability' : 'Confirm Mutual Availability' ?></title>
@@ -172,7 +172,7 @@ if (!$is_admin) {
             padding: 15px;
             display: block;
             text-align: center;
-            transition: all 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s, visibility 0.2s, max-height 0.2s;
             font-weight: 600;
             color: var(--primary-color);
             background-color: var(--card-bg);

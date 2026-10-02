@@ -489,7 +489,7 @@ $pageTitle = 'Emergency Requests Status';
         font-weight: 700;
         color: var(--text-main);
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     .ab-back-btn:hover { background: rgba(0, 0, 0, 0.08); color: var(--text-main); }
     .ab-back-btn i { width: 13px; height: 13px; }
@@ -514,7 +514,7 @@ $pageTitle = 'Emergency Requests Status';
         font-weight: 700;
         color: var(--text-main);
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     .ab-tab i { width: 14px; height: 14px; }
     .ab-tab:hover { border-color: #1e3a5f; }
@@ -597,7 +597,7 @@ $pageTitle = 'Emergency Requests Status';
         padding: 0.75rem;
         color: var(--text-main);
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         cursor: pointer;
     }
     .ab-list-item:hover { border-color: #1e3a5f; }
@@ -824,7 +824,7 @@ $pageTitle = 'Emergency Requests Status';
         font-size: 0.68rem;
         font-weight: 800;
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     .ab-detail-footer .ab-action-btn:hover { background: rgba(0, 0, 0, 0.08); color: var(--text-main); }
     .ab-detail-footer .ab-action-btn i { width: 12px; height: 12px; }

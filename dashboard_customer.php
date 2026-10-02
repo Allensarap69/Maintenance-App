@@ -162,8 +162,19 @@ foreach ($customerMotorcycles as $md) {
 $alerts = array_slice($alerts, 0, 5);
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
+    <script>
+        // Global theme state: apply saved theme before first paint to avoid a light-theme flash
+        (function () {
+            var t = localStorage.getItem('theme');
+            if (t !== 'dark' && t !== 'light') {
+                t = (localStorage.getItem('adminDarkMode') === '1' || localStorage.getItem('customerDarkMode') === '1') ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Dashboard | AutoCare Pro</title>
@@ -235,7 +246,7 @@ $alerts = array_slice($alerts, 0, 5);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
             border-bottom: 2px solid rgba(250, 204, 21, 0.3);
             z-index: 1030;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             padding: 15px 0;
             position: fixed;
             top: 0;
@@ -328,7 +339,7 @@ $alerts = array_slice($alerts, 0, 5);
             padding: 8px 12px;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         }
 
         .sidebar-toggle:hover {
@@ -432,7 +443,7 @@ $alerts = array_slice($alerts, 0, 5);
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            transition: all 0.4s ease;
+            transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.4s ease, visibility 0.4s ease, max-height 0.4s ease;
             position: relative;
             overflow: hidden;
             text-decoration: none;
@@ -563,7 +574,7 @@ $alerts = array_slice($alerts, 0, 5);
             border-radius: 20px;
             padding: 35px 30px;
             text-align: center;
-            transition: all 0.4s ease;
+            transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.4s ease, visibility 0.4s ease, max-height 0.4s ease;
             border: 1px solid rgba(0, 0, 0, 0.05);
             position: relative;
             overflow: hidden;
@@ -604,7 +615,7 @@ $alerts = array_slice($alerts, 0, 5);
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
-            transition: all 0.4s ease;
+            transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.4s ease, visibility 0.4s ease, max-height 0.4s ease;
         }
 
         .action-card:hover .action-icon-wrapper {
@@ -615,7 +626,7 @@ $alerts = array_slice($alerts, 0, 5);
         .action-icon {
             font-size: 1.5rem;
             color: var(--accent-color);
-            transition: color 0.4s ease;
+            
         }
 
         .action-card:hover .action-icon {
@@ -682,7 +693,7 @@ $alerts = array_slice($alerts, 0, 5);
             border-radius: 50px;
             border: none;
             font-size: 1.1rem;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             box-shadow: 0 4px 20px rgba(250, 204, 21, 0.4);
             text-decoration: none;
             display: inline-block;
@@ -783,7 +794,7 @@ $alerts = array_slice($alerts, 0, 5);
             border-radius: 20px;
             padding: 30px 25px;
             text-align: center;
-            transition: all 0.4s ease;
+            transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.4s ease, visibility 0.4s ease, max-height 0.4s ease;
             border: 1px solid rgba(0, 0, 0, 0.05);
             position: relative;
             overflow: hidden;
@@ -822,7 +833,7 @@ $alerts = array_slice($alerts, 0, 5);
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
-            transition: all 0.4s ease;
+            transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.4s ease, visibility 0.4s ease, max-height 0.4s ease;
         }
 
         .motorcycle-card:hover .motorcycle-icon-wrapper {
@@ -833,7 +844,7 @@ $alerts = array_slice($alerts, 0, 5);
         .motorcycle-icon {
             font-size: 2.5rem;
             color: var(--primary-color);
-            transition: color 0.4s ease;
+            
         }
 
         .motorcycle-card:hover .motorcycle-icon {
@@ -1157,7 +1168,7 @@ $alerts = array_slice($alerts, 0, 5);
             border-bottom: 2px solid rgba(250, 204, 21, 0.3);
             overflow: visible;
             height: 60px;
-            transition: left 0.3s ease, background 0.3s ease;
+            transition: left 0.3s ease;
         }
 
         .top-bar::after {
@@ -1272,7 +1283,7 @@ $alerts = array_slice($alerts, 0, 5);
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             z-index: 1100;
             border: 1px solid #e2e8f0;
             overflow: hidden;
@@ -1309,7 +1320,7 @@ $alerts = array_slice($alerts, 0, 5);
             font-size: 0.8rem;
             color: #1e293b;
             text-decoration: none;
-            transition: background 0.2s ease;
+            
         }
 
         .dropdown-item:hover {
@@ -1642,7 +1653,7 @@ $alerts = array_slice($alerts, 0, 5);
             display: flex; align-items: center; gap: 10px;
             background: #fff; border: 1.5px solid #E5E7EB; border-radius: 14px;
             padding: 10px 14px; cursor: pointer; text-decoration: none;
-            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            transition: box-shadow 0.15s ease;
             font-family: inherit; position: relative; min-width: 200px;
         }
         .veh-chip:hover { border-color: #C7D6EA; box-shadow: 0 4px 12px rgba(15,23,42,0.06); }
@@ -1790,7 +1801,7 @@ $alerts = array_slice($alerts, 0, 5);
             display: flex; align-items: center; gap: 7px;
             font-size: 0.78rem; font-weight: 600; color: #374151; text-decoration: none;
             padding: 7px 12px; border-radius: 10px;
-            transition: background 0.15s ease;
+            
         }
         .qa-item i { color: #6b7280; }
         .qa-item:hover { background: #F3F6FA; color: #111827; }
@@ -1877,107 +1888,107 @@ $alerts = array_slice($alerts, 0, 5);
 
         /* ===== Dark mode overrides ===== */
         /* Stat / quick-link cards */
-        html.dark-mode .dc-card.dc-navy,
-        html.dark-mode .dc-card.dc-gold,
-        html.dark-mode .dc-card.dc-amber,
-        html.dark-mode .dc-card.dc-blue {
+        html[data-theme="dark"] .dc-card.dc-navy,
+        html[data-theme="dark"] .dc-card.dc-gold,
+        html[data-theme="dark"] .dc-card.dc-amber,
+        html[data-theme="dark"] .dc-card.dc-blue {
             background: linear-gradient(135deg, #22335a 0%, #1a2b4f 100%) !important;
         }
-        html.dark-mode .dc-icon, html.dark-mode .dc-arrow { background: #22335a !important; }
-        html.dark-mode .dc-navy .dc-icon, html.dark-mode .dc-navy .dc-arrow { color: #93c5fd !important; }
-        html.dark-mode .dc-title { color: #cbd5e1 !important; }
-        html.dark-mode .dc-moto-bg { color: rgba(255, 255, 255, 0.05) !important; }
+        html[data-theme="dark"] .dc-icon, html[data-theme="dark"] .dc-arrow { background: #22335a !important; }
+        html[data-theme="dark"] .dc-navy .dc-icon, html[data-theme="dark"] .dc-navy .dc-arrow { color: #93c5fd !important; }
+        html[data-theme="dark"] .dc-title { color: #cbd5e1 !important; }
+        html[data-theme="dark"] .dc-moto-bg { color: rgba(255, 255, 255, 0.05) !important; }
 
         /* Vehicle switcher chips */
-        html.dark-mode .veh-switch-head h2 { color: #e2e8f0 !important; }
-        html.dark-mode .veh-switch-link { color: #94a3b8 !important; }
-        html.dark-mode .veh-switch-link:hover { color: #FDE047 !important; }
-        html.dark-mode .veh-chip { background: #1a2b4f !important; border-color: rgba(255, 255, 255, 0.12) !important; }
-        html.dark-mode .veh-chip:hover { border-color: rgba(59, 130, 246, 0.5) !important; }
-        html.dark-mode .veh-chip.selected { border-color: #FACC15 !important; background: rgba(250, 204, 21, 0.08) !important; }
-        html.dark-mode .veh-chip-img { background: transparent !important; color: #94a3b8 !important; }
-        html.dark-mode .veh-chip-img img { mix-blend-mode: normal; }
-        html.dark-mode .veh-chip-name { color: #e2e8f0 !important; }
-        html.dark-mode .veh-chip-plate { color: #94a3b8 !important; }
-        html.dark-mode .veh-chip-badge { background: rgba(250, 204, 21, 0.2) !important; color: #FDE047 !important; }
-        html.dark-mode .veh-chip-caret { color: #64748b !important; }
-        html.dark-mode .veh-chip-add { color: #93c5fd !important; }
-        html.dark-mode .veh-chip-add:hover { border-color: #93c5fd !important; }
+        html[data-theme="dark"] .veh-switch-head h2 { color: #e2e8f0 !important; }
+        html[data-theme="dark"] .veh-switch-link { color: #94a3b8 !important; }
+        html[data-theme="dark"] .veh-switch-link:hover { color: #FDE047 !important; }
+        html[data-theme="dark"] .veh-chip { background: #1a2b4f !important; border-color: rgba(255, 255, 255, 0.12) !important; }
+        html[data-theme="dark"] .veh-chip:hover { border-color: rgba(59, 130, 246, 0.5) !important; }
+        html[data-theme="dark"] .veh-chip.selected { border-color: #FACC15 !important; background: rgba(250, 204, 21, 0.08) !important; }
+        html[data-theme="dark"] .veh-chip-img { background: transparent !important; color: #94a3b8 !important; }
+        html[data-theme="dark"] .veh-chip-img img { mix-blend-mode: normal; }
+        html[data-theme="dark"] .veh-chip-name { color: #e2e8f0 !important; }
+        html[data-theme="dark"] .veh-chip-plate { color: #94a3b8 !important; }
+        html[data-theme="dark"] .veh-chip-badge { background: rgba(250, 204, 21, 0.2) !important; color: #FDE047 !important; }
+        html[data-theme="dark"] .veh-chip-caret { color: #64748b !important; }
+        html[data-theme="dark"] .veh-chip-add { color: #93c5fd !important; }
+        html[data-theme="dark"] .veh-chip-add:hover { border-color: #93c5fd !important; }
 
         /* Vehicle overview card */
-        html.dark-mode .vov-card, html.dark-mode .stl-card,
-        html.dark-mode .ua-card, html.dark-mode .al-card,
-        html.dark-mode .tip-card, html.dark-mode .qa-bar,
-        html.dark-mode .no-motorcycles {
+        html[data-theme="dark"] .vov-card, html[data-theme="dark"] .stl-card,
+        html[data-theme="dark"] .ua-card, html[data-theme="dark"] .al-card,
+        html[data-theme="dark"] .tip-card, html[data-theme="dark"] .qa-bar,
+        html[data-theme="dark"] .no-motorcycles {
             background: #1a2b4f !important;
             border-color: rgba(255, 255, 255, 0.1) !important;
             color: #e2e8f0 !important;
         }
-        html.dark-mode .vov-head h3, html.dark-mode .stl-head h3,
-        html.dark-mode .ua-head h3, html.dark-mode .al-head h3,
-        html.dark-mode .vov-comps-title, html.dark-mode .vov-bike-name,
-        html.dark-mode .vov-comp-name, html.dark-mode .ua-service-name,
-        html.dark-mode .al-title, html.dark-mode .tip-text strong,
-        html.dark-mode .stl-type, html.dark-mode .vov-ring span,
-        html.dark-mode .no-motorcycles h3 { color: #e2e8f0 !important; }
-        html.dark-mode .vov-bike-plate, html.dark-mode .vov-type,
-        html.dark-mode .vov-health-label, html.dark-mode .vov-ring small,
-        html.dark-mode .stl-date, html.dark-mode .stl-sub,
-        html.dark-mode .stl-empty, html.dark-mode .ua-service-bike,
-        html.dark-mode .ua-meta, html.dark-mode .ua-empty,
-        html.dark-mode .al-sub, html.dark-mode .tip-text p,
-        html.dark-mode .no-motorcycles p { color: #94a3b8 !important; }
-        html.dark-mode .ua-head-ico, html.dark-mode .al-head-ico,
-        html.dark-mode .ua-link, html.dark-mode .stl-link { color: #93c5fd !important; }
-        html.dark-mode .ua-link:hover, html.dark-mode .stl-link:hover { color: #FDE047 !important; }
-        html.dark-mode .ua-body { background: #16233f !important; }
-        html.dark-mode .ua-service-ico { background: rgba(59, 130, 246, 0.15) !important; }
-        html.dark-mode .vov-bike-img { background: transparent !important; }
-        html.dark-mode .vov-bike-img img { mix-blend-mode: normal; }
-        html.dark-mode .vov-status { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
-        html.dark-mode .vov-health-cond.good { color: #34d399 !important; }
-        html.dark-mode .vov-health-cond.fair { color: #FDE047 !important; }
-        html.dark-mode .vov-health-cond.bad { color: #f87171 !important; }
-        html.dark-mode .vov-comp { border-color: rgba(255, 255, 255, 0.09) !important; }
-        html.dark-mode .vov-comp-ico.good { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
-        html.dark-mode .vov-comp-ico.fair { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
-        html.dark-mode .vov-comp-ico.bad { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
-        html.dark-mode .vov-comp-pill.good { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
-        html.dark-mode .vov-comp-pill.fair { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
-        html.dark-mode .vov-comp-pill.bad { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
-        html.dark-mode .vov-comp-caret, html.dark-mode .al-caret { color: #64748b !important; }
+        html[data-theme="dark"] .vov-head h3, html[data-theme="dark"] .stl-head h3,
+        html[data-theme="dark"] .ua-head h3, html[data-theme="dark"] .al-head h3,
+        html[data-theme="dark"] .vov-comps-title, html[data-theme="dark"] .vov-bike-name,
+        html[data-theme="dark"] .vov-comp-name, html[data-theme="dark"] .ua-service-name,
+        html[data-theme="dark"] .al-title, html[data-theme="dark"] .tip-text strong,
+        html[data-theme="dark"] .stl-type, html[data-theme="dark"] .vov-ring span,
+        html[data-theme="dark"] .no-motorcycles h3 { color: #e2e8f0 !important; }
+        html[data-theme="dark"] .vov-bike-plate, html[data-theme="dark"] .vov-type,
+        html[data-theme="dark"] .vov-health-label, html[data-theme="dark"] .vov-ring small,
+        html[data-theme="dark"] .stl-date, html[data-theme="dark"] .stl-sub,
+        html[data-theme="dark"] .stl-empty, html[data-theme="dark"] .ua-service-bike,
+        html[data-theme="dark"] .ua-meta, html[data-theme="dark"] .ua-empty,
+        html[data-theme="dark"] .al-sub, html[data-theme="dark"] .tip-text p,
+        html[data-theme="dark"] .no-motorcycles p { color: #94a3b8 !important; }
+        html[data-theme="dark"] .ua-head-ico, html[data-theme="dark"] .al-head-ico,
+        html[data-theme="dark"] .ua-link, html[data-theme="dark"] .stl-link { color: #93c5fd !important; }
+        html[data-theme="dark"] .ua-link:hover, html[data-theme="dark"] .stl-link:hover { color: #FDE047 !important; }
+        html[data-theme="dark"] .ua-body { background: #16233f !important; }
+        html[data-theme="dark"] .ua-service-ico { background: rgba(59, 130, 246, 0.15) !important; }
+        html[data-theme="dark"] .vov-bike-img { background: transparent !important; }
+        html[data-theme="dark"] .vov-bike-img img { mix-blend-mode: normal; }
+        html[data-theme="dark"] .vov-status { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+        html[data-theme="dark"] .vov-health-cond.good { color: #34d399 !important; }
+        html[data-theme="dark"] .vov-health-cond.fair { color: #FDE047 !important; }
+        html[data-theme="dark"] .vov-health-cond.bad { color: #f87171 !important; }
+        html[data-theme="dark"] .vov-comp { border-color: rgba(255, 255, 255, 0.09) !important; }
+        html[data-theme="dark"] .vov-comp-ico.good { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+        html[data-theme="dark"] .vov-comp-ico.fair { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
+        html[data-theme="dark"] .vov-comp-ico.bad { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+        html[data-theme="dark"] .vov-comp-pill.good { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+        html[data-theme="dark"] .vov-comp-pill.fair { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
+        html[data-theme="dark"] .vov-comp-pill.bad { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+        html[data-theme="dark"] .vov-comp-caret, html[data-theme="dark"] .al-caret { color: #64748b !important; }
 
         /* Service timeline */
-        html.dark-mode .stl-head-ico { background: #22335a !important; color: #93c5fd !important; }
-        html.dark-mode .stl-item::before { background: #3b4d7d !important; }
-        html.dark-mode .stl-item.completed::before { background: #10B981 !important; }
-        html.dark-mode .stl-dot { box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2) !important; }
-        html.dark-mode .stl-item.upcoming .stl-dot { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important; }
-        html.dark-mode .stl-item.current .stl-dot { box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.25) !important; }
-        html.dark-mode .stl-item.upcoming .stl-type { color: #94a3b8 !important; }
-        html.dark-mode .stl-pill { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
-        html.dark-mode .stl-pill.upcoming { background: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; }
-        html.dark-mode .stl-pill.current { background: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
+        html[data-theme="dark"] .stl-head-ico { background: #22335a !important; color: #93c5fd !important; }
+        html[data-theme="dark"] .stl-item::before { background: #3b4d7d !important; }
+        html[data-theme="dark"] .stl-item.completed::before { background: #10B981 !important; }
+        html[data-theme="dark"] .stl-dot { box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2) !important; }
+        html[data-theme="dark"] .stl-item.upcoming .stl-dot { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important; }
+        html[data-theme="dark"] .stl-item.current .stl-dot { box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.25) !important; }
+        html[data-theme="dark"] .stl-item.upcoming .stl-type { color: #94a3b8 !important; }
+        html[data-theme="dark"] .stl-pill { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+        html[data-theme="dark"] .stl-pill.upcoming { background: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; }
+        html[data-theme="dark"] .stl-pill.current { background: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
 
         /* Alerts & tip cards */
-        html.dark-mode .al-count { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
-        html.dark-mode .al-item { background: #22335a !important; border-color: rgba(255, 255, 255, 0.09) !important; }
-        html.dark-mode .al-ico.red { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
-        html.dark-mode .al-ico.amber { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
-        html.dark-mode .tip-ico { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
+        html[data-theme="dark"] .al-count { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+        html[data-theme="dark"] .al-item { background: #22335a !important; border-color: rgba(255, 255, 255, 0.09) !important; }
+        html[data-theme="dark"] .al-ico.red { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+        html[data-theme="dark"] .al-ico.amber { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
+        html[data-theme="dark"] .tip-ico { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
 
         /* Health ring inner disc + track */
-        html.dark-mode .vov-ring {
+        html[data-theme="dark"] .vov-ring {
             background:
                 radial-gradient(closest-side, #1a2b4f 80%, transparent 81% 100%),
                 conic-gradient(var(--c, #10B981) calc(var(--p, 0) * 1%), #3b4d7d 0) !important;
         }
 
         /* Quick action bar */
-        html.dark-mode .qa-label { color: #e2e8f0 !important; }
-        html.dark-mode .qa-item { color: #cbd5e1 !important; }
-        html.dark-mode .qa-item i { color: #94a3b8 !important; }
-        html.dark-mode .qa-item:hover { background: #2a3d6b !important; color: #FDE047 !important; }
+        html[data-theme="dark"] .qa-label { color: #e2e8f0 !important; }
+        html[data-theme="dark"] .qa-item { color: #cbd5e1 !important; }
+        html[data-theme="dark"] .qa-item i { color: #94a3b8 !important; }
+        html[data-theme="dark"] .qa-item:hover { background: #2a3d6b !important; color: #FDE047 !important; }
     </style>
 </head>
 <body>

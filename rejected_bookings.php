@@ -205,7 +205,7 @@ $pageTitle = 'Rejected Bookings';
         font-weight: 700;
         color: var(--text-main);
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     .rb-back-btn:hover { background: rgba(0, 0, 0, 0.08); color: var(--text-main); }
     .rb-back-btn i { width: 13px; height: 13px; }
@@ -249,7 +249,7 @@ $pageTitle = 'Rejected Bookings';
         padding: 0.7rem 0.85rem;
         color: var(--text-main);
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         cursor: pointer;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
     }
@@ -343,7 +343,7 @@ $pageTitle = 'Rejected Bookings';
         font-weight: 800;
         color: var(--text-main);
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     .rb-action-btn:hover { background: rgba(0, 0, 0, 0.08); color: var(--text-main); }
     .rb-action-btn i { width: 12px; height: 12px; }

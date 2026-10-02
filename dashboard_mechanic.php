@@ -615,7 +615,7 @@ $activity_items = array_slice($activity_items, 0, 5);
     /* Segmented duty toggle */
     .seg-toggle { display:inline-flex; background:#F1F4F9; border-radius:99px; padding:3px; gap:2px; margin-top:0.7rem; }
     .seg-toggle form { display:flex; }
-    .seg-btn { border:none; background:transparent; font-family:inherit; font-size:0.72rem; font-weight:700; color:#64748b; padding:0.34rem 0.95rem; border-radius:99px; cursor:pointer; transition:all .15s ease; }
+    .seg-btn { border:none; background:transparent; font-family:inherit; font-size:0.72rem; font-weight:700; color:#64748b; padding:0.34rem 0.95rem; border-radius:99px; cursor:pointer; transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease, visibility .15s ease, max-height .15s ease; }
     .seg-btn:hover:not(:disabled) { color:#0f172a; }
     .seg-btn.active.on { background:#FACC15; color:#111827; box-shadow:0 2px 6px rgba(250,204,21,0.45); }
     .seg-btn.active.off { background:#fff; color:#0f172a; box-shadow:0 1px 4px rgba(15,23,42,0.12); }
@@ -662,7 +662,7 @@ $activity_items = array_slice($activity_items, 0, 5);
     .prio.high { background:#FDE4E4; color:#ef4444; }
     .prio.medium { background:#FEF3D8; color:#d97706; }
     .prio.low { background:#F1F4F9; color:#64748b; }
-    .btn-view-sm { display:inline-flex; align-items:center; gap:0.3rem; background:#fff; border:1px solid #E2E8F0; border-radius:8px; padding:0.32rem 0.8rem; font-size:0.72rem; font-weight:700; color:#0f172a; cursor:pointer; transition:all .15s ease; }
+    .btn-view-sm { display:inline-flex; align-items:center; gap:0.3rem; background:#fff; border:1px solid #E2E8F0; border-radius:8px; padding:0.32rem 0.8rem; font-size:0.72rem; font-weight:700; color:#0f172a; cursor:pointer; transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease, visibility .15s ease, max-height .15s ease; }
     .btn-view-sm:hover { border-color:#3b82f6; color:#3b82f6; }
     .queue-scroll { overflow-x:auto; }
 
@@ -702,7 +702,7 @@ $activity_items = array_slice($activity_items, 0, 5);
     .time-left { font-size:0.66rem; font-weight:700; color:#2563eb; background:#E3EDFF; border-radius:99px; padding:0.28rem 0.65rem; white-space:nowrap; }
 
     /* ---- Emergency card ---- */
-    .emg-card { background:#FFF7F7; border:1px solid #FBDCDC; border-radius:14px; padding:0.95rem 1rem; display:block; text-decoration:none; transition:border-color .15s ease; }
+    .emg-card { background:#FFF7F7; border:1px solid #FBDCDC; border-radius:14px; padding:0.95rem 1rem; display:block; text-decoration:none;  }
     .emg-card:hover { border-color:#ef4444; }
     .emg-card-top { display:flex; align-items:center; justify-content:space-between; gap:0.5rem; }
     .emg-card-title { font-size:0.85rem; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:0.4rem; }

@@ -730,7 +730,7 @@ require 'admin_sidebar_template.php';
         border-radius: 12px;
         padding: 12px 16px;
         font-size: 0.9rem;
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
     }
     .form-control:focus, .form-select:focus {
         border-color: #1e293b;
@@ -755,7 +755,7 @@ require 'admin_sidebar_template.php';
         padding: 10px 24px;
         border-radius: 12px;
         font-weight: 600;
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         box-shadow: none !important;
     }
     body .btn-primary:hover {
@@ -889,7 +889,7 @@ require 'admin_sidebar_template.php';
     }
     .customer-row {
         border-bottom: 1px solid var(--card-border);
-        transition: background 0.15s ease;
+        
         color: var(--text-dark);
     }
     .customer-row:last-child { border-bottom: none; }
@@ -952,7 +952,7 @@ require 'admin_sidebar_template.php';
         font-size: 1rem;
         background: transparent;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         padding: 0;
         color: #FACC15;
     }
@@ -1041,10 +1041,10 @@ require 'admin_sidebar_template.php';
     }
 
     /* Dark mode overrides */
-    html.dark-mode .customer-status.Active { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
-    html.dark-mode .customer-status.Inactive { background: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
-    html.dark-mode .customer-status.Archived { background: rgba(148, 163, 184, 0.15) !important; color: #cbd5e1 !important; }
-    html.dark-mode .view-moto-image img { mix-blend-mode: normal; }
+    html[data-theme="dark"] .customer-status.Active { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html[data-theme="dark"] .customer-status.Inactive { background: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
+    html[data-theme="dark"] .customer-status.Archived { background: rgba(148, 163, 184, 0.15) !important; color: #cbd5e1 !important; }
+    html[data-theme="dark"] .view-moto-image img { mix-blend-mode: normal; }
 </style>
 
 <!-- Alert Message -->

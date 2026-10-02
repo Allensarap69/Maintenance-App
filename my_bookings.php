@@ -222,8 +222,19 @@ $active_page = basename($_SERVER['PHP_SELF']);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
+    <script>
+        // Global theme state: apply saved theme before first paint to avoid a light-theme flash
+        (function () {
+            var t = localStorage.getItem('theme');
+            if (t !== 'dark' && t !== 'light') {
+                t = (localStorage.getItem('adminDarkMode') === '1' || localStorage.getItem('customerDarkMode') === '1') ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Bookings</title>
@@ -364,7 +375,7 @@ $active_page = basename($_SERVER['PHP_SELF']);
             -webkit-backdrop-filter: blur(20px);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
             z-index: 1030;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             padding: 15px 0;
         }
 
@@ -391,7 +402,7 @@ $active_page = basename($_SERVER['PHP_SELF']);
             font-weight: 500;
             padding: 10px 20px;
             border-radius: 50px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         }
 
         .btn-back:hover {
@@ -408,7 +419,7 @@ $active_page = basename($_SERVER['PHP_SELF']);
             border: none;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
             margin-bottom: 25px;
-            transition: all 0.4s ease;
+            transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.4s ease, visibility 0.4s ease, max-height 0.4s ease;
             overflow: hidden;
         }
 
@@ -551,7 +562,7 @@ $active_page = basename($_SERVER['PHP_SELF']);
             color: var(--text-light);
             background: white;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         }
 
         .nav-tabs .nav-link:hover {
@@ -590,7 +601,7 @@ $active_page = basename($_SERVER['PHP_SELF']);
             font-weight: 600;
             padding: 10px 25px;
             border-radius: 50px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             box-shadow: 0 4px 15px rgba(15, 23, 42, 0.3);
         }
 
@@ -607,7 +618,7 @@ $active_page = basename($_SERVER['PHP_SELF']);
             font-weight: 600;
             padding: 10px 25px;
             border-radius: 50px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
         }
 
@@ -624,7 +635,7 @@ $active_page = basename($_SERVER['PHP_SELF']);
             font-weight: 500;
             padding: 8px 20px;
             border-radius: 50px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         }
 
         .btn-outline-custom:hover {
@@ -802,7 +813,7 @@ $active_page = basename($_SERVER['PHP_SELF']);
         border-left: 4px solid #cbd5e1;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         overflow: hidden;
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
     }
 
     .booking-list-item:hover {
@@ -952,7 +963,7 @@ $active_page = basename($_SERVER['PHP_SELF']);
         font-weight: 600;
         font-size: 0.8rem;
         text-decoration: none;
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
     }
 
     .btn-view-details:hover {
@@ -976,7 +987,7 @@ $active_page = basename($_SERVER['PHP_SELF']);
         color: var(--text-light);
         background: #fff;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         display: flex;
         align-items: center;
         gap: 6px;
@@ -1010,7 +1021,7 @@ $active_page = basename($_SERVER['PHP_SELF']);
         border-left: 4px solid #cbd5e1;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         overflow: hidden;
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         display: flex;
         flex-direction: column;
         height: 100%;
@@ -1155,7 +1166,7 @@ $active_page = basename($_SERVER['PHP_SELF']);
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        transition: all 0.2s;
+        transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s, visibility 0.2s, max-height 0.2s;
     }
     .view-toggle .btn.active {
         background: var(--primary-color);

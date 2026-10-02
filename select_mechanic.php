@@ -244,8 +244,19 @@ $button_specialties = [
 ];
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
+    <script>
+        // Global theme state: apply saved theme before first paint to avoid a light-theme flash
+        (function () {
+            var t = localStorage.getItem('theme');
+            if (t !== 'dark' && t !== 'light') {
+                t = (localStorage.getItem('adminDarkMode') === '1' || localStorage.getItem('customerDarkMode') === '1') ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select Mechanic Availability</title>
@@ -299,7 +310,7 @@ $button_specialties = [
             -webkit-backdrop-filter: blur(10px);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
             z-index: 1050;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             padding: 12px 0;
             position: fixed;
             top: 0;
@@ -342,7 +353,7 @@ $button_specialties = [
             font-weight: 600;
             padding: 10px 20px;
             border-radius: 8px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             font-size: 0.95rem;
         }
 
@@ -372,7 +383,7 @@ $button_specialties = [
             align-items: center;
             gap: 8px;
             opacity: 0.4;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         }
 
         .page-stepper .step-item.active {
@@ -422,7 +433,7 @@ $button_specialties = [
             margin-bottom: 10px; 
             display: flex;
             align-items: center; 
-            transition: all 0.2s ease; 
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease; 
             background-color: var(--card-bg); 
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             height: 100%;

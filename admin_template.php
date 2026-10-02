@@ -35,7 +35,7 @@ try {
 $currentPage = basename($_SERVER['PHP_SELF'], '.php');
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -134,7 +134,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
             width: var(--sidebar-width);
             height: 100vh;
             background: var(--sidebar-bg);
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             z-index: 1000;
             display: flex;
             flex-direction: column;
@@ -234,7 +234,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
             text-decoration: none;
             border-radius: 12px;
             margin: 4px 15px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             position: relative;
             overflow: hidden;
         }
@@ -341,7 +341,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
             color: rgba(255, 255, 255, 0.5);
             cursor: pointer;
             padding: 5px;
-            transition: color 0.3s ease;
+            
         }
 
         .btn-logout:hover {
@@ -487,7 +487,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
             cursor: pointer;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             z-index: 99;
             box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
         }

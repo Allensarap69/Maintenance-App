@@ -481,7 +481,7 @@ $pageTitle = 'Maintenance History Management';
         font-size: 0.75rem;
         background: transparent;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         padding: 0;
     }
     .action-btn.view { background: transparent; color: #2563eb; border-color: transparent; }
@@ -649,7 +649,7 @@ $pageTitle = 'Maintenance History Management';
         font-size: 0.85rem;
         background: #ffffff;
         color: #111827;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     .mh-search-input:focus {
         border-color: #3b82f6;
@@ -672,7 +672,7 @@ $pageTitle = 'Maintenance History Management';
         width: 20px;
         height: 20px;
         border-radius: 50%;
-        transition: color 0.2s ease, background 0.2s ease;
+        
     }
     .mh-search-clear:hover {
         color: #ef4444;
@@ -685,30 +685,30 @@ $pageTitle = 'Maintenance History Management';
     }
 
     /* Dark mode overrides */
-    html.dark-mode .mh-content .table { color: #e2e8f0 !important; }
-    html.dark-mode .mh-content .table thead th {
+    html[data-theme="dark"] .mh-content .table { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .mh-content .table thead th {
         background-color: #22335a !important;
         color: #93c5fd !important;
         border-bottom-color: rgba(255, 255, 255, 0.12) !important;
     }
-    html.dark-mode .mh-content .table tbody tr {
+    html[data-theme="dark"] .mh-content .table tbody tr {
         background: #1a2b4f !important;
         border-bottom-color: rgba(255, 255, 255, 0.08) !important;
     }
-    html.dark-mode .mh-content,
-    html.dark-mode .mh-form, html.dark-mode .mh-form .form-label,
-    html.dark-mode .mh-form .form-check-label, html.dark-mode .mh-form .form-text,
-    html.dark-mode .filter-row .form-label { color: #e2e8f0 !important; }
-    html.dark-mode .section-title { color: #e2e8f0 !important; }
-    html.dark-mode .view-label { color: #94a3b8 !important; }
-    html.dark-mode .view-value { color: #e2e8f0 !important; }
-    html.dark-mode .moto-model, html.dark-mode .customer-name,
-    html.dark-mode .mechanic-name, html.dark-mode .mileage-cell,
-    html.dark-mode .cost-cell { color: #e2e8f0 !important; }
-    html.dark-mode .moto-plate, html.dark-mode .cell-icon { color: #94a3b8 !important; }
-    html.dark-mode .service-type-badge.booked { background: rgba(250, 204, 21, 0.12) !important; border-color: rgba(250, 204, 21, 0.3) !important; }
-    html.dark-mode .service-type-badge.general { background: rgba(168, 85, 247, 0.15) !important; color: #c084fc !important; border-color: rgba(168, 85, 247, 0.3) !important; }
-    html.dark-mode .pagination-sm .page-item.active .page-link { color: #111827 !important; }
+    html[data-theme="dark"] .mh-content,
+    html[data-theme="dark"] .mh-form, html[data-theme="dark"] .mh-form .form-label,
+    html[data-theme="dark"] .mh-form .form-check-label, html[data-theme="dark"] .mh-form .form-text,
+    html[data-theme="dark"] .filter-row .form-label { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .section-title { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .view-label { color: #94a3b8 !important; }
+    html[data-theme="dark"] .view-value { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .moto-model, html[data-theme="dark"] .customer-name,
+    html[data-theme="dark"] .mechanic-name, html[data-theme="dark"] .mileage-cell,
+    html[data-theme="dark"] .cost-cell { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .moto-plate, html[data-theme="dark"] .cell-icon { color: #94a3b8 !important; }
+    html[data-theme="dark"] .service-type-badge.booked { background: rgba(250, 204, 21, 0.12) !important; border-color: rgba(250, 204, 21, 0.3) !important; }
+    html[data-theme="dark"] .service-type-badge.general { background: rgba(168, 85, 247, 0.15) !important; color: #c084fc !important; border-color: rgba(168, 85, 247, 0.3) !important; }
+    html[data-theme="dark"] .pagination-sm .page-item.active .page-link { color: #111827 !important; }
 </style>
 
 <div class="container-fluid mh-content">

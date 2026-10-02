@@ -216,8 +216,19 @@ if (empty($saved_boundary)) {
 $pageTitle = 'Emergency Service Request';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
+    <script>
+        // Global theme state: apply saved theme before first paint to avoid a light-theme flash
+        (function () {
+            var t = localStorage.getItem('theme');
+            if (t !== 'dark' && t !== 'light') {
+                t = (localStorage.getItem('adminDarkMode') === '1' || localStorage.getItem('customerDarkMode') === '1') ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?> | AutoCare Pro</title>
@@ -270,7 +281,7 @@ $pageTitle = 'Emergency Service Request';
             align-items: center;
             gap: 16px;
             height: 100%;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         }
 
         .stat-card:hover {
@@ -300,7 +311,7 @@ $pageTitle = 'Emergency Service Request';
         .emergency-card {
             background: white; border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            border: none; transition: all 0.3s ease; overflow: hidden;
+            border: none; transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease; overflow: hidden;
         }
         .emergency-header { padding: 20px 25px; color: white; }
         .emergency-header.pending { background: var(--primary-gradient); }

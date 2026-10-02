@@ -236,7 +236,7 @@ $pageTitle = 'Warranty Management';
         border-radius: 12px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         border: none;
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
     }
     
     .warranty-card:hover {
@@ -366,32 +366,32 @@ $pageTitle = 'Warranty Management';
     .claim-modal-header .btn-close { filter: none; }
 
     /* Dark mode overrides */
-    html.dark-mode .warranty-card-header { background: #1a2b4f !important; color: #e2e8f0 !important; }
-    html.dark-mode .warranty-card-header h4 { color: #e2e8f0 !important; }
-    html.dark-mode .claim-modal-header { background: #1a2b4f !important; color: #e2e8f0 !important; }
-    html.dark-mode .claim-modal-header .modal-title { color: #e2e8f0 !important; }
-    html.dark-mode .table thead th { background-color: #22335a !important; color: #e2e8f0 !important; }
-    html.dark-mode #warranties-tab .table thead th { color: #FDE047 !important; }
-    html.dark-mode .table tbody tr:hover { background-color: rgba(255, 255, 255, 0.05) !important; }
-    html.dark-mode .warranty-form,
-    html.dark-mode .warranty-form .form-label,
-    html.dark-mode .warranty-form .form-control,
-    html.dark-mode .warranty-form .form-select,
-    html.dark-mode .warranty-form .form-check-label,
-    html.dark-mode .warranty-content,
-    html.dark-mode .warranty-content .table,
-    html.dark-mode .warranty-content .table th,
-    html.dark-mode .warranty-content .table td,
-    html.dark-mode .warranty-content .nav-link { color: #e2e8f0 !important; }
-    html.dark-mode .nav-tabs .nav-link.active { background-color: #2a3d6b !important; color: #FDE047 !important; }
-    html.dark-mode .status-active { background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
-    html.dark-mode .status-expired { background-color: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
-    html.dark-mode .status-claimed { background-color: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
-    html.dark-mode .status-cancelled { background-color: rgba(148, 163, 184, 0.15) !important; color: #94a3b8 !important; }
-    html.dark-mode .status-pending { background-color: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; }
-    html.dark-mode .status-approved { background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
-    html.dark-mode .status-rejected { background-color: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
-    html.dark-mode .status-completed { background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html[data-theme="dark"] .warranty-card-header { background: #1a2b4f !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .warranty-card-header h4 { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .claim-modal-header { background: #1a2b4f !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .claim-modal-header .modal-title { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .table thead th { background-color: #22335a !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] #warranties-tab .table thead th { color: #FDE047 !important; }
+    html[data-theme="dark"] .table tbody tr:hover { background-color: rgba(255, 255, 255, 0.05) !important; }
+    html[data-theme="dark"] .warranty-form,
+    html[data-theme="dark"] .warranty-form .form-label,
+    html[data-theme="dark"] .warranty-form .form-control,
+    html[data-theme="dark"] .warranty-form .form-select,
+    html[data-theme="dark"] .warranty-form .form-check-label,
+    html[data-theme="dark"] .warranty-content,
+    html[data-theme="dark"] .warranty-content .table,
+    html[data-theme="dark"] .warranty-content .table th,
+    html[data-theme="dark"] .warranty-content .table td,
+    html[data-theme="dark"] .warranty-content .nav-link { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .nav-tabs .nav-link.active { background-color: #2a3d6b !important; color: #FDE047 !important; }
+    html[data-theme="dark"] .status-active { background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html[data-theme="dark"] .status-expired { background-color: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+    html[data-theme="dark"] .status-claimed { background-color: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
+    html[data-theme="dark"] .status-cancelled { background-color: rgba(148, 163, 184, 0.15) !important; color: #94a3b8 !important; }
+    html[data-theme="dark"] .status-pending { background-color: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; }
+    html[data-theme="dark"] .status-approved { background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html[data-theme="dark"] .status-rejected { background-color: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+    html[data-theme="dark"] .status-completed { background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
 </style>
 
 <div class="container-fluid">

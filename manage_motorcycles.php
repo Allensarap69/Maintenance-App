@@ -392,7 +392,7 @@ require 'admin_sidebar_template.php';
         border-radius: 12px;
         padding: 12px 16px;
         font-size: 0.9rem;
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
     }
     .form-control:focus, .form-select:focus {
         border-color: #1e293b;
@@ -417,7 +417,7 @@ require 'admin_sidebar_template.php';
         padding: 10px 24px;
         border-radius: 12px;
         font-weight: 600;
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         box-shadow: none !important;
     }
     body .btn-primary:hover {
@@ -521,7 +521,7 @@ require 'admin_sidebar_template.php';
         font-size: 1rem;
         background: transparent;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         padding: 0;
     }
     .action-btn { color: #FACC15; }
@@ -607,7 +607,7 @@ require 'admin_sidebar_template.php';
     .moto-row {
         background: transparent;
         border-bottom: 1px solid var(--card-border);
-        transition: background 0.15s ease;
+        
     }
     .moto-row:last-child { border-bottom: none; }
     .moto-row:hover { background: rgba(0, 0, 0, 0.02); }
@@ -738,7 +738,7 @@ require 'admin_sidebar_template.php';
         font-size: 0.85rem;
         background: #fff;
         color: var(--text-dark);
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         text-align: left;
         cursor: pointer;
     }
@@ -891,42 +891,42 @@ require 'admin_sidebar_template.php';
     }
 
     /* Dark mode overrides */
-    html.dark-mode .moto-card { background: #1a2b4f !important; border-color: rgba(255, 255, 255, 0.12) !important; color: #e2e8f0 !important; }
-    html.dark-mode .moto-list-header {
+    html[data-theme="dark"] .moto-card { background: #1a2b4f !important; border-color: rgba(255, 255, 255, 0.12) !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .moto-list-header {
         background: #22335a !important;
         color: #93c5fd !important;
         border-bottom-color: rgba(255, 255, 255, 0.09) !important;
     }
-    html.dark-mode .moto-list { border-color: rgba(255, 255, 255, 0.09) !important; }
-    html.dark-mode .moto-row { border-bottom-color: rgba(255, 255, 255, 0.09) !important; }
-    html.dark-mode .moto-row:hover { background: rgba(255, 255, 255, 0.05) !important; }
-    html.dark-mode .moto-plate {
+    html[data-theme="dark"] .moto-list { border-color: rgba(255, 255, 255, 0.09) !important; }
+    html[data-theme="dark"] .moto-row { border-bottom-color: rgba(255, 255, 255, 0.09) !important; }
+    html[data-theme="dark"] .moto-row:hover { background: rgba(255, 255, 255, 0.05) !important; }
+    html[data-theme="dark"] .moto-plate {
         background: rgba(14, 165, 233, 0.15) !important;
         color: #7dd3fc !important;
     }
-    html.dark-mode .moto-status.active { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
-    html.dark-mode .moto-status.archived { background: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
+    html[data-theme="dark"] .moto-status.active { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html[data-theme="dark"] .moto-status.archived { background: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
 
     /* Model picker dropdown */
-    html.dark-mode .model-picker-toggle { background: #16233f !important; border-color: #3b4d7d !important; color: #e2e8f0 !important; }
-    html.dark-mode .model-picker-toggle:hover,
-    html.dark-mode .model-picker-toggle.open { border-color: #FACC15 !important; }
-    html.dark-mode .model-picker-caret { color: #94a3b8 !important; }
-    html.dark-mode .model-picker-menu { background: #22335a !important; border-color: rgba(255, 255, 255, 0.1) !important; }
-    html.dark-mode .model-picker-option { background: #22335a !important; color: #e2e8f0 !important; }
-    html.dark-mode .model-picker-option:hover { background: #2a3d6b !important; }
-    html.dark-mode .model-picker-option .model-picker-other-icon { color: #94a3b8 !important; }
-    html.dark-mode .model-picker-thumb,
-    html.dark-mode .model-picker-option img { mix-blend-mode: normal; background: transparent; }
+    html[data-theme="dark"] .model-picker-toggle { background: #16233f !important; border-color: #3b4d7d !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .model-picker-toggle:hover,
+    html[data-theme="dark"] .model-picker-toggle.open { border-color: #FACC15 !important; }
+    html[data-theme="dark"] .model-picker-caret { color: #94a3b8 !important; }
+    html[data-theme="dark"] .model-picker-menu { background: #22335a !important; border-color: rgba(255, 255, 255, 0.1) !important; }
+    html[data-theme="dark"] .model-picker-option { background: #22335a !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .model-picker-option:hover { background: #2a3d6b !important; }
+    html[data-theme="dark"] .model-picker-option .model-picker-other-icon { color: #94a3b8 !important; }
+    html[data-theme="dark"] .model-picker-thumb,
+    html[data-theme="dark"] .model-picker-option img { mix-blend-mode: normal; background: transparent; }
 
     /* Motorcycle photo thumbs */
-    html.dark-mode .moto-thumb, html.dark-mode .view-moto-image img,
-    html.dark-mode .edit-moto-preview { mix-blend-mode: normal; background: transparent; }
+    html[data-theme="dark"] .moto-thumb, html[data-theme="dark"] .view-moto-image img,
+    html[data-theme="dark"] .edit-moto-preview { mix-blend-mode: normal; background: transparent; }
 
     /* Floating alerts */
-    html.dark-mode .floating-alert.success { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; border-color: rgba(16, 185, 129, 0.35) !important; }
-    html.dark-mode .floating-alert.error { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; border-color: rgba(239, 68, 68, 0.35) !important; }
-    html.dark-mode .floating-alert.warning { background: rgba(250, 204, 21, 0.12) !important; color: #FDE047 !important; border-color: rgba(250, 204, 21, 0.35) !important; }
+    html[data-theme="dark"] .floating-alert.success { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; border-color: rgba(16, 185, 129, 0.35) !important; }
+    html[data-theme="dark"] .floating-alert.error { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; border-color: rgba(239, 68, 68, 0.35) !important; }
+    html[data-theme="dark"] .floating-alert.warning { background: rgba(250, 204, 21, 0.12) !important; color: #FDE047 !important; border-color: rgba(250, 204, 21, 0.35) !important; }
 </style>
 
 <!-- Alert Message -->

@@ -215,8 +215,19 @@ foreach ($packages as $pkg) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
+    <script>
+        // Global theme state: apply saved theme before first paint to avoid a light-theme flash
+        (function () {
+            var t = localStorage.getItem('theme');
+            if (t !== 'dark' && t !== 'light') {
+                t = (localStorage.getItem('adminDarkMode') === '1' || localStorage.getItem('customerDarkMode') === '1') ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Service</title>
@@ -279,7 +290,7 @@ foreach ($packages as $pkg) {
             align-items: center;
             gap: 8px;
             opacity: 0.4;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         }
 
         .page-stepper .step-item.active {
@@ -313,7 +324,7 @@ foreach ($packages as $pkg) {
             -webkit-backdrop-filter: blur(10px);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
             z-index: 1050;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             padding: 12px 0;
             position: fixed;
             top: 0;
@@ -356,7 +367,7 @@ foreach ($packages as $pkg) {
             font-weight: 600;
             padding: 10px 20px;
             border-radius: 8px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             font-size: 0.95rem;
         }
 
@@ -375,7 +386,7 @@ foreach ($packages as $pkg) {
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             overflow: hidden;
             background: white;
         }
@@ -439,7 +450,7 @@ foreach ($packages as $pkg) {
             border: 1px solid var(--border-color);
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
             background-color: white;
             font-size: 1rem;
             height: 100%;
@@ -551,7 +562,7 @@ foreach ($packages as $pkg) {
             font-weight: 500;
             color: var(--text-light);
             border-bottom: 2px solid transparent;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
             background: none;
             border: none;
             font-size: 1rem;
@@ -626,7 +637,7 @@ foreach ($packages as $pkg) {
             font-weight: 600;
             padding: 10px 24px;
             border-radius: 8px;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
             box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
         }
 
@@ -644,7 +655,7 @@ foreach ($packages as $pkg) {
             font-weight: 500;
             padding: 8px 20px;
             border-radius: 8px;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         }
 
         .btn-outline-custom:hover {

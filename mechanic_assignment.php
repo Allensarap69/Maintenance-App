@@ -461,7 +461,7 @@ $pageTitle = 'Mechanic Assignment';
     }
     .assignment-row {
         border-bottom: 1px solid var(--card-border);
-        transition: background 0.15s ease;
+        
     }
     .assignment-row:last-child { border-bottom: none; }
     .assignment-row:hover { background: rgba(0, 0, 0, 0.02); }
@@ -524,7 +524,7 @@ $pageTitle = 'Mechanic Assignment';
         font-size: 0.72rem;
         font-weight: 700;
         cursor: pointer;
-        transition: background 0.2s ease;
+        
     }
     .assign-btn:hover { background: #EAB308; }
     .assign-btn i { font-size: 0.85rem; }
@@ -540,7 +540,7 @@ $pageTitle = 'Mechanic Assignment';
         font-size: 0.72rem;
         font-weight: 700;
         cursor: pointer;
-        transition: background 0.2s ease;
+        
     }
     .complete-btn:hover { background: #059669; }
 
@@ -602,21 +602,21 @@ $pageTitle = 'Mechanic Assignment';
     }
 
     /* Dark mode overrides */
-    html.dark-mode .assignment-price { color: #f87171 !important; }
-    html.dark-mode .assignment-status.pending { background: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
-    html.dark-mode .assignment-status.assigned { background: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; }
-    html.dark-mode .assignment-status.accepted { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
-    html.dark-mode .assignment-status.unassigned { background: rgba(148, 163, 184, 0.15) !important; color: #cbd5e1 !important; }
-    html.dark-mode .assignment-status.in_progress { background: rgba(168, 85, 247, 0.15) !important; color: #c084fc !important; }
-    html.dark-mode .assignment-status.urgent { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
-    html.dark-mode .assignment-status.high { background: rgba(251, 191, 36, 0.15) !important; color: #fbbf24 !important; }
-    html.dark-mode .assignment-status.medium { background: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; }
-    html.dark-mode .assignment-status.low { background: rgba(148, 163, 184, 0.12) !important; color: #94a3b8 !important; }
-    html.dark-mode .assignment-mechanic { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
-    html.dark-mode .mechanic-stat-icon { background: rgba(250, 204, 21, 0.15) !important; }
-    html.dark-mode .mechanic-stat-icon.blue { background: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; }
-    html.dark-mode .mechanic-stat-icon.green { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
-    html.dark-mode .assignment-vehicle .moto-thumb { mix-blend-mode: normal; }
+    html[data-theme="dark"] .assignment-price { color: #f87171 !important; }
+    html[data-theme="dark"] .assignment-status.pending { background: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
+    html[data-theme="dark"] .assignment-status.assigned { background: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; }
+    html[data-theme="dark"] .assignment-status.accepted { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html[data-theme="dark"] .assignment-status.unassigned { background: rgba(148, 163, 184, 0.15) !important; color: #cbd5e1 !important; }
+    html[data-theme="dark"] .assignment-status.in_progress { background: rgba(168, 85, 247, 0.15) !important; color: #c084fc !important; }
+    html[data-theme="dark"] .assignment-status.urgent { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+    html[data-theme="dark"] .assignment-status.high { background: rgba(251, 191, 36, 0.15) !important; color: #fbbf24 !important; }
+    html[data-theme="dark"] .assignment-status.medium { background: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; }
+    html[data-theme="dark"] .assignment-status.low { background: rgba(148, 163, 184, 0.12) !important; color: #94a3b8 !important; }
+    html[data-theme="dark"] .assignment-mechanic { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html[data-theme="dark"] .mechanic-stat-icon { background: rgba(250, 204, 21, 0.15) !important; }
+    html[data-theme="dark"] .mechanic-stat-icon.blue { background: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; }
+    html[data-theme="dark"] .mechanic-stat-icon.green { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html[data-theme="dark"] .assignment-vehicle .moto-thumb { mix-blend-mode: normal; }
 
     /* Mechanic Workload modal - show ~3 mechanics, scroll for the rest */
     #mechanicStatsModal .workload-rows {
@@ -626,7 +626,7 @@ $pageTitle = 'Mechanic Assignment';
     }
     #mechanicStatsModal .workload-rows::-webkit-scrollbar { width: 6px; }
     #mechanicStatsModal .workload-rows::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); border-radius: 3px; }
-    html.dark-mode #mechanicStatsModal .workload-rows::-webkit-scrollbar-thumb { background: #3b4d7d; }
+    html[data-theme="dark"] #mechanicStatsModal .workload-rows::-webkit-scrollbar-thumb { background: #3b4d7d; }
 </style>
 
 <div class="container-fluid">

@@ -299,7 +299,7 @@ $pageTitle = 'Service Package Management';
         background: #ffffff;
         border: 1px solid rgba(0, 0, 0, 0.1);
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
     }
     
     .package-card:hover {
@@ -366,7 +366,7 @@ $pageTitle = 'Service Package Management';
         padding: 6px 12px;
         border-radius: 8px;
         font-size: 0.85rem;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
     
     .modal-header {
@@ -414,19 +414,19 @@ $pageTitle = 'Service Package Management';
     }
 
     /* Dark mode overrides */
-    html.dark-mode .package-card .card-body,
-    html.dark-mode .package-card .card-title,
-    html.dark-mode .package-card small,
-    html.dark-mode .package-card .text-muted { color: #e2e8f0 !important; }
-    html.dark-mode .package-card .service-item { background: rgba(255, 255, 255, 0.04) !important; }
-    html.dark-mode .status-active { background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
-    html.dark-mode .status-archived { background-color: rgba(148, 163, 184, 0.15) !important; color: #94a3b8 !important; }
-    html.dark-mode .package-form,
-    html.dark-mode .package-form .form-label,
-    html.dark-mode .package-form .form-control,
-    html.dark-mode .package-form .form-select,
-    html.dark-mode .package-form .form-check-label { color: #e2e8f0 !important; }
-    html.dark-mode .included-service-item { border-color: rgba(255, 255, 255, 0.09) !important; }
+    html[data-theme="dark"] .package-card .card-body,
+    html[data-theme="dark"] .package-card .card-title,
+    html[data-theme="dark"] .package-card small,
+    html[data-theme="dark"] .package-card .text-muted { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .package-card .service-item { background: rgba(255, 255, 255, 0.04) !important; }
+    html[data-theme="dark"] .status-active { background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html[data-theme="dark"] .status-archived { background-color: rgba(148, 163, 184, 0.15) !important; color: #94a3b8 !important; }
+    html[data-theme="dark"] .package-form,
+    html[data-theme="dark"] .package-form .form-label,
+    html[data-theme="dark"] .package-form .form-control,
+    html[data-theme="dark"] .package-form .form-select,
+    html[data-theme="dark"] .package-form .form-check-label { color: #e2e8f0 !important; }
+    html[data-theme="dark"] .included-service-item { border-color: rgba(255, 255, 255, 0.09) !important; }
 </style>
 
 <div>

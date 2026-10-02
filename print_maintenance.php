@@ -27,7 +27,7 @@ if (!$record) {
 $parts = array_filter(array_map('trim', explode(',', $record['parts_replaced'] ?? '')));
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <title>Maintenance Service Report - #<?= $maintenance_id ?></title>

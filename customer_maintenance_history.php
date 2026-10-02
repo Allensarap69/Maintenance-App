@@ -464,8 +464,19 @@ if ($date_filter !== 'all') {
 $pageTitle = 'Maintenance History';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
+    <script>
+        // Global theme state: apply saved theme before first paint to avoid a light-theme flash
+        (function () {
+            var t = localStorage.getItem('theme');
+            if (t !== 'dark' && t !== 'light') {
+                t = (localStorage.getItem('adminDarkMode') === '1' || localStorage.getItem('customerDarkMode') === '1') ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?> | AutoCare Pro</title>
@@ -523,7 +534,7 @@ $pageTitle = 'Maintenance History';
             -webkit-backdrop-filter: blur(20px);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
             z-index: 1030;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             padding: 15px 0;
         }
 
@@ -569,7 +580,7 @@ $pageTitle = 'Maintenance History';
             font-weight: 500;
             padding: 8px 20px;
             border-radius: 50px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
         }
 
         @media (hover: hover) and (pointer: fine) {
@@ -667,7 +678,7 @@ $pageTitle = 'Maintenance History';
             align-items: center;
             gap: 16px;
             height: 100%;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         }
 
         @media (hover: hover) and (pointer: fine) {
@@ -709,7 +720,7 @@ $pageTitle = 'Maintenance History';
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
             border: 1px solid #e2e8f0;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             overflow: hidden;
         }
 
@@ -753,7 +764,7 @@ $pageTitle = 'Maintenance History';
             border-radius: 12px;
             padding: 14px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         }
 
         @media (hover: hover) and (pointer: fine) {
@@ -772,7 +783,7 @@ $pageTitle = 'Maintenance History';
             padding: 16px;
             border-left: 4px solid var(--accent-color);
             height: 100%;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         }
 
         .emergency-card .contact-info strong {
@@ -850,7 +861,7 @@ $pageTitle = 'Maintenance History';
             border-radius: 50px;
             padding: 5px 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         }
 
         .filter-control:hover {
@@ -1069,7 +1080,7 @@ $pageTitle = 'Maintenance History';
             border: 1px solid #e2e8f0;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
             display: flex;
             align-items: stretch;
             height: 100%;
@@ -1197,7 +1208,7 @@ $pageTitle = 'Maintenance History';
             background: #fff;
             cursor: pointer;
             text-decoration: none;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
             white-space: nowrap;
         }
 

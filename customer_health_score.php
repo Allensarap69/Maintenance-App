@@ -150,8 +150,19 @@ try {
 
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
+    <script>
+        // Global theme state: apply saved theme before first paint to avoid a light-theme flash
+        (function () {
+            var t = localStorage.getItem('theme');
+            if (t !== 'dark' && t !== 'light') {
+                t = (localStorage.getItem('adminDarkMode') === '1' || localStorage.getItem('customerDarkMode') === '1') ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health Score | AutoCare Pro</title>
@@ -281,7 +292,7 @@ try {
             color: var(--text-sub);
             border-radius: 8px;
             text-decoration: none;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         }
 
         .top-bar-user-dropdown .dropdown-item:hover {
@@ -316,7 +327,7 @@ try {
             align-items: center;
             gap: 16px;
             height: 100%;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         }
 
         .stat-card:hover {
@@ -370,7 +381,7 @@ try {
             height: 100%;
             display: flex;
             flex-direction: column;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         }
 
         .health-card .card-header-custom {
@@ -551,7 +562,7 @@ try {
             border: 1px solid var(--border-color);
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         }
 
         .moto-list-item:hover {
@@ -657,7 +668,7 @@ try {
             border: 2px solid var(--accent-blue);
             z-index: 2;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         }
 
         .timeline-dot:hover {
@@ -727,7 +738,7 @@ try {
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 6px 8px;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
             font-size: 0.7rem;
         }
 

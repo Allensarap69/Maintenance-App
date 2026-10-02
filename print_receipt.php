@@ -160,7 +160,7 @@ if ($status === 'accepted') {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <title><?= $document_title ?> - #<?= sprintf('%04d', $booking_id) ?></title>
@@ -202,7 +202,7 @@ if ($status === 'accepted') {
             text-decoration: none;
             border: 1px solid var(--line);
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease, visibility 0.15s ease, max-height 0.15s ease;
             font-family: inherit;
         }
         .tbtn.print { background: var(--navy); color: #fff; border-color: var(--navy); }

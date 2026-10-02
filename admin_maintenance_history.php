@@ -683,6 +683,32 @@ $pageTitle = 'Maintenance History Management';
         color: #6b7280;
         margin-top: 0.4rem;
     }
+
+    /* Dark mode overrides */
+    html.dark-mode .mh-content .table { color: #e2e8f0 !important; }
+    html.dark-mode .mh-content .table thead th {
+        background-color: #1a2540 !important;
+        color: #93c5fd !important;
+        border-bottom-color: rgba(255, 255, 255, 0.12) !important;
+    }
+    html.dark-mode .mh-content .table tbody tr {
+        background: #151f36 !important;
+        border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    html.dark-mode .mh-content,
+    html.dark-mode .mh-form, html.dark-mode .mh-form .form-label,
+    html.dark-mode .mh-form .form-check-label, html.dark-mode .mh-form .form-text,
+    html.dark-mode .filter-row .form-label { color: #e2e8f0 !important; }
+    html.dark-mode .section-title { color: #e2e8f0 !important; }
+    html.dark-mode .view-label { color: #94a3b8 !important; }
+    html.dark-mode .view-value { color: #e2e8f0 !important; }
+    html.dark-mode .moto-model, html.dark-mode .customer-name,
+    html.dark-mode .mechanic-name, html.dark-mode .mileage-cell,
+    html.dark-mode .cost-cell { color: #e2e8f0 !important; }
+    html.dark-mode .moto-plate, html.dark-mode .cell-icon { color: #94a3b8 !important; }
+    html.dark-mode .service-type-badge.booked { background: rgba(250, 204, 21, 0.12) !important; border-color: rgba(250, 204, 21, 0.3) !important; }
+    html.dark-mode .service-type-badge.general { background: rgba(168, 85, 247, 0.15) !important; color: #c084fc !important; border-color: rgba(168, 85, 247, 0.3) !important; }
+    html.dark-mode .pagination-sm .page-item.active .page-link { color: #111827 !important; }
 </style>
 
 <div class="container-fluid mh-content">

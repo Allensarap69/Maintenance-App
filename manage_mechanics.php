@@ -841,6 +841,12 @@ $pageTitle = 'Manage Mechanics';
         margin-top: 0.4rem;
     }
     .mechanic-row.hidden-match { display: none; }
+
+    /* Dark mode overrides */
+    html.dark-mode .mechanic-specialties { background: rgba(14, 165, 233, 0.15) !important; color: #7dd3fc !important; }
+    html.dark-mode .mechanic-status.Available { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html.dark-mode .mechanic-status.Busy { background: rgba(249, 115, 22, 0.15) !important; color: #fdba74 !important; }
+    html.dark-mode .mechanic-status.Unavailable { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
 </style>
 
 <div class="container-fluid">

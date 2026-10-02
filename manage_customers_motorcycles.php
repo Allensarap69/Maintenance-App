@@ -1038,6 +1038,12 @@ require 'admin_sidebar_template.php';
         border-radius: 12px;
         mix-blend-mode: multiply;
     }
+
+    /* Dark mode overrides */
+    html.dark-mode .customer-status.Active { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html.dark-mode .customer-status.Inactive { background: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
+    html.dark-mode .customer-status.Archived { background: rgba(148, 163, 184, 0.15) !important; color: #cbd5e1 !important; }
+    html.dark-mode .view-moto-image img { mix-blend-mode: normal; }
 </style>
 
 <!-- Alert Message -->

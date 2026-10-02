@@ -404,6 +404,41 @@ try {
     .dash-btn.ghost:hover { background: #E5E7EB; color: #111827; }
     .dash-btn i { width: 14px; height: 14px; }
 
+    /* ===== Dark mode overrides ===== */
+    html.dark-mode .emg-title,
+    html.dark-mode .emg-label,
+    html.dark-mode .qa-title,
+    html.dark-mode .av-head,
+    html.dark-mode .av-value { color: #e2e8f0 !important; }
+
+    html.dark-mode .emg-sub, html.dark-mode .av-sub { color: #94a3b8 !important; }
+    html.dark-mode .emg-title i, html.dark-mode .qa-title i { color: #fbbf24 !important; }
+    html.dark-mode .av-head i { color: #60a5fa !important; }
+
+    html.dark-mode .btn-view { background: #1a2540 !important; border-color: #33415f !important; color: #e2e8f0 !important; }
+    html.dark-mode .btn-view:hover { border-color: #3b82f6 !important; color: #60a5fa !important; }
+
+    html.dark-mode .card-x.qa-card { background: #151f36 !important; border-color: rgba(250, 204, 21, 0.2) !important; }
+    html.dark-mode .qa-item { background: #0f1a30 !important; border-color: rgba(255, 255, 255, 0.09) !important; color: #e2e8f0 !important; }
+    html.dark-mode .qa-item:hover { background: #16233f !important; border-color: #3b82f6 !important; color: #ffffff !important; }
+    html.dark-mode .qa-item i.lead { color: #94a3b8 !important; }
+    html.dark-mode .qa-item i.tail { color: #475569 !important; }
+
+    html.dark-mode .av-bar { background: #22304f !important; }
+    html.dark-mode .trend-select { background: #0f1a30 !important; border-color: #33415f !important; color: #e2e8f0 !important; }
+
+    html.dark-mode .modal-content.glass-modal { background: #151f36 !important; border-color: rgba(255, 255, 255, 0.1) !important; color: #e2e8f0 !important; }
+    html.dark-mode .glass-modal-header { border-bottom-color: rgba(255, 255, 255, 0.09) !important; }
+    html.dark-mode .glass-modal .modal-title { color: #e2e8f0 !important; }
+    html.dark-mode .glass-modal .btn-close { filter: invert(1) !important; opacity: 0.8; }
+    html.dark-mode .dash-form-label { color: #94a3b8 !important; }
+    html.dark-mode .dash-form-control { background: #0f1a30 !important; border-color: #33415f !important; color: #e2e8f0 !important; }
+    html.dark-mode .dash-form-control::placeholder { color: #64748b; }
+    html.dark-mode .dash-form-control:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25) !important; }
+    html.dark-mode .dash-form-check { background: #0f1a30 !important; border-color: #33415f !important; color: #e2e8f0 !important; }
+    html.dark-mode .dash-btn.ghost { background: #22304f !important; color: #cbd5e1 !important; }
+    html.dark-mode .dash-btn.ghost:hover { background: #2b3a5c !important; color: #ffffff !important; }
+
     @media (max-width: 1200px) {
         .stat-grid { grid-template-columns: repeat(3, 1fr); }
         .row-mid, .row-low, .row-bot { grid-template-columns: 1fr; }
@@ -795,11 +830,23 @@ $pkgTotal = (int)($totalPackageServices ?? 0);
         if (typeof lucide !== 'undefined') lucide.createIcons();
     });
 
-    const tickColor = '#6B7280';
-    const gridColor = 'rgba(15, 23, 42, 0.06)';
+    // Theme-aware chart colors
+    function chartTheme() {
+        const dark = document.documentElement.classList.contains('dark-mode');
+        return {
+            tick: dark ? '#94a3b8' : '#6B7280',
+            grid: dark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+            donutBorder: dark ? '#151f36' : '#ffffff',
+            centerMain: dark ? '#e2e8f0' : '#0f172a',
+            centerSub: dark ? '#94a3b8' : '#6B7280'
+        };
+    }
+    let chartColors = chartTheme();
+    const tickColor = chartColors.tick;
+    const gridColor = chartColors.grid;
 
     // ===== Service Overview: bars (services) + line (customers) =====
-    new Chart(document.getElementById('overviewChart'), {
+    const overviewChart = new Chart(document.getElementById('overviewChart'), {
         data: {
             labels: <?= json_encode($overviewLabels) ?>,
             datasets: [
@@ -848,16 +895,16 @@ $pkgTotal = (int)($totalPackageServices ?? 0);
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.font = "800 22px 'Plus Jakarta Sans', sans-serif";
-            ctx.fillStyle = '#0f172a';
+            ctx.fillStyle = chartColors.centerMain;
             ctx.fillText('<?= $pkgTotal ?>', x, y - 8);
             ctx.font = "600 9px 'Plus Jakarta Sans', sans-serif";
-            ctx.fillStyle = '#6B7280';
+            ctx.fillStyle = chartColors.centerSub;
             ctx.fillText('Total Services', x, y + 12);
             ctx.restore();
         }
     };
 
-    new Chart(document.getElementById('packageChart'), {
+    const packageChart = new Chart(document.getElementById('packageChart'), {
         type: 'doughnut',
         data: {
             labels: <?= json_encode($pkgLabels) ?>,
@@ -865,7 +912,7 @@ $pkgTotal = (int)($totalPackageServices ?? 0);
                 data: <?= json_encode($pkgData) ?>,
                 backgroundColor: ['#3b82f6', '#FACC15', '#10b981', '#8b5cf6', '#94a3b8', '#f97316'],
                 borderWidth: 2,
-                borderColor: '#ffffff'
+                borderColor: chartColors.donutBorder
             }]
         },
         options: {
@@ -883,7 +930,7 @@ $pkgTotal = (int)($totalPackageServices ?? 0);
     trendGradient.addColorStop(0, 'rgba(59, 130, 246, 0.25)');
     trendGradient.addColorStop(1, 'rgba(59, 130, 246, 0.01)');
 
-    new Chart(trendsCtx, {
+    const trendsChart = new Chart(trendsCtx, {
         type: 'line',
         data: {
             labels: <?= json_encode($trendLabels) ?>,
@@ -907,5 +954,18 @@ $pkgTotal = (int)($totalPackageServices ?? 0);
                 y: { ticks: { color: tickColor, precision: 0 }, grid: { color: gridColor }, beginAtZero: true }
             }
         }
+    });
+
+    // Re-theme charts when dark mode is toggled
+    document.addEventListener('adminThemeChanged', function () {
+        chartColors = chartTheme();
+        [overviewChart, trendsChart].forEach(function (c) {
+            c.options.scales.x.ticks.color = chartColors.tick;
+            c.options.scales.y.ticks.color = chartColors.tick;
+            c.options.scales.y.grid.color = chartColors.grid;
+            c.update();
+        });
+        packageChart.data.datasets[0].borderColor = chartColors.donutBorder;
+        packageChart.update();
     });
 </script>

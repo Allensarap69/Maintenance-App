@@ -397,6 +397,13 @@ $pageTitle = 'Manage Services';
         padding: 2rem;
         color: var(--text-muted);
     }
+
+    /* Dark mode overrides */
+    html.dark-mode .specialty-tag { color: #93c5fd !important; }
+    html.dark-mode .service-form-header,
+    html.dark-mode .service-form-title { color: #e2e8f0 !important; }
+    html.dark-mode .main-content .service-form-card .form-label { color: #cbd5e1 !important; }
+    html.dark-mode .service-item-name { color: #e2e8f0 !important; }
 </style>
 
 <div class="container-fluid">

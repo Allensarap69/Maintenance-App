@@ -907,6 +907,57 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
         font-weight: 600;
         color: var(--text-main);
     }
+
+    /* ===== Dark mode overrides ===== */
+    html.dark-mode .mb-booking-card { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); }
+    html.dark-mode .mb-booking-card:hover { border-color: #3b82f6; }
+
+    html.dark-mode .mb-customer-name,
+    html.dark-mode .mb-customer-meta,
+    html.dark-mode .mb-info-item,
+    html.dark-mode .mb-info-label,
+    html.dark-mode .mb-info-val,
+    html.dark-mode .mb-payment-method { color: #e2e8f0 !important; }
+
+    html.dark-mode .mb-search,
+    html.dark-mode .mb-filter-bar select,
+    html.dark-mode .mb-filter-bar input[type="date"] {
+        background: #0f1a30;
+        border-color: #33415f;
+        color: #e2e8f0;
+    }
+    html.dark-mode .mb-search input { color: #e2e8f0; }
+    html.dark-mode .mb-search input::placeholder { color: #64748b; }
+    html.dark-mode .mb-search i { color: #94a3b8; }
+
+    html.dark-mode .mb-active-badge { background: rgba(255, 255, 255, 0.05); }
+    html.dark-mode .mb-clear-btn { background: rgba(255, 255, 255, 0.08); color: #cbd5e1; }
+    html.dark-mode .mb-clear-btn:hover { background: rgba(255, 255, 255, 0.14); }
+
+    html.dark-mode .mb-avatar { background: rgba(250, 204, 21, 0.15); color: #FACC15; }
+
+    html.dark-mode .status-pending,
+    html.dark-mode .status-awaiting-deposit { color: #FDE047; }
+    html.dark-mode .status-assigned { color: #93c5fd; }
+    html.dark-mode .status-approved,
+    html.dark-mode .status-accepted { color: #34d399; }
+    html.dark-mode .status-rejected { color: #f87171; }
+
+    html.dark-mode .mb-action-btn.ghost { border-color: rgba(255, 255, 255, 0.15); }
+    html.dark-mode .mb-action-btn.ghost:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.25); }
+    html.dark-mode .mb-action-btn.success { color: #34d399; }
+    html.dark-mode .mb-action-btn.danger { color: #f87171; }
+    html.dark-mode .mb-action-btn.primary { color: #60a5fa; }
+
+    html.dark-mode .modal-header.glass-modal-header {
+        background: #1a2540 !important;
+        color: #e2e8f0;
+        border-bottom-color: rgba(255, 255, 255, 0.09) !important;
+    }
+    html.dark-mode .modal-header.glass-modal-header .modal-title,
+    html.dark-mode .modal-header.glass-modal-header h5 { color: #e2e8f0; }
+    html.dark-mode .glass-modal .btn-close { filter: invert(1); opacity: 0.8; }
+    html.dark-mode .modal-detail-card { background: #0f1a30; border-color: rgba(255, 255, 255, 0.09); }
 </style>
 
 <div class="manage-bookings-page">

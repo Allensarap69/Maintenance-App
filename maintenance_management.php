@@ -827,6 +827,39 @@ $pageTitle = 'Maintenance Management';
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.2);
     }
+
+    /* Dark mode overrides */
+    html.dark-mode .mm-text, html.dark-mode .mm-label,
+    html.dark-mode .mm-heading, html.dark-mode .mm-section-title,
+    html.dark-mode .vehicle-title, html.dark-mode .action-card h5,
+    html.dark-mode .customer-list, html.dark-mode .maintenance-timeline,
+    html.dark-mode .customer-name { color: #e2e8f0 !important; }
+    html.dark-mode .mm-section-title { background: transparent !important; }
+    html.dark-mode .mm-section-title .mm-customer-count { color: #94a3b8 !important; }
+    html.dark-mode .customer-list .list-group-item { color: #e2e8f0 !important; border-bottom-color: rgba(255, 255, 255, 0.07) !important; }
+    html.dark-mode .customer-list .list-group-item:hover,
+    html.dark-mode .customer-list .list-group-item.active { background: #FACC15 !important; color: #111827 !important; }
+    html.dark-mode .customer-list .list-group-item.active .badge,
+    html.dark-mode .customer-list .list-group-item:hover .badge { color: #FACC15 !important; }
+    html.dark-mode .vehicle-header { color: #cbd5e1 !important; }
+    html.dark-mode .vehicle-header:hover { color: #e2e8f0 !important; }
+    html.dark-mode .vehicle-header.active { background: #FACC15 !important; color: #111827 !important; }
+    html.dark-mode .timeline-track::before { background: #33415f !important; }
+    html.dark-mode .service-card .type { color: #e2e8f0 !important; }
+    html.dark-mode .service-card .plate { color: #94a3b8 !important; }
+    html.dark-mode .service-card .badge-completed { background: rgba(34, 197, 94, 0.15) !important; color: #4ade80 !important; }
+    html.dark-mode .service-card .badge-pending { background: rgba(148, 163, 184, 0.15) !important; color: #cbd5e1 !important; }
+    html.dark-mode .service-card .checks li i { color: #64748b !important; }
+    html.dark-mode .service-card.completed .checks li i { color: #4ade80 !important; }
+    html.dark-mode .action-card.upcoming { background: rgba(250, 204, 21, 0.07) !important; }
+    html.dark-mode .action-card.overdue { background: rgba(239, 68, 68, 0.08) !important; }
+    html.dark-mode .action-card .meta { color: #94a3b8 !important; }
+    html.dark-mode .empty-state { color: #94a3b8 !important; }
+    html.dark-mode .customer-motorcycle { background: #1a2540 !important; }
+    html.dark-mode .maintenance-timeline .timeline-content { background: #151f36 !important; }
+    html.dark-mode .maintenance-timeline .timeline-dot,
+    html.dark-mode .maintenance-timeline .timeline-item.scheduled .timeline-dot { background: #151f36 !important; }
+    html.dark-mode .maintenance-timeline .timeline-badge.current { background: rgba(255, 255, 255, 0.12) !important; color: #e2e8f0 !important; }
 </style>
 
 <div class="container-fluid">

@@ -599,6 +599,33 @@ $pageTitle = 'Mechanic Assignment';
         flex-shrink: 0;
         mix-blend-mode: multiply;
     }
+
+    /* Dark mode overrides */
+    html.dark-mode .assignment-price { color: #f87171 !important; }
+    html.dark-mode .assignment-status.pending { background: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
+    html.dark-mode .assignment-status.assigned { background: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; }
+    html.dark-mode .assignment-status.accepted { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html.dark-mode .assignment-status.unassigned { background: rgba(148, 163, 184, 0.15) !important; color: #cbd5e1 !important; }
+    html.dark-mode .assignment-status.in_progress { background: rgba(168, 85, 247, 0.15) !important; color: #c084fc !important; }
+    html.dark-mode .assignment-status.urgent { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+    html.dark-mode .assignment-status.high { background: rgba(251, 191, 36, 0.15) !important; color: #fbbf24 !important; }
+    html.dark-mode .assignment-status.medium { background: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; }
+    html.dark-mode .assignment-status.low { background: rgba(148, 163, 184, 0.12) !important; color: #94a3b8 !important; }
+    html.dark-mode .assignment-mechanic { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html.dark-mode .mechanic-stat-icon { background: rgba(250, 204, 21, 0.15) !important; }
+    html.dark-mode .mechanic-stat-icon.blue { background: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; }
+    html.dark-mode .mechanic-stat-icon.green { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html.dark-mode .assignment-vehicle .moto-thumb { mix-blend-mode: normal; }
+
+    /* Mechanic Workload modal - show ~3 mechanics, scroll for the rest */
+    #mechanicStatsModal .workload-rows {
+        max-height: 320px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+    }
+    #mechanicStatsModal .workload-rows::-webkit-scrollbar { width: 6px; }
+    #mechanicStatsModal .workload-rows::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); border-radius: 3px; }
+    html.dark-mode #mechanicStatsModal .workload-rows::-webkit-scrollbar-thumb { background: #33415f; }
 </style>
 
 <div class="container-fluid">
@@ -817,6 +844,7 @@ $pageTitle = 'Mechanic Assignment';
                         <span>Total</span>
                         <span>Current Work</span>
                     </div>
+                    <div class="workload-rows">
                     <?php foreach ($mechanic_stats as $m):
                         $work_items = $mechanic_work[$m['id']] ?? [];
                         $active_total = count($work_items);
@@ -840,6 +868,7 @@ $pageTitle = 'Mechanic Assignment';
                             </div>
                         </div>
                     <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">

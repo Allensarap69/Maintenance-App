@@ -412,6 +412,21 @@ $pageTitle = 'Service Package Management';
         padding: 12px;
         margin-bottom: 10px;
     }
+
+    /* Dark mode overrides */
+    html.dark-mode .package-card .card-body,
+    html.dark-mode .package-card .card-title,
+    html.dark-mode .package-card small,
+    html.dark-mode .package-card .text-muted { color: #e2e8f0 !important; }
+    html.dark-mode .package-card .service-item { background: rgba(255, 255, 255, 0.04) !important; }
+    html.dark-mode .status-active { background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+    html.dark-mode .status-archived { background-color: rgba(148, 163, 184, 0.15) !important; color: #94a3b8 !important; }
+    html.dark-mode .package-form,
+    html.dark-mode .package-form .form-label,
+    html.dark-mode .package-form .form-control,
+    html.dark-mode .package-form .form-select,
+    html.dark-mode .package-form .form-check-label { color: #e2e8f0 !important; }
+    html.dark-mode .included-service-item { border-color: rgba(255, 255, 255, 0.09) !important; }
 </style>
 
 <div>

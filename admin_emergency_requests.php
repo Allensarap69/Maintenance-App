@@ -624,6 +624,89 @@ $pageTitle = 'Emergency Service Requests Management';
     .assign-modal h5 { margin-top: 0; margin-bottom: 1rem; font-weight: 700; color: #1e293b; }
     .assign-modal .form-select { font-size: 0.85rem; padding: 0.5rem; border-radius: 8px; margin-bottom: 1rem; }
     .assign-modal .modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+
+    /* ===== Dark mode overrides ===== */
+    html.dark-mode .emergency-page { color: #e2e8f0; }
+
+    html.dark-mode .emergency-panel {
+        background: #151f36 !important;
+        border-color: rgba(255, 255, 255, 0.09);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+    html.dark-mode .emergency-panel .panel-header {
+        background: #151f36;
+        color: #e2e8f0;
+        border-bottom-color: rgba(255, 255, 255, 0.09);
+    }
+    html.dark-mode .panel-title { color: #e2e8f0; }
+
+    html.dark-mode .stat-card { box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4); }
+    html.dark-mode .stat-card:hover { background: #1a2540; border-color: #475569; }
+    html.dark-mode .stat-card.active { background: rgba(250, 204, 21, 0.08); border-color: #FACC15; }
+    html.dark-mode .stat-icon.all { background: #22304f; color: #94a3b8; }
+    html.dark-mode .stat-icon.pending { background: rgba(250, 204, 21, 0.15); color: #FDE047; }
+    html.dark-mode .stat-icon.accepted { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    html.dark-mode .stat-icon.declined { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+    html.dark-mode .stat-icon.completed { background: rgba(59, 130, 246, 0.15); color: #93c5fd; }
+    html.dark-mode .stat-label { color: #94a3b8; }
+    html.dark-mode .stat-value { color: #e2e8f0; }
+
+    html.dark-mode .filter-pills .nav-link {
+        background: #151f36;
+        border-color: rgba(255, 255, 255, 0.09);
+        color: #cbd5e1;
+    }
+    html.dark-mode .filter-pills .nav-link.active { background: #FACC15; border-color: #FACC15; color: #111827; }
+    html.dark-mode .filter-pills .nav-link .pill-count { background: rgba(255, 255, 255, 0.1); }
+    html.dark-mode .filter-pills .nav-link.active .pill-count { background: rgba(0, 0, 0, 0.15); }
+
+    html.dark-mode .emergency-card {
+        background: #0f1a30 !important;
+        border-color: rgba(255, 255, 255, 0.09);
+    }
+    html.dark-mode .emergency-card:hover { border-color: #3b82f6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); }
+    html.dark-mode .emergency-card .ecard-header { background: #151f36; border-bottom-color: rgba(255, 255, 255, 0.08); }
+    html.dark-mode .emergency-card .ecard-footer { background: #151f36; border-top-color: rgba(255, 255, 255, 0.06); }
+    html.dark-mode .emergency-card .ecard-title,
+    html.dark-mode .emergency-card .ecard-value,
+    html.dark-mode .emergency-card .ecard-meta strong { color: #e2e8f0; }
+    html.dark-mode .emergency-card .ecard-meta { color: #94a3b8; }
+    html.dark-mode .emergency-card .details-inner { background: #151f36; border-color: rgba(255, 255, 255, 0.09); }
+    html.dark-mode .emergency-card .action-bar { border-top-color: rgba(255, 255, 255, 0.09); }
+    html.dark-mode .emergency-list::-webkit-scrollbar-thumb { background: #33415f; }
+
+    html.dark-mode .priority-urgent { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
+    html.dark-mode .priority-high { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    html.dark-mode .priority-medium { background: rgba(59, 130, 246, 0.15); color: #93c5fd; }
+    html.dark-mode .priority-low { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; }
+
+    html.dark-mode .status-pill.pending { background: rgba(250, 204, 21, 0.15); color: #FDE047; }
+    html.dark-mode .status-pill.accepted,
+    html.dark-mode .status-pill.completed { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    html.dark-mode .status-pill.assigned { background: rgba(59, 130, 246, 0.15); color: #93c5fd; }
+    html.dark-mode .status-pill.in_progress { background: rgba(139, 92, 246, 0.15); color: #c4b5fd; }
+    html.dark-mode .status-pill.declined { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+    html.dark-mode .assign-modal { background: #151f36; color: #e2e8f0; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); }
+    html.dark-mode .assign-modal h5 { color: #e2e8f0; }
+    html.dark-mode .assign-modal .form-label { color: #94a3b8; }
+
+    html.dark-mode .btn-outline-secondary { color: #cbd5e1; border-color: #475569; }
+    html.dark-mode .btn-outline-secondary:hover { background: #22304f; border-color: #64748b; color: #e2e8f0; }
+    html.dark-mode .btn-outline-primary { color: #93c5fd; border-color: #3b82f6; }
+    html.dark-mode .btn-outline-primary:hover { background: #3b82f6; color: #fff; }
+
+    /* Leaflet controls */
+    html.dark-mode .leaflet-bar a,
+    html.dark-mode .leaflet-control-layers {
+        background: #1a2540;
+        color: #e2e8f0;
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    html.dark-mode .leaflet-bar a:hover { background: #22304f; }
+    html.dark-mode .leaflet-control-attribution { background: rgba(21, 31, 54, 0.8); color: #64748b; }
+    html.dark-mode .leaflet-control-attribution a { color: #60a5fa; }
+    html.dark-mode .leaflet-tile { filter: brightness(0.85) saturate(0.85); }
 </style>
 
 <div class="container-fluid emergency-page">

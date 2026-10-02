@@ -1562,6 +1562,11 @@ $totalNotificationCount = count($customerNotificationItems);
     html:not(.dark-mode) .sidebar-footer-text { color: #334155; }
     html:not(.dark-mode) .sidebar-footer-copyright { color: #94a3b8; }
     html.dark-mode .user-avatar, html.dark-mode .top-bar-user-avatar { border: 2px solid rgba(255, 255, 255, 0.15); }
+
+    /* Unified theme transition — active only while toggling */
+    html.theme-switching, html.theme-switching *, html.theme-switching *::before, html.theme-switching *::after {
+        transition: background-color .45s ease, border-color .45s ease, color .45s ease, box-shadow .45s ease !important;
+    }
 </style>
 
 <!-- Sidebar Overlay for Mobile -->
@@ -1771,7 +1776,10 @@ $totalNotificationCount = count($customerNotificationItems);
             renderToggleIcon();
             themeToggle.addEventListener('click', function (e) {
                 e.stopPropagation();
-                const isDark = document.documentElement.classList.toggle('dark-mode');
+                const root = document.documentElement;
+                root.classList.add('theme-switching');
+                const isDark = root.classList.toggle('dark-mode');
+                setTimeout(function () { root.classList.remove('theme-switching'); }, 500);
                 localStorage.setItem('customerDarkMode', isDark ? '1' : '0');
                 renderToggleIcon();
                 window.dispatchEvent(new CustomEvent('customerThemeChanged', { detail: { dark: isDark } }));

@@ -1722,6 +1722,11 @@ $adminNotifIcons = [
         html:not(.dark-mode) .sidebar-footer-text { color: #334155 !important; }
         html:not(.dark-mode) .sidebar-footer-copyright { color: #94a3b8 !important; }
         html:not(.dark-mode) .sidebar-menu::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); }
+
+        /* Unified theme transition — active only while toggling */
+        html.theme-switching, html.theme-switching *, html.theme-switching *::before, html.theme-switching *::after {
+            transition: background-color .45s ease, border-color .45s ease, color .45s ease, box-shadow .45s ease !important;
+        }
     </style>
     <script>
         function confirmLogout() {
@@ -1997,7 +2002,10 @@ $adminNotifIcons = [
                 syncDarkIcon();
                 darkModeToggle.addEventListener('click', function (e) {
                     e.stopPropagation();
-                    const isDark = document.documentElement.classList.toggle('dark-mode');
+                    const root = document.documentElement;
+                    root.classList.add('theme-switching');
+                    const isDark = root.classList.toggle('dark-mode');
+                    setTimeout(function () { root.classList.remove('theme-switching'); }, 500);
                     localStorage.setItem('adminDarkMode', isDark ? '1' : '0');
                     syncDarkIcon();
                     document.dispatchEvent(new CustomEvent('adminThemeChanged', { detail: { dark: isDark } }));

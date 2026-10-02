@@ -37,6 +37,7 @@ $modelImages = [
     'Smash 115'  => 'sma.png',
     'Bajaj'      => 'bad.png',
 ];
+$modelImages = array_map(function ($p) { return $p . '?v=3'; }, $modelImages);
 
 /**
  * Fetch service and package names as an HTML list.

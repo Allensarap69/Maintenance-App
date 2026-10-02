@@ -984,6 +984,7 @@ require 'admin_sidebar_template.php';
         'Smash 115'  => 'sma.png',
         'Bajaj'      => 'bad.png',
     ];
+    $modelImages = array_map(function ($p) { return $p . '?v=3'; }, $modelImages);
     ?>
     <?php if (empty($motorcycles)): ?>
         <div class="text-center py-5">

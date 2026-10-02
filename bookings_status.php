@@ -183,6 +183,7 @@ function renderBookingDetail($b, $pdo) {
         'Smash 115'  => 'sma.png',
         'Bajaj'      => 'bad.png',
     ];
+    $modelImages = array_map(function ($p) { return $p . '?v=3'; }, $modelImages);
     $vehicle_img_src = !empty($b['vehicle_image']) ? $b['vehicle_image'] : ($modelImages[$b['model']] ?? null);
 
     $start_time_ts = strtotime($b['schedule_start_time']);

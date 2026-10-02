@@ -65,6 +65,7 @@ $modelImages = [
     'Smash 115'  => 'sma.png',
     'Bajaj'      => 'bad.png',
 ];
+$modelImages = array_map(function ($p) { return $p . '?v=3'; }, $modelImages);
 
 // --- Fetch Customer Motorcycles with Dashboard Data ---
 $customerMotorcycles = [];

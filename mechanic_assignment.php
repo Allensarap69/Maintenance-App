@@ -33,6 +33,7 @@ $modelImages = [
     'Smash 115'  => 'sma.png',
     'Bajaj'      => 'bad.png',
 ];
+$modelImages = array_map(function ($p) { return $p . '?v=3'; }, $modelImages);
 
 // --- 1. Logic to Handle Mechanic Assignment POST Request ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['assign_mechanic'])) {

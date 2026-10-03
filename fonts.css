@@ -37,6 +37,16 @@ h1, h2, h3, h4, h5, h6,
 }
 
 /* ============================================
+   BASE TEXT SIZE - Portals (Admin / Customer / Mechanic)
+   Slightly larger than the 16px browser default so all
+   rem-based text scales up a bit. Public pages opt out
+   via class="public-page" on <html>. Tune the % to taste.
+   ============================================ */
+html:not(.public-page) {
+    font-size: 108%;
+}
+
+/* ============================================
    GLOBAL UI OVERRIDES - SweetAlert2 compact size
    ============================================ */
 .swal2-popup:not(.swal2-toast) {

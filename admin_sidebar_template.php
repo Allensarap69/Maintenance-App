@@ -242,12 +242,12 @@ require __DIR__ . '/partials/head.php';
             ?>
             <div class="menu-section">
                 <div class="menu-title">Main Menu</div>
-                <a href="dashboard_admin.php" class="menu-item <?= $currentPage == 'dashboard_admin' ? 'active' : '' ?>">
+                <a href="dashboard_admin.php" class="menu-item <?= $currentPage == 'dashboard_admin' ? 'active' : '' ?>" data-tooltip="Dashboard">
                     <i data-lucide="layout-dashboard"></i>
                     <span>Dashboard</span>
                 </a>
 
-                <button type="button" class="menu-item menu-parent <?= $bookingsActive ? 'child-active open' : '' ?>" data-submenu="submenuBookings" data-href="manage_bookings.php">
+                <button type="button" class="menu-item menu-parent <?= $bookingsActive ? 'child-active open' : '' ?>" data-submenu="submenuBookings" data-href="manage_bookings.php" data-tooltip="Bookings">
                     <i data-lucide="calendar-check"></i>
                     <span>Bookings</span>
                     <?php if ($pendingCount > 0): ?>
@@ -264,7 +264,7 @@ require __DIR__ . '/partials/head.php';
                     </a>
                 </div>
 
-                <button type="button" class="menu-item menu-parent <?= $emergencyActive ? 'child-active open' : '' ?>" data-submenu="submenuEmergency" data-href="admin_emergency_requests.php">
+                <button type="button" class="menu-item menu-parent <?= $emergencyActive ? 'child-active open' : '' ?>" data-submenu="submenuEmergency" data-href="admin_emergency_requests.php" data-tooltip="Emergency">
                     <i data-lucide="siren"></i>
                     <span>Emergency</span>
                     <?php if ($emergencyCount > 0): ?>
@@ -284,23 +284,23 @@ require __DIR__ . '/partials/head.php';
 
             <div class="menu-section">
                 <div class="menu-title">Fleet &amp; Customers</div>
-                <a href="manage_customers_motorcycles.php" class="menu-item <?= $currentPage == 'manage_customers_motorcycles' ? 'active' : '' ?>">
+                <a href="manage_customers_motorcycles.php" class="menu-item <?= $currentPage == 'manage_customers_motorcycles' ? 'active' : '' ?>" data-tooltip="Customers">
                     <i data-lucide="users"></i>
                     <span>Customers</span>
                 </a>
-                <a href="manage_motorcycles.php" class="menu-item <?= $currentPage == 'manage_motorcycles' ? 'active' : '' ?>">
+                <a href="manage_motorcycles.php" class="menu-item <?= $currentPage == 'manage_motorcycles' ? 'active' : '' ?>" data-tooltip="Motorcycles">
                     <i data-lucide="bike"></i>
                     <span>Motorcycles</span>
                 </a>
-                <a href="admin_health_scores.php" class="menu-item <?= $currentPage == 'admin_health_scores' ? 'active' : '' ?>">
+                <a href="admin_health_scores.php" class="menu-item <?= $currentPage == 'admin_health_scores' ? 'active' : '' ?>" data-tooltip="Health Scores">
                     <i data-lucide="heart-pulse"></i>
                     <span>Health Scores</span>
                 </a>
-                <a href="maintenance_management.php" class="menu-item <?= $currentPage == 'maintenance_management' ? 'active' : '' ?>">
+                <a href="maintenance_management.php" class="menu-item <?= $currentPage == 'maintenance_management' ? 'active' : '' ?>" data-tooltip="Maintenance Management">
                     <i data-lucide="clipboard-list"></i>
                     <span>Maintenance Management</span>
                 </a>
-                <a href="admin_maintenance_history.php" class="menu-item <?= $currentPage == 'admin_maintenance_history' ? 'active' : '' ?>">
+                <a href="admin_maintenance_history.php" class="menu-item <?= $currentPage == 'admin_maintenance_history' ? 'active' : '' ?>" data-tooltip="Maintenance History">
                     <i data-lucide="history"></i>
                     <span>Maintenance History</span>
                 </a>
@@ -308,15 +308,15 @@ require __DIR__ . '/partials/head.php';
 
             <div class="menu-section">
                 <div class="menu-title">Operations &amp; Staff</div>
-                <a href="manage_mechanics.php" class="menu-item <?= $currentPage == 'manage_mechanics' ? 'active' : '' ?>">
+                <a href="manage_mechanics.php" class="menu-item <?= $currentPage == 'manage_mechanics' ? 'active' : '' ?>" data-tooltip="Mechanics">
                     <i data-lucide="wrench"></i>
                     <span>Mechanics</span>
                 </a>
-                <a href="mechanic_assignment.php" class="menu-item <?= $currentPage == 'mechanic_assignment' ? 'active' : '' ?>">
+                <a href="mechanic_assignment.php" class="menu-item <?= $currentPage == 'mechanic_assignment' ? 'active' : '' ?>" data-tooltip="Assignments">
                     <i data-lucide="user-check"></i>
                     <span>Assignments</span>
                 </a>
-                <a href="admin_availability.php" class="menu-item <?= $currentPage == 'admin_availability' ? 'active' : '' ?>">
+                <a href="admin_availability.php" class="menu-item <?= $currentPage == 'admin_availability' ? 'active' : '' ?>" data-tooltip="Availability">
                     <i data-lucide="calendar-days"></i>
                     <span>Availability</span>
                 </a>
@@ -324,15 +324,15 @@ require __DIR__ . '/partials/head.php';
 
             <div class="menu-section">
                 <div class="menu-title">Catalog &amp; Services</div>
-                <a href="services.php" class="menu-item <?= $currentPage == 'services' ? 'active' : '' ?>">
+                <a href="services.php" class="menu-item <?= $currentPage == 'services' ? 'active' : '' ?>" data-tooltip="Services">
                     <i data-lucide="settings"></i>
                     <span>Services</span>
                 </a>
-                <a href="admin_service_packages.php" class="menu-item <?= $currentPage == 'admin_service_packages' ? 'active' : '' ?>">
+                <a href="admin_service_packages.php" class="menu-item <?= $currentPage == 'admin_service_packages' ? 'active' : '' ?>" data-tooltip="Service Packages">
                     <i data-lucide="package"></i>
                     <span>Service Packages</span>
                 </a>
-                <a href="admin_warranty.php" class="menu-item <?= $currentPage == 'admin_warranty' ? 'active' : '' ?>">
+                <a href="admin_warranty.php" class="menu-item <?= $currentPage == 'admin_warranty' ? 'active' : '' ?>" data-tooltip="Warranty">
                     <i data-lucide="shield-check"></i>
                     <span>Warranty</span>
                 </a>
@@ -340,14 +340,18 @@ require __DIR__ . '/partials/head.php';
 
             <div class="menu-section">
                 <div class="menu-title">Communication</div>
-                <a href="sms_history.php" class="menu-item <?= $currentPage == 'sms_history' ? 'active' : '' ?>">
+                <a href="sms_history.php" class="menu-item <?= $currentPage == 'sms_history' ? 'active' : '' ?>" data-tooltip="SMS History">
                     <i data-lucide="message-square"></i>
                     <span>SMS History</span>
+                </a>
+                <a href="admin_feedback.php" class="menu-item <?= $currentPage == 'admin_feedback' ? 'active' : '' ?>" data-tooltip="Customer Feedback">
+                    <i data-lucide="star"></i>
+                    <span>Customer Feedback</span>
                 </a>
             </div>
             <div class="menu-section">
                 <div class="menu-title">Account</div>
-                <a href="admin_profile.php" class="menu-item <?= $currentPage == 'admin_profile' ? 'active' : '' ?>">
+                <a href="admin_profile.php" class="menu-item <?= $currentPage == 'admin_profile' ? 'active' : '' ?>" data-tooltip="Profile Settings">
                     <i data-lucide="user-cog"></i>
                     <span>Profile Settings</span>
                 </a>

@@ -270,9 +270,9 @@
         }
 
         .sidebar-collapse-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #FACC15;
+            background: none;
+            border: none;
+            color: #ffffff;
             width: 32px;
             height: 32px;
             border-radius: 8px;
@@ -284,11 +284,11 @@
         }
 
         .sidebar-collapse-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            opacity: 0.75;
         }
         .sidebar-collapse-btn i,
         .sidebar-collapse-btn svg {
-            color: #FACC15 !important;
+            color: #ffffff !important;
         }
 
         .sidebar-menu {
@@ -1066,7 +1066,7 @@
     body.collapsed .menu-caret,
     body.collapsed .submenu,
     body.collapsed .menu-badge,
-    body.collapsed .sidebar-brand span { display: none; }
+    body.collapsed .sidebar-brand span { display: none !important; }
     body.collapsed .sidebar-footer { padding: 10px; }
     body.collapsed .sidebar-footer-text span,
-    body.collapsed .sidebar-footer-copyright { display: none; }
+    body.collapsed .sidebar-footer-copyright { display: none !important; }

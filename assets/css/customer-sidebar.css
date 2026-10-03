@@ -85,8 +85,8 @@
     }
 
     .sidebar-collapse-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: none;
+        border: none;
         color: white;
         width: 32px;
         height: 32px;
@@ -99,7 +99,7 @@
     }
 
     .sidebar-collapse-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
+        opacity: 0.75;
     }
 
     .sidebar-brand i,
@@ -1398,8 +1398,8 @@
     }
     html[data-theme="light"] .sidebar-brand,
     html[data-theme="light"] .sidebar-brand span { color: #0f172a; }
-    html[data-theme="light"] .sidebar-collapse-btn { background: rgba(0, 0, 0, 0.05); border-color: rgba(0, 0, 0, 0.12); color: #334155; }
-    html[data-theme="light"] .sidebar-collapse-btn:hover { background: rgba(0, 0, 0, 0.09); }
+    html[data-theme="light"] .sidebar-collapse-btn { background: none; border: none; color: #1e3a5f; }
+    html[data-theme="light"] .sidebar-collapse-btn:hover { background: none; opacity: 0.75; }
     html[data-theme="light"] .sidebar-section-title { color: #94a3b8; }
     html[data-theme="light"] .sidebar-nav-item { color: #334155; }
     html[data-theme="light"] .sidebar-nav-item:hover { background: rgba(0, 0, 0, 0.05); color: #0f172a; }

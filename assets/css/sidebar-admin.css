@@ -272,8 +272,8 @@
         }
 
         .sidebar-collapse-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: none;
+            border: none;
             color: #FACC15;
             width: 32px;
             height: 32px;
@@ -286,8 +286,7 @@
         }
 
         .sidebar-collapse-btn:hover {
-            background: rgba(250, 204, 21, 0.15);
-            border-color: rgba(250, 204, 21, 0.35);
+            opacity: 0.75;
         }
         .sidebar-collapse-btn i,
         .sidebar-collapse-btn svg {
@@ -1056,22 +1055,60 @@
         .sidebar, .sidebar-menu { scrollbar-width: none !important; }
         .sidebar::-webkit-scrollbar-thumb, .sidebar-menu::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2) !important; }
     /* Collapsible sidebar */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     body.collapsed { --sidebar-width: 80px; }
-    body.collapsed .menu-item { justify-content: center; padding: 12px 0; margin: 4px 10px; }
+    body.collapsed .menu-section { padding: 0; margin-bottom: 18px; }
+    body.collapsed .menu-item { justify-content: center; padding: 12px 0; margin: 4px 15px; overflow: visible; }
     body.collapsed .menu-item span,
     body.collapsed .menu-title,
     body.collapsed .menu-subtitle,
     body.collapsed .menu-caret,
     body.collapsed .submenu,
-    body.collapsed .menu-badge,
     body.collapsed .sidebar-brand span,
     body.collapsed .user-info,
-    body.collapsed .btn-logout-sm { display: none; }
+    body.collapsed .btn-logout-sm { display: none !important; }
+    body.collapsed .menu-item .menu-badge {
+        position: absolute;
+        top: 6px;
+        right: 8px;
+        min-width: 16px;
+        height: 16px;
+        padding: 0 4px;
+        font-size: 0.6rem;
+        margin-left: 0;
+    }
+    body.collapsed .menu-item:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #0f172a;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        margin-left: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        z-index: 1050;
+        opacity: 0;
+        animation: fadeIn 0.3s ease forwards;
+    }
+    body.collapsed .sidebar-header {
+        padding: 12px 10px;
+        justify-content: center;
+        gap: 6px;
+    }
+    body.collapsed .sidebar-brand { gap: 0; }
+    body.collapsed .sidebar-brand i,
+    body.collapsed .sidebar-brand svg { width: 30px; height: 30px; }
+    body.collapsed .sidebar-collapse-btn { width: 24px; height: 24px; }
     body.collapsed .user-avatar { width: 35px; height: 35px; font-size: 1rem; }
     body.collapsed .user-profile { padding: 10px; justify-content: center; }
     body.collapsed .sidebar-footer { padding: 10px; }
     body.collapsed .sidebar-footer-text span,
-    body.collapsed .sidebar-footer-copyright { display: none; }
+    body.collapsed .sidebar-footer-copyright { display: none !important; }
 
         /* ===== Dark Mode ===== */
         .dark-mode-toggle {
@@ -1564,8 +1601,13 @@
         }
         html[data-theme="light"] .sidebar-brand,
         html[data-theme="light"] .sidebar-brand span { color: #0f172a !important; }
-        html[data-theme="light"] .sidebar-collapse-btn { background: rgba(0, 0, 0, 0.05) !important; border-color: rgba(0, 0, 0, 0.12) !important; color: #334155 !important; }
-        html[data-theme="light"] .sidebar-collapse-btn:hover { background: rgba(0, 0, 0, 0.09) !important; }
+        html[data-theme="light"] .sidebar-collapse-btn { background: none !important; border: none !important; color: #1e3a5f !important; }
+        html[data-theme="light"] .sidebar-collapse-btn i,
+        html[data-theme="light"] .sidebar-collapse-btn svg { color: #1e3a5f !important; }
+        html[data-theme="light"] .sidebar-collapse-btn:hover { background: none !important; opacity: 0.75; }
+        html[data-theme="dark"] .sidebar-collapse-btn,
+        html[data-theme="dark"] .sidebar-collapse-btn i,
+        html[data-theme="dark"] .sidebar-collapse-btn svg { color: #ffffff !important; }
         html[data-theme="light"] .menu-title { color: #94a3b8 !important; background: #ffffff !important; }
         html[data-theme="light"] .menu-item { color: #334155 !important; }
         html[data-theme="light"] .menu-item:hover { background: rgba(0, 0, 0, 0.05) !important; color: #0f172a !important; }

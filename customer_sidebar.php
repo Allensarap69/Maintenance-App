@@ -170,7 +170,7 @@ $totalNotificationCount = count($customerNotificationItems);
 </script>
 
 <!-- Sidebar CSS -->
-<link rel="stylesheet" href="assets/css/customer-sidebar.css">
+<link rel="stylesheet" href="assets/css/customer-sidebar.css?v=<?= @filemtime(__DIR__ . '/assets/css/customer-sidebar.css') ?>">
 
 <!-- Sidebar Overlay for Mobile -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>

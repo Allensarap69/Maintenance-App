@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'db.php';
+require_once 'feedback_helper.php';
 
 // Security check - only customers can access emergency service requests
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'customer') {
@@ -18,6 +19,13 @@ if (isset($_SESSION['emergency_flash'])) {
     $msg = $_SESSION['emergency_flash']['msg'];
     $msg_type = $_SESSION['emergency_flash']['type'];
     unset($_SESSION['emergency_flash']);
+}
+
+// Feedback submission flash (set by rate_service.php)
+if (isset($_SESSION['feedback_flash'])) {
+    $msg = $_SESSION['feedback_flash']['msg'];
+    $msg_type = $_SESSION['feedback_flash']['type'];
+    unset($_SESSION['feedback_flash']);
 }
 
 $active_page = basename($_SERVER['PHP_SELF']);
@@ -815,6 +823,27 @@ $pageTitle = 'Emergency Service Request';
                                                 Cancel Request
                                             </button>
                                         </form>
+                                    <?php endif; ?>
+                                    <?php if ($request['request_status'] === 'completed'): ?>
+                                        <?php $feedback = get_emergency_feedback($pdo, $request['id']); ?>
+                                        <?php if ($feedback): ?>
+                                            <div class="contact-info mb-0">
+                                                <strong><i class="bi bi-star-fill me-1" style="color:#EAB308;"></i>Your Feedback</strong>
+                                                <div class="small mt-1">
+                                                    <?php if ($feedback['mechanic_rating'] !== null): ?>
+                                                        <div>Mechanic: <?= render_stars((int)$feedback['mechanic_rating']) ?></div>
+                                                    <?php endif; ?>
+                                                    <div>Service: <?= render_stars((int)$feedback['service_rating']) ?></div>
+                                                    <?php if (!empty($feedback['comments'])): ?>
+                                                        <div class="text-muted mt-1"><?= htmlspecialchars(mb_strimwidth($feedback['comments'], 0, 100, '…')) ?></div>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        <?php else: ?>
+                                            <a href="rate_service.php?type=emergency&id=<?= (int)$request['id'] ?>" class="btn btn-sm btn-warning w-100">
+                                                <i class="bi bi-star me-1"></i>Rate Mechanic &amp; Service
+                                            </a>
+                                        <?php endif; ?>
                                     <?php endif; ?>
                                 </div>
                             </div>

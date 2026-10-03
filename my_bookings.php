@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'db.php'; // Your database connection file
+require_once 'feedback_helper.php';
 
 // 1. Security Check: Only logged-in customers can view this page.
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
@@ -11,6 +12,15 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
 // 2. Get User ID & Set Notification Clear Marker
 $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'] ?? 'Customer';
+
+// Feedback submission flash (set by rate_service.php)
+$toast_msg = '';
+$toast_type = 'info';
+if (isset($_SESSION['feedback_flash'])) {
+    $toast_msg = $_SESSION['feedback_flash']['msg'];
+    $toast_type = $_SESSION['feedback_flash']['type'];
+    unset($_SESSION['feedback_flash']);
+}
 
 // === CRUCIAL LINES TO CLEAR DASHBOARD NOTIFICATION ===
 $_SESSION['last_booking_view'] = time();
@@ -149,6 +159,7 @@ $base_query_with_payment = "
         v.model,
         v.year_model,
         v.plate_number,
+        v.image,
         m.name AS mechanic_name, -- Retained for legacy/simplicity, but not used in the final display
         p.payment_method,
         p.status AS payment_status,
@@ -183,6 +194,7 @@ $pending_query = "
         v.model,
         v.year_model,
         v.plate_number,
+        v.image,
         m.name AS mechanic_name, -- Retained for legacy/simplicity, but not used in the final display
         p.payment_method,
         p.status AS payment_status,
@@ -810,7 +822,6 @@ $active_page = basename($_SERVER['PHP_SELF']);
         background: #fff;
         border-radius: 16px;
         border: 1px solid #e2e8f0;
-        border-left: 4px solid #cbd5e1;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         overflow: hidden;
         transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
@@ -820,11 +831,6 @@ $active_page = basename($_SERVER['PHP_SELF']);
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         transform: translateY(-2px);
     }
-
-    .booking-list-item.pending { border-left-color: var(--accent-color); }
-    .booking-list-item.accepted { border-left-color: var(--success); }
-    .booking-list-item.rejected { border-left-color: var(--danger); }
-    .booking-list-item.completed { border-left-color: var(--info); }
 
     .booking-list-header {
         display: flex;
@@ -883,7 +889,7 @@ $active_page = basename($_SERVER['PHP_SELF']);
     }
 
     .section-title {
-        color: var(--accent-color);
+        color: var(--text-light);
         font-size: 0.65rem;
         font-weight: 600;
         text-transform: uppercase;
@@ -894,7 +900,7 @@ $active_page = basename($_SERVER['PHP_SELF']);
     }
 
     .section-title i {
-        color: var(--accent-color);
+        color: var(--text-light);
         font-size: 1rem;
     }
 
@@ -1012,13 +1018,26 @@ $active_page = basename($_SERVER['PHP_SELF']);
         .section-title { font-size: 0.65rem; }
         .price-value { font-size: 1.4rem; }
         .booking-box-body { flex-direction: column; gap: 12px; }
+        .booking-box-media {
+            flex-basis: auto;
+            margin: -16px -16px 0 -16px;
+            padding: 12px 14px;
+            border-right: none;
+            border-bottom: 1px solid #e2e8f0;
+            flex-direction: row;
+            justify-content: flex-start;
+            gap: 12px;
+            text-align: left;
+        }
+        .booking-box-media img { width: 56px; height: 56px; }
+        .tab-pane.view-list .booking-box-media { margin: -8px -8px 0 -8px; padding: 8px 12px; }
+        .tab-pane.view-list .booking-box-media img { width: 44px; height: 44px; }
     }
     /* --- Box cards --- */
     .booking-box {
         background: #fff;
         border-radius: 16px;
         border: 1px solid #e2e8f0;
-        border-left: 4px solid #cbd5e1;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         overflow: hidden;
         transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
@@ -1031,11 +1050,6 @@ $active_page = basename($_SERVER['PHP_SELF']);
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         transform: translateY(-2px);
     }
-
-    .booking-box.pending { border-left-color: var(--accent-color); }
-    .booking-box.accepted { border-left-color: var(--success); }
-    .booking-box.rejected { border-left-color: var(--danger); }
-    .booking-box.completed { border-left-color: var(--info); }
 
     .booking-box-header {
         display: flex;
@@ -1056,6 +1070,51 @@ $active_page = basename($_SERVER['PHP_SELF']);
         flex: 1;
         display: flex;
         gap: 20px;
+    }
+
+    /* --- Motorcycle media rail --- */
+    .booking-box-media {
+        flex: 0 0 118px;
+        margin: -16px 0 -16px -16px;
+        padding: 14px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-align: center;
+        background: linear-gradient(160deg, #f8fafc 0%, #e8eef5 100%);
+        border-right: 1px solid #e2e8f0;
+    }
+
+    .booking-box-media img {
+        width: 92px;
+        height: 92px;
+        object-fit: contain;
+        filter: drop-shadow(0 4px 8px rgba(15, 23, 42, 0.18));
+        transition: transform 0.3s ease;
+    }
+
+    .booking-box:hover .booking-box-media img {
+        transform: scale(1.06);
+    }
+
+    .booking-box-media-name {
+        font-size: 0.68rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        line-height: 1.2;
+    }
+
+    .booking-box-media-plate {
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        color: #fff;
+        background: #0f172a;
+        border-radius: 6px;
+        padding: 2px 8px;
+        white-space: nowrap;
     }
 
     .booking-box-col {
@@ -1101,6 +1160,21 @@ $active_page = basename($_SERVER['PHP_SELF']);
     .tab-pane.view-list .payment-section {
         background: transparent;
         padding: 0;
+    }
+    .tab-pane.view-list .booking-box-media {
+        flex-basis: 72px;
+        margin: -8px 0 -8px -8px;
+        padding: 8px 6px;
+        gap: 4px;
+    }
+    .tab-pane.view-list .booking-box-media img {
+        width: 52px;
+        height: 52px;
+        filter: drop-shadow(0 2px 4px rgba(15, 23, 42, 0.15));
+    }
+    .tab-pane.view-list .booking-box-media-name,
+    .tab-pane.view-list .booking-box-media-plate {
+        display: none;
     }
 
     .booking-box-section {
@@ -1257,10 +1331,10 @@ $active_page = basename($_SERVER['PHP_SELF']);
 
     <div class="tab-content" id="bookingTabsContent">
 
-        <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+        <div class="tab-pane fade show active view-list" id="pending" role="tabpanel" aria-labelledby="pending-tab">
             <div class="d-flex justify-content-end mb-3 view-toggle">
-                <button class="btn btn-sm active" data-view="grid" data-target="pending"><i class="bi bi-grid-3x3-gap-fill"></i> Grid</button>
-                <button class="btn btn-sm" data-view="list" data-target="pending"><i class="bi bi-list-ul"></i> List</button>
+                <button class="btn btn-sm" data-view="grid" data-target="pending"><i class="bi bi-grid-3x3-gap-fill"></i> Grid</button>
+                <button class="btn btn-sm active" data-view="list" data-target="pending"><i class="bi bi-list-ul"></i> List</button>
             </div>
             <div class="row booking-row">
                 <?= generateBookingCards($pending_bookings, $pdo); ?>
@@ -1273,10 +1347,10 @@ $active_page = basename($_SERVER['PHP_SELF']);
             <?php endif; ?>
         </div>
 
-        <div class="tab-pane fade" id="accepted" role="tabpanel" aria-labelledby="accepted-tab">
+        <div class="tab-pane fade view-list" id="accepted" role="tabpanel" aria-labelledby="accepted-tab">
             <div class="d-flex justify-content-end mb-3 view-toggle">
-                <button class="btn btn-sm active" data-view="grid" data-target="accepted"><i class="bi bi-grid-3x3-gap-fill"></i> Grid</button>
-                <button class="btn btn-sm" data-view="list" data-target="accepted"><i class="bi bi-list-ul"></i> List</button>
+                <button class="btn btn-sm" data-view="grid" data-target="accepted"><i class="bi bi-grid-3x3-gap-fill"></i> Grid</button>
+                <button class="btn btn-sm active" data-view="list" data-target="accepted"><i class="bi bi-list-ul"></i> List</button>
             </div>
             <div class="row booking-row">
                 <?= generateBookingCards($accepted_bookings, $pdo); // Use helper function ?>
@@ -1289,10 +1363,10 @@ $active_page = basename($_SERVER['PHP_SELF']);
             <?php endif; ?>
         </div>
 
-        <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab">
+        <div class="tab-pane fade view-list" id="rejected" role="tabpanel" aria-labelledby="rejected-tab">
             <div class="d-flex justify-content-end mb-3 view-toggle">
-                <button class="btn btn-sm active" data-view="grid" data-target="rejected"><i class="bi bi-grid-3x3-gap-fill"></i> Grid</button>
-                <button class="btn btn-sm" data-view="list" data-target="rejected"><i class="bi bi-list-ul"></i> List</button>
+                <button class="btn btn-sm" data-view="grid" data-target="rejected"><i class="bi bi-grid-3x3-gap-fill"></i> Grid</button>
+                <button class="btn btn-sm active" data-view="list" data-target="rejected"><i class="bi bi-list-ul"></i> List</button>
             </div>
             <div class="row booking-row">
                 <?= generateBookingCards($rejected_bookings, $pdo); ?>
@@ -1305,10 +1379,10 @@ $active_page = basename($_SERVER['PHP_SELF']);
             <?php endif; ?>
         </div>
 
-        <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
+        <div class="tab-pane fade view-list" id="completed" role="tabpanel" aria-labelledby="completed-tab">
             <div class="d-flex justify-content-end mb-3 view-toggle">
-                <button class="btn btn-sm active" data-view="grid" data-target="completed"><i class="bi bi-grid-3x3-gap-fill"></i> Grid</button>
-                <button class="btn btn-sm" data-view="list" data-target="completed"><i class="bi bi-list-ul"></i> List</button>
+                <button class="btn btn-sm" data-view="grid" data-target="completed"><i class="bi bi-grid-3x3-gap-fill"></i> Grid</button>
+                <button class="btn btn-sm active" data-view="list" data-target="completed"><i class="bi bi-list-ul"></i> List</button>
             </div>
             <div class="row booking-row">
                 <?= generateBookingCards($completed_bookings, $pdo); ?>
@@ -1421,6 +1495,26 @@ function generateBookingCards($bookings, $pdo) {
         }
         // --- END IMPROVED VEHICLE INFO LOGIC ---
 
+        // --- VEHICLE IMAGE: uploaded image → model illustration → generic fallback ---
+        $modelImages = [
+            'Click 125'  => 'click125.png',
+            'Click 160'  => 'click160.png',
+            'ADV 160'    => 'adv.png',
+            'PCX 160'    => 'pcx.png',
+            'XRM 125'    => 'xrm.png',
+            'Mio i 125'  => 'mio.png',
+            'NMAX'       => 'nmax.png',
+            'Aerox'      => 'ea.png',
+            'Sniper 155' => 'snip.png',
+            'Raider'     => 'rai.png',
+            'Smash 115'  => 'sma.png',
+            'Bajaj'      => 'bad.png',
+        ];
+        $vehicle_img_src = !empty($b['image'])
+            ? $b['image']
+            : (isset($modelImages[$b['model'] ?? '']) ? $modelImages[$b['model']] . '?v=3' : 'MOTOR.jpg');
+        // --- END VEHICLE IMAGE ---
+
         // Get status-specific footer message and button text
         $footer_message = '';
         $show_button = false;
@@ -1499,6 +1593,16 @@ function generateBookingCards($bookings, $pdo) {
                 <span class='booking-status-badge <?= $status_class ?>'><?= $status_display ?></span>
             </div>
             <div class='booking-box-body'>
+                <div class='booking-box-media'>
+                    <img src='<?= htmlspecialchars($vehicle_img_src) ?>' alt='<?= htmlspecialchars(trim(($b['brand'] ?? '') . ' ' . ($b['model'] ?? ''))) ?>' onerror="this.onerror=null;this.src='MOTOR.jpg';">
+                    <?php $media_name = trim(($b['brand'] ?? '') . ' ' . ($b['model'] ?? '')); ?>
+                    <?php if ($media_name !== ''): ?>
+                        <div class='booking-box-media-name'><?= htmlspecialchars($media_name) ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($b['plate_number'])): ?>
+                        <div class='booking-box-media-plate'><?= htmlspecialchars($b['plate_number']) ?></div>
+                    <?php endif; ?>
+                </div>
                 <div class='booking-box-col left-col'>
                     <div class='booking-box-section'>
                         <h6 class='section-title'><i class='bi bi-calendar-event me-2'></i>Appointment</h6>
@@ -1541,6 +1645,25 @@ function generateBookingCards($bookings, $pdo) {
                     <?php endif; ?>
                 </div>
             </div>
+            <?php if ($status === 'completed'): ?>
+            <?php $feedback = get_booking_feedback($pdo, $b['id']); ?>
+            <div class='booking-box-footer'>
+                <?php if ($feedback): ?>
+                    <span class='footer-message'>
+                        <i class='bi bi-star-fill' style='color:#EAB308;'></i>
+                        <strong>Your rating:</strong>
+                        <?= render_stars((int)($feedback['mechanic_rating'] ?? $feedback['service_rating'])) ?>
+                        <?php if (!empty($feedback['comments'])): ?>
+                            <span class='text-muted'> — <?= htmlspecialchars(mb_strimwidth($feedback['comments'], 0, 80, '…')) ?></span>
+                        <?php endif; ?>
+                    </span>
+                    <a href='rate_service.php?type=booking&id=<?= (int)$b['id'] ?>' class='btn-view-details'><i class='bi bi-eye'></i> View</a>
+                <?php else: ?>
+                    <span class='footer-message'><i class='bi bi-chat-heart me-1'></i> How was your service? Let us know!</span>
+                    <a href='rate_service.php?type=booking&id=<?= (int)$b['id'] ?>' class='btn-view-details'><i class='bi bi-star me-1'></i>Rate Service</a>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 <?php
@@ -1550,8 +1673,15 @@ function generateBookingCards($bookings, $pdo) {
 }
 ?>
 
+<?php include 'floating_toast.php'; ?>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Activate the completed tab when redirected back from the feedback form
+    if (location.hash === '#completed') {
+        var completedTab = document.getElementById('completed-tab');
+        if (completedTab && window.bootstrap) new bootstrap.Tab(completedTab).show();
+    }
+
     // Top bar user dropdown toggle
     document.addEventListener('DOMContentLoaded', function() {
         const topBarUser = document.getElementById('topBarUser');

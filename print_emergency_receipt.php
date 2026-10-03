@@ -88,7 +88,7 @@ if ($group === 'completed') {
 ?>
 
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="light" class="public-page">
 <head>
     <meta charset="UTF-8">
     <title><?= $document_title ?> - #<?= sprintf('%04d', $request_id) ?></title>

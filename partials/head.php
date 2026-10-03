@@ -38,5 +38,5 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <?php if (!empty($portalCss)): ?>
-    <link rel="stylesheet" href="<?= htmlspecialchars($portalCss) ?>">
+    <link rel="stylesheet" href="<?= htmlspecialchars($portalCss) ?>?v=<?= @filemtime(__DIR__ . '/../' . $portalCss) ?>">
     <?php endif; ?>

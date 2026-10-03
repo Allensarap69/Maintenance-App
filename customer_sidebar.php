@@ -159,8 +159,8 @@ $totalNotificationCount = count($customerNotificationItems);
     // Global theme state: apply saved theme before first paint to avoid a light-theme flash
     (function () {
         var t = localStorage.getItem('theme');
-        if (t !== 'dark' && t !== 'light') {
-            t = (localStorage.getItem('adminDarkMode') === '1' || localStorage.getItem('customerDarkMode') === '1') ? 'dark' : 'light';
+        if (localStorage.getItem('themeManual') !== '1' || (t !== 'dark' && t !== 'light')) {
+            t = 'light';
             localStorage.setItem('theme', t);
             localStorage.removeItem('adminDarkMode');
             localStorage.removeItem('customerDarkMode');
@@ -384,6 +384,7 @@ $totalNotificationCount = count($customerNotificationItems);
                 const applyTheme = function () {
                     root.setAttribute('data-theme', isDark ? 'dark' : 'light');
                     localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    localStorage.setItem('themeManual', '1');
                     renderToggleIcon();
                     window.dispatchEvent(new CustomEvent('customerThemeChanged', { detail: { dark: isDark } }));
                 };

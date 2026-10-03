@@ -462,6 +462,7 @@ require __DIR__ . '/partials/head.php';
                     const applyTheme = function () {
                         root.setAttribute('data-theme', isDark ? 'dark' : 'light');
                         localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                        localStorage.setItem('themeManual', '1');
                         syncDarkIcon();
                         document.dispatchEvent(new CustomEvent('adminThemeChanged', { detail: { dark: isDark } }));
                     };

@@ -197,12 +197,8 @@ $login_button_text = 'Login';
     <script>
         (function () {
             var t = localStorage.getItem('theme');
-            if (t !== 'dark' && t !== 'light') {
-                t = localStorage.getItem('mev-theme');
-            }
-            if (t !== 'dark' && t !== 'light') {
-                t = (localStorage.getItem('adminDarkMode') === '1' || localStorage.getItem('customerDarkMode') === '1') ? 'dark'
-                    : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            if (localStorage.getItem('themeManual') !== '1' || (t !== 'dark' && t !== 'light')) {
+                t = 'light';
             }
             localStorage.setItem('theme', t);
             document.documentElement.setAttribute('data-theme', t);
@@ -1002,6 +998,7 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
             const applyTheme = (theme) => {
                 document.documentElement.setAttribute('data-theme', theme);
                 localStorage.setItem('theme', theme);
+                localStorage.setItem('themeManual', '1');
                 themeToggle.setAttribute('aria-pressed', theme === 'dark');
                 if (themeMeta) themeMeta.setAttribute('content', theme === 'dark' ? '#0b1220' : '#ffffff');
             };

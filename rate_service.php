@@ -152,8 +152,9 @@ $pageTitle = 'Rate Your Service';
     <script>
         (function () {
             var t = localStorage.getItem('theme');
-            if (t !== 'dark' && t !== 'light') {
-                t = (localStorage.getItem('adminDarkMode') === '1' || localStorage.getItem('customerDarkMode') === '1') ? 'dark' : 'light';
+            if (localStorage.getItem('themeManual') !== '1' || (t !== 'dark' && t !== 'light')) {
+                t = 'light';
+                localStorage.setItem('theme', t);
             }
             document.documentElement.setAttribute('data-theme', t);
         })();

@@ -59,8 +59,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
         // Global theme state: apply saved theme before first paint to avoid a light-theme flash
         (function () {
             var t = localStorage.getItem('theme');
-            if (t !== 'dark' && t !== 'light') {
-                t = (localStorage.getItem('adminDarkMode') === '1' || localStorage.getItem('customerDarkMode') === '1') ? 'dark' : 'light';
+            if (localStorage.getItem('themeManual') !== '1' || (t !== 'dark' && t !== 'light')) {
+                t = 'light';
+                localStorage.setItem('theme', t);
             }
             document.documentElement.setAttribute('data-theme', t);
         })();

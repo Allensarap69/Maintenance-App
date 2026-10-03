@@ -1168,7 +1168,6 @@
         color: #e2e8f0 !important;
     }
     /* Inner chips/panels (sit inside cards) */
-    html[data-theme="dark"] .dc-icon, html[data-theme="dark"] .dc-arrow,
     html[data-theme="dark"] .step-circle, html[data-theme="dark"] .factor-item,
     html[data-theme="dark"] .breakdown-box, html[data-theme="dark"] .status-block,
     html[data-theme="dark"] .sr-plate, html[data-theme="dark"] .timeline-dot,
@@ -1307,12 +1306,18 @@
     html[data-theme="dark"] .support-box .lead { color: #cbd5e1 !important; }
     html[data-theme="dark"] .support-box h4 { color: #FDE047 !important; }
 
-    /* Booking-flow stepper -> brand yellow (both themes) */
+    /* Booking-flow stepper -> brand yellow on active step (both themes) */
     .page-stepper .step-item i,
-    .page-stepper .step-item span,
+    .page-stepper .step-item span {
+        color: #94a3b8 !important;
+    }
     .page-stepper .step-item.active i,
     .page-stepper .step-item.active span {
         color: #FACC15 !important;
+    }
+    .page-stepper .step-item.active {
+        border-bottom: 2px solid #FACC15;
+        padding-bottom: 4px;
     }
 
     /* Selection accents -> brand yellow (both themes) */

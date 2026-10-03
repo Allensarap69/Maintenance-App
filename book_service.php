@@ -401,12 +401,18 @@ foreach ($packages as $pkg) {
         }
 
         .step-header {
-            background: var(--primary-color);
+            background: #fff;
             padding: 14px 20px;
             font-weight: 600;
-            color: white;
-            border-bottom: 1px solid var(--border-color);
+            color: #172033;
+            border-bottom: 1px solid #E2E8F0;
             font-size: 1rem;
+        }
+
+        html[data-theme="dark"] .step-header {
+            background: #22335a;
+            color: #e2e8f0;
+            border-bottom-color: rgba(255, 255, 255, 0.09);
         }
         
         /* --- MODIFIED SERVICE SELECTION STYLES --- */

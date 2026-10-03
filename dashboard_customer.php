@@ -1392,23 +1392,18 @@ $alerts = array_slice($alerts, 0, 5);
         }
         .dc-card .dc-meta { margin-top: auto; }
         .dc-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,0.08); color: var(--text-dark); }
-        .dc-card.dc-navy  { background: linear-gradient(135deg, #EAF0F8 0%, #DFE9F5 100%); }
-        .dc-card.dc-gold  { background: linear-gradient(135deg, #FEF6DC 0%, #FDF0C0 100%); }
-        .dc-card.dc-amber { background: linear-gradient(135deg, #FFF0DB 0%, #FFE8C7 100%); }
-        .dc-card.dc-blue  { background: linear-gradient(135deg, #EAF2FE 0%, #DFEBFD 100%); }
+        .dc-card.dc-navy, .dc-card.dc-gold, .dc-card.dc-amber, .dc-card.dc-blue {
+            background: #fff;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.05);
+        }
         .dc-icon {
             width: 40px; height: 40px;
             border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.15rem;
             margin-bottom: 10px;
-            background: #fff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
-        .dc-navy .dc-icon { color: #1e3a5f; }
-        .dc-gold .dc-icon { color: #EAB308; }
-        .dc-amber .dc-icon { color: #F59E0B; }
-        .dc-blue .dc-icon { color: #3B82F6; }
+        .dc-card .dc-icon { color: #1e3a5f; }
         .dc-title { font-size: 0.82rem; font-weight: 600; color: #374151; }
         .dc-value { font-size: 1.7rem; font-weight: 700; line-height: 1.15; color: #111827; }
         .dc-meta { font-size: 0.72rem; color: #6b7280; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -1421,15 +1416,10 @@ $alerts = array_slice($alerts, 0, 5);
             bottom: 14px;
             width: 30px; height: 30px;
             border-radius: 50%;
-            background: #fff;
             display: flex; align-items: center; justify-content: center;
             font-size: 0.8rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-        .dc-navy .dc-arrow { color: #1e3a5f; }
-        .dc-gold .dc-arrow { color: #EAB308; }
-        .dc-amber .dc-arrow { color: #F59E0B; }
-        .dc-blue .dc-arrow { color: #3B82F6; }
+        .dc-card .dc-arrow { color: #1e3a5f; }
         .dc-moto-bg {
             position: absolute;
             right: -8px; bottom: -6px;
@@ -1895,8 +1885,7 @@ $alerts = array_slice($alerts, 0, 5);
         html[data-theme="dark"] .dc-card.dc-blue {
             background: linear-gradient(135deg, #22335a 0%, #1a2b4f 100%) !important;
         }
-        html[data-theme="dark"] .dc-icon, html[data-theme="dark"] .dc-arrow { background: #22335a !important; }
-        html[data-theme="dark"] .dc-navy .dc-icon, html[data-theme="dark"] .dc-navy .dc-arrow { color: #93c5fd !important; }
+        html[data-theme="dark"] .dc-card .dc-icon, html[data-theme="dark"] .dc-card .dc-arrow { color: #93c5fd !important; }
         html[data-theme="dark"] .dc-title { color: #cbd5e1 !important; }
         html[data-theme="dark"] .dc-moto-bg { color: rgba(255, 255, 255, 0.05) !important; }
 

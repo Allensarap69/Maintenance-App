@@ -480,9 +480,14 @@ $button_specialties = [
         .group-qualified {
             font-size: 0.9rem;
             padding: 8px 12px;
+            color: #059669;
+            border-left-color: var(--qualified-border) !important;
         }
         .group-other {
-            border-left: 4px solid #64748B;
+            border-left: 4px solid #dc2626;
+            color: #dc2626;
+            margin-top: 32px;
+            margin-bottom: 24px;
         }
         .info-card {
             background-color: var(--card-bg);
@@ -700,6 +705,7 @@ $button_specialties = [
         .mechanic-info small { font-size: 0.75rem; }
         .skills-link { font-size: 0.75rem; }
         .group-header { padding: 8px 12px; font-size: 0.85rem; margin-top: 16px; margin-bottom: 10px; }
+        .group-other { margin-top: 45px; margin-bottom: 15px; }
         .fixed-footer-bar { padding: 12px 0; }
         .btn-check-availability { padding: 8px 16px; font-size: 0.85rem; }
         .btn { font-size: 0.85rem; padding: 0.4rem 0.8rem; }

@@ -634,6 +634,10 @@ $required_duration_human_readable = convertMinutesToHoursMins($required_duration
         .btn { font-size: 0.85rem; padding: 0.5rem 1rem; }
         .table { font-size: 0.75rem; }
         .table th, .table td { padding: 0.4rem; }
+
+        /* --- Dark mode --- */
+        html[data-theme="dark"] .service-time-display { color: #e2e8f0; }
+        html[data-theme="dark"] .remaining-time-display { color: #e2e8f0; }
     </style>
 </head>
 <body>

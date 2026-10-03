@@ -1,6 +1,6 @@
 <?php
 // generate_reports.php (Example)
-require 'db.php';
+require __DIR__ . '/../db.php';
 
 // 1. Define the report period (e.g., Yesterday)
 $report_date = date('Y-m-d', strtotime('yesterday'));

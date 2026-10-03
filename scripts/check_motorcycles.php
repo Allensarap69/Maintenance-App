@@ -1,5 +1,5 @@
 <?php
-require 'db.php';
+require __DIR__ . '/../db.php';
 
 echo "<h2>Check Motorcycles Table</h2>";
 echo "<hr>";

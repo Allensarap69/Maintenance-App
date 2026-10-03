@@ -4,7 +4,7 @@
  * This file tests the warranty management functionality
  */
 
-require 'db.php';
+require __DIR__ . '/../db.php';
 
 echo "<h2>Warranty Management Module Test</h2>";
 echo "<hr>";

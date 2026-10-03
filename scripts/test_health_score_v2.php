@@ -4,8 +4,8 @@
  * Creates a test customer + motorcycle, runs the six scenarios,
  * and rolls back the transaction at the end.
  */
-require_once 'db.php';
-require_once 'motorcycle_health_helper.php';
+require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../motorcycle_health_helper.php';
 
 function showScore($label, $motorcycle) {
     $factors = [];

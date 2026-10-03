@@ -3,7 +3,7 @@
  * Health Score v2 Database Setup
  * Run once to add the inspection table and mileage interval column.
  */
-require 'db.php';
+require __DIR__ . '/../db.php';
 
 echo "=== Health Score v2 Database Setup ===\n\n";
 

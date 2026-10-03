@@ -1,0 +1,18 @@
+# ---- Webroot hardening (Apache 2.4) ----
+
+# Never serve VCS internals
+RedirectMatch 403 (^|/)\.git
+
+# Never serve dumps, backups, docs, or scratch files by extension
+<FilesMatch "\.(sql|bak|bak2|backup|old|orig|log|docx|py|md|sh)$">
+    Require all denied
+</FilesMatch>
+
+# Block one-off scratch files (_filename.*)
+<FilesMatch "^_">
+    Require all denied
+</FilesMatch>
+
+# Dev/setup scripts are not web-runnable — run via CLI instead:
+#   php -f scripts/setup_mechanic_login.php
+RedirectMatch 403 (^|/)scripts/

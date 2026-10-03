@@ -5,8 +5,12 @@
 sms_config.php
 .env
 
-# User uploads (ephemeral on Render anyway)
+# User uploads (ephemeral on Render anyway) — keep only the protect .htaccess
 uploads/
+!uploads/.htaccess
+
+# Dev/setup/test scripts — never shipped to the image (run via CLI)
+scripts/
 
 # Backups and scratch files
 *.bak

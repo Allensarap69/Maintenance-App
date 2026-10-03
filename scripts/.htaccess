@@ -1,0 +1,4 @@
+# Dev/setup/test scripts — never web-runnable.
+# Run from the command line instead, e.g.:
+#   D:\xampp\php\php.exe -f scripts\setup_mechanic_login.php
+Require all denied

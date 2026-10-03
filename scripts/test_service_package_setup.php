@@ -1,6 +1,6 @@
 <?php
 // Test script to verify service package tables setup
-require 'db.php';
+require __DIR__ . '/../db.php';
 
 echo "<h2>Service Package Database Test</h2>";
 echo "<hr>";

@@ -1,5 +1,5 @@
 <?php
-require 'db.php';
+require __DIR__ . '/../db.php';
 
 // Check motorcycles table structure
 echo "=== MOTORCYCLES TABLE STRUCTURE ===\n";

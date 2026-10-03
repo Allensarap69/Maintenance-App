@@ -1,8 +1,8 @@
 <?php
 session_start();
-require 'db.php';
-require 'sms_config.php';
-require 'sms_helper.php';
+require __DIR__ . '/../db.php';
+require __DIR__ . '/../sms_config.php';
+require __DIR__ . '/../sms_helper.php';
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_test'])) {
 
 $credits = $sms->getCredits();
 $pageTitle = 'Test SMS';
-require 'admin_sidebar_template.php';
+require __DIR__ . '/../admin_sidebar_template.php';
 ?>
 
 <div class="container-fluid py-4">
@@ -87,4 +87,4 @@ require 'admin_sidebar_template.php';
     </div>
 </div>
 
-<?php require 'admin_sidebar_footer.php'; ?>
+<?php require __DIR__ . '/../admin_sidebar_footer.php'; ?>

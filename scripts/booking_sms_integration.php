@@ -4,8 +4,8 @@
  * Add these functions to your existing booking management files
  */
 
-require_once 'sms_helper.php';
-require_once 'sms_config.php';
+require_once __DIR__ . '/../sms_helper.php';
+require_once __DIR__ . '/../sms_config.php';
 
 /**
  * Send SMS notification when booking is accepted

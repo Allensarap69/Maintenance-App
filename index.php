@@ -68,18 +68,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
     if (!verify_csrf_token()) {
         $msg = "Security validation failed. Please refresh the page and try again.";
     } else {
-        // Check progressive login delay
-        $delay_info = check_login_delay();
-        
-        // If account is locked, show error
-        if ($delay_info['locked']) {
+        $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
+        $password = $_POST['password'] ?? '';
+
+        // Check progressive login delay (server-side, keyed on email + IP)
+        $delay_info = check_login_delay($pdo, $email);
+
+        // If account is locked or delayed, do not process credentials
+        if ($delay_info['locked'] || $delay_info['delay'] > 0) {
             $msg = $delay_info['message'];
         } elseif (empty($_POST['email']) || empty($_POST['password'])) {
             $msg = "Please enter both email and password.";
         } else {
-            $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-            $password = $_POST['password'];
-
             try {
                 $stmt = $pdo->prepare("SELECT id, role, username, password FROM users WHERE email=?");
                 $stmt->execute([$email]);
@@ -91,9 +91,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
                 }
 
                 if ($user) {
+                    // Transparently upgrade weak MD5/plaintext hashes to bcrypt
+                    $stored_hash = $user['password'];
+                    $is_bcrypt = strpos($stored_hash, '$2y$') === 0 || strpos($stored_hash, '$2a$') === 0;
+                    if (!$is_bcrypt) {
+                        try {
+                            $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")
+                                ->execute([password_hash($password, PASSWORD_BCRYPT), $user['id']]);
+                        } catch (PDOException $e) {
+                            error_log("Password rehash failed for user {$user['id']}: " . $e->getMessage());
+                        }
+                    }
+
                     // Successful login: Clear failed attempts
-                    clear_login_rate_limit();
-                    
+                    clear_login_rate_limit($pdo, $email);
+
                     // Set session variables
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['role']    = $user['role'];
@@ -111,8 +123,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
                     exit;
                 } else {
                     // Failed login - record attempt and show delay
-                    record_failed_login();
-                    $delay_info = check_login_delay();
+                    record_failed_login($pdo, $email);
+                    $delay_info = check_login_delay($pdo, $email);
                     
                     if ($delay_info['delay'] > 0) {
                         $msg = "Invalid credentials. " . $delay_info['message'];
@@ -121,8 +133,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
                     }
                 }
             } catch (PDOException $e) {
-                // Detailed error handling is good for development
-                $msg = "A database error occurred: " . $e->getMessage();
+                error_log("Login error: " . $e->getMessage());
+                $msg = "A database error occurred. Please try again.";
             }
         }
     }
@@ -211,7 +223,7 @@ $login_button_text = 'Login';
 </head>
 <?php 
 // Show progressive delay overlay if there are failed attempts
-$delay_info = check_login_delay();
+$delay_info = check_login_delay($pdo, $_POST['email'] ?? '');
 if ($delay_info['delay'] > 0 && $login_attempt) {
     echo render_login_delay($delay_info);
 }

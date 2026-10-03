@@ -3,7 +3,7 @@
  * Add Dashboard Fields to Database
  * Run this script to add the necessary fields for the customer dashboard features
  */
-require 'db.php';
+require __DIR__ . '/../db.php';
 
 echo "=== ADDING DASHBOARD FIELDS TO MOTORCYCLES TABLE ===\n\n";
 

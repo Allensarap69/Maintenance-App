@@ -58,11 +58,50 @@ function csrf_field() {
 }
 
 /**
- * Progressive Login Delay - Check and enforce increasing delays
- * @return array ['allowed' => bool, 'delay' => int, 'attempts' => int, 'locked' => bool, 'remaining' => int]
+ * Client IP used for throttling. REMOTE_ADDR only — X-Forwarded-For
+ * is client-supplied and would let attackers rotate IPs at will.
  */
-function check_login_delay() {
-    return [
+function client_ip() {
+    return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+}
+
+/**
+ * Lazily create the login_attempts table. Fail-open: if DDL fails we
+ * log and continue without throttling (same as before this existed).
+ */
+function ensure_login_attempts_table($pdo) {
+    static $done = false;
+    if ($done) return;
+    $done = true;
+    try {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS login_attempts (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            email VARCHAR(255) NOT NULL DEFAULT '',
+            ip VARCHAR(45) NOT NULL DEFAULT '',
+            attempted_at INT UNSIGNED NOT NULL,
+            INDEX idx_email (email),
+            INDEX idx_ip (ip),
+            INDEX idx_time (attempted_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    } catch (Exception $e) {
+        error_log('login_attempts table init failed: ' . $e->getMessage());
+    }
+}
+
+/**
+ * Progressive Login Delay — server-side, keyed on email + IP.
+ * Clearing cookies does NOT reset it (unlike the old session version).
+ *
+ * Schedule within a 15-min window:
+ *   fails 1-2 : no delay
+ *   fail  3   : 10s, fail 4 : 30s, fail 5 : 60s
+ *   fail  6+  : locked until 15 min after the last attempt
+ *
+ * @return array ['allowed' => bool, 'delay' => int, 'attempts' => int,
+ *                'locked' => bool, 'remaining' => int, 'message' => ?string]
+ */
+function check_login_delay($pdo = null, $email = '') {
+    $allowed = [
         'allowed' => true,
         'delay' => 0,
         'attempts' => 0,
@@ -70,6 +109,57 @@ function check_login_delay() {
         'remaining' => 0,
         'message' => null
     ];
+    $pdo = $pdo ?: ($GLOBALS['pdo'] ?? null);
+    if (!$pdo) return $allowed;
+
+    try {
+        ensure_login_attempts_table($pdo);
+        $ip = client_ip();
+        $window = 900; // 15 minutes
+        $cutoff = time() - $window;
+        $email = strtolower(trim((string)$email));
+
+        $stmt = $pdo->prepare(
+            "SELECT COUNT(*), MAX(attempted_at) FROM login_attempts
+             WHERE attempted_at > ? AND (email = ? OR ip = ?)"
+        );
+        $stmt->execute([$cutoff, $email, $ip]);
+        $row = $stmt->fetch(PDO::FETCH_NUM);
+        $attempts = (int)($row[0] ?? 0);
+        $last = (int)($row[1] ?? 0);
+
+        if ($attempts >= 6) {
+            $remaining = $last + $window - time();
+            if ($remaining > 0) {
+                return [
+                    'allowed' => false,
+                    'delay' => 0,
+                    'attempts' => $attempts,
+                    'locked' => true,
+                    'remaining' => $remaining,
+                    'message' => 'Too many failed attempts. Try again in ' . format_wait_time($remaining) . '.'
+                ];
+            }
+        }
+
+        $delays = [3 => 10, 4 => 30, 5 => 60];
+        if (isset($delays[$attempts])) {
+            $wait = $delays[$attempts] - (time() - $last);
+            if ($wait > 0) {
+                return [
+                    'allowed' => false,
+                    'delay' => $wait,
+                    'attempts' => $attempts,
+                    'locked' => false,
+                    'remaining' => $wait,
+                    'message' => 'Please wait ' . format_wait_time($wait) . ' before trying again.'
+                ];
+            }
+        }
+    } catch (Exception $e) {
+        error_log('check_login_delay failed: ' . $e->getMessage());
+    }
+    return $allowed;
 }
 
 /**
@@ -178,20 +268,36 @@ function render_login_delay($delay_info) {
 }
 
 /**
- * Record a failed login attempt
+ * Record a failed login attempt (server-side, survives cookie clears).
+ * ~5% of calls also purge attempts older than 24h.
  */
-function record_failed_login() {
-    if (!isset($_SESSION['login_attempts'])) {
-        $_SESSION['login_attempts'] = [];
+function record_failed_login($pdo = null, $email = '') {
+    $pdo = $pdo ?: ($GLOBALS['pdo'] ?? null);
+    if (!$pdo) return;
+    try {
+        ensure_login_attempts_table($pdo);
+        $stmt = $pdo->prepare("INSERT INTO login_attempts (email, ip, attempted_at) VALUES (?, ?, ?)");
+        $stmt->execute([strtolower(trim((string)$email)), client_ip(), time()]);
+        if (random_int(1, 20) === 1) {
+            $pdo->exec("DELETE FROM login_attempts WHERE attempted_at < " . (time() - 86400));
+        }
+    } catch (Exception $e) {
+        error_log('record_failed_login failed: ' . $e->getMessage());
     }
-    $_SESSION['login_attempts'][] = time();
 }
 
 /**
  * Clear login rate limit after successful login
  */
-function clear_login_rate_limit() {
-    unset($_SESSION['login_attempts']);
+function clear_login_rate_limit($pdo = null, $email = '') {
+    $pdo = $pdo ?: ($GLOBALS['pdo'] ?? null);
+    if (!$pdo) return;
+    try {
+        $stmt = $pdo->prepare("DELETE FROM login_attempts WHERE email = ? OR ip = ?");
+        $stmt->execute([strtolower(trim((string)$email)), client_ip()]);
+    } catch (Exception $e) {
+        error_log('clear_login_rate_limit failed: ' . $e->getMessage());
+    }
 }
 
 /**
@@ -211,7 +317,7 @@ function set_security_headers() {
     header('Referrer-Policy: strict-origin-when-cross-origin');
     
     // Basic Content Security Policy
-    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self';");
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self';");
 }
 
 /**

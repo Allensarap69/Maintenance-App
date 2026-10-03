@@ -1,5 +1,5 @@
 <?php
-require 'db.php';
+require __DIR__ . '/../db.php';
 
 echo "<h2>Customer Modules Tables Setup</h2>";
 echo "<hr>";

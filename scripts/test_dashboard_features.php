@@ -4,8 +4,8 @@
  * This script tests the new customer dashboard features
  */
 
-require 'db.php';
-require 'motorcycle_health_helper.php';
+require __DIR__ . '/../db.php';
+require __DIR__ . '/../motorcycle_health_helper.php';
 
 echo "=== TESTING CUSTOMER DASHBOARD FEATURES ===\n\n";
 

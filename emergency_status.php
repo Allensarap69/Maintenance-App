@@ -116,9 +116,13 @@ function renderList($requests, $listId, $activeTab, $tabKey) {
     $activeClass = ($activeTab === $tabKey) ? ' active' : '';
     echo '<ul class="ab-list' . $activeClass . '" id="' . $listId . '" data-tab-list="' . $tabKey . '">';
     if (empty($requests)) {
-        echo '<li class="ab-empty-state" style="border: none; background: none; box-shadow: none; text-align: center; padding: 2rem 1rem;">';
-        echo '<i data-lucide="inbox" style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.4;"></i>';
-        echo '<h4 style="color: var(--text-main); font-weight: 700;">No ' . ucfirst($tabKey) . ' requests</h4>';
+        $empty_icons = ['accepted' => 'check-circle', 'declined' => 'x-circle', 'completed' => 'flag'];
+        $empty_icon = $empty_icons[$tabKey] ?? 'inbox';
+        $empty_label = ($tabKey === 'declined') ? 'Rejected' : ucfirst($tabKey);
+        echo '<li class="ab-empty-state ab-empty-inline ' . $tabKey . '">';
+        echo '<div class="ab-empty-icon"><i data-lucide="' . $empty_icon . '"></i></div>';
+        echo '<h4>No ' . $empty_label . ' requests</h4>';
+        echo '<p>Emergency requests will appear here once they are ' . $tabKey . '.</p>';
         echo '</li>';
     } else {
         foreach ($requests as $b) {
@@ -127,14 +131,16 @@ function renderList($requests, $listId, $activeTab, $tabKey) {
             $group = getStatusGroup($b['request_status']);
             $status_label = ($group === 'declined') ? 'Rejected' : ucfirst($b['request_status']);
             $status_class = ($group === 'declined') ? 'rejected' : $group;
+            $status_icons = ['pending' => 'clock', 'accepted' => 'check-circle', 'rejected' => 'x-circle', 'completed' => 'flag'];
+            $status_icon = $status_icons[$status_class] ?? 'siren';
             $created = !empty($b['created_at']) ? date('M d, Y', strtotime($b['created_at'])) : 'N/A';
-            echo '<li class="ab-list-item" data-booking-id="' . $b['id'] . '">';
-            echo '<div class="ab-list-icon"><i data-lucide="alert-triangle"></i></div>';
+            $created_time = !empty($b['created_at']) ? date('g:i A', strtotime($b['created_at'])) : '';
+            echo '<li class="ab-list-item ab-li-' . $status_class . '" data-booking-id="' . $b['id'] . '">';
+            echo '<div class="ab-list-icon ' . $status_class . '"><i data-lucide="' . $status_icon . '"></i></div>';
             echo '<div class="ab-list-main">';
-            echo '<div class="ab-list-customer">' . $customer . '</div>';
-            echo '<div class="ab-list-meta">Emergency #' . $detail_id . ' &middot; ' . $created . '</div>';
+            echo '<div class="ab-list-top"><span class="ab-list-customer">' . $customer . '</span><span class="ab-list-status ' . $status_class . '">' . $status_label . '</span></div>';
+            echo '<div class="ab-list-meta"><i data-lucide="siren"></i>#' . $detail_id . '<i data-lucide="calendar"></i>' . $created . '<i data-lucide="clock"></i>' . $created_time . '</div>';
             echo '</div>';
-            echo '<div class="ab-list-status ' . $status_class . '">' . $status_label . '</div>';
             echo '<div class="ab-list-arrow"><i data-lucide="chevron-right"></i></div>';
             echo '</li>';
         }
@@ -195,22 +201,41 @@ function renderEmergencyDetail($b) {
     $status_class = ($group === 'declined') ? 'rejected' : $group;
 
     if ($is_pending) {
+        $box_icon = 'clock';
         $box_text = 'Request Pending';
         $box_subtext = 'Awaiting admin response.';
     } elseif ($is_accepted) {
         if (strtolower(trim($b['request_status'] ?? '')) === 'assigned') {
+            $box_icon = 'user-check';
             $box_text = 'Mechanic Assigned';
             $box_subtext = 'A mechanic has been assigned. Awaiting acceptance.';
         } else {
+            $box_icon = 'check-circle';
             $box_text = 'Request Accepted';
             $box_subtext = 'This emergency request has been accepted.';
         }
     } elseif ($is_declined) {
+        $box_icon = 'x-circle';
         $box_text = 'Request Declined';
         $box_subtext = 'This emergency request has been declined.';
     } else {
+        $box_icon = 'check-circle-2';
         $box_text = 'Service Completed';
         $box_subtext = 'This emergency service has been completed.';
+    }
+
+    // Status progress stepper
+    if ($is_declined) {
+        $steps = [
+            ['label' => 'Requested', 'state' => 'done', 'icon' => 'check'],
+            ['label' => 'Rejected', 'state' => 'danger', 'icon' => 'x'],
+        ];
+    } else {
+        $steps = [
+            ['label' => 'Requested', 'state' => 'done', 'icon' => 'check'],
+            ['label' => 'Accepted', 'state' => $is_completed ? 'done' : 'current', 'icon' => 'check'],
+            ['label' => 'Completed', 'state' => $is_completed ? 'done' : 'todo', 'icon' => 'flag'],
+        ];
     }
 
     $detailItem = function($icon, $label, $value, $valueClass = '', $full = false) {
@@ -228,13 +253,14 @@ function renderEmergencyDetail($b) {
     $col1 = $detailItem('user', 'Customer', $customer_name) .
             $detailItem('mail', 'Email', $customer_email) .
             $detailItem('phone', 'Phone', $customer_phone) .
-            $detailItem('motorbike', 'Vehicle', $motorcycle) .
-            $detailItem('alert-triangle', 'Issue Type', $issue) .
-            $detailItem($service_icon, 'Service Type', $service_label) .
             $detailItem('phone-call', 'Contact', $contact);
 
-    $col2 = $detailItem('flag', 'Status', $status_label) .
-            $detailItem('zap', 'Priority', $priority) .
+    $col2 = $detailItem('motorbike', 'Vehicle', $motorcycle) .
+            $detailItem('alert-triangle', 'Issue Type', $issue) .
+            $detailItem($service_icon, 'Service Type', $service_label) .
+            $detailItem('zap', 'Priority', $priority);
+
+    $col3 = $detailItem('flag', 'Status', $status_label) .
             $detailItem('wrench', 'Mechanic', $mechanic) .
             $detailItem('calendar', 'Created', $created) .
             $detailItem('clock', 'Updated', $updated) .
@@ -306,7 +332,7 @@ function renderEmergencyDetail($b) {
                 <div class="ab-detail-header-main">
                     <div class="ab-detail-header-top">
                         <div class="ab-detail-id">Emergency #<?= $detail_id ?></div>
-                        <span class="ab-status-badge"><?= $status_label ?></span>
+                        <span class="ab-status-badge <?= $status_class ?>"><?= $status_label ?></span>
                     </div>
                     <div class="ab-detail-meta">
                         <span class="ab-detail-meta-item"><i data-lucide="calendar"></i> <?= $created ?></span>
@@ -318,8 +344,22 @@ function renderEmergencyDetail($b) {
                 <?php endif; ?>
             </div>
             <div class="ab-status-banner <?= $status_class ?>">
-                <div class="ab-status-banner-title"><?= $box_text ?></div>
-                <div class="ab-status-banner-sub"><?= $box_subtext ?></div>
+                <div class="ab-status-banner-icon"><i data-lucide="<?= $box_icon ?>"></i></div>
+                <div class="ab-status-banner-content">
+                    <div class="ab-status-banner-title"><?= $box_text ?></div>
+                    <div class="ab-status-banner-sub"><?= $box_subtext ?></div>
+                </div>
+            </div>
+            <div class="ab-stepper">
+                <?php foreach ($steps as $i => $s): ?>
+                    <?php if ($i > 0): ?>
+                        <div class="ab-step-line<?= $s['state'] === 'done' ? ' filled' : ($s['state'] === 'danger' ? ' filled danger' : '') ?>"></div>
+                    <?php endif; ?>
+                    <div class="ab-step <?= $s['state'] ?>">
+                        <div class="ab-step-dot"><i data-lucide="<?= $s['icon'] ?>"></i></div>
+                        <div class="ab-step-label"><?= $s['label'] ?></div>
+                    </div>
+                <?php endforeach; ?>
             </div>
             <div class="ab-card-title"><i data-lucide="file-text"></i> Emergency Details</div>
             <div class="ab-detail-body">
@@ -328,6 +368,9 @@ function renderEmergencyDetail($b) {
                 </div>
                 <div class="ab-detail-col">
                     <?= $col2 ?>
+                </div>
+                <div class="ab-detail-col">
+                    <?= $col3 ?>
                 </div>
                 <?= $full ?>
             </div>
@@ -527,11 +570,9 @@ $pageTitle = 'Emergency Requests Status';
         flex: 1;
         display: flex;
         flex-direction: column;
-        background: var(--card-bg);
-        border: 1px solid var(--card-border);
+        background: transparent;
+        border: none;
         border-radius: 16px;
-        backdrop-filter: blur(24px);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
         overflow: hidden;
         min-height: 0;
     }
@@ -539,6 +580,7 @@ $pageTitle = 'Emergency Requests Status';
     .ab-pane-layout {
         display: grid;
         grid-template-columns: 320px 1fr;
+        gap: 0.9rem;
         flex: 1;
         min-height: 0;
     }
@@ -547,7 +589,8 @@ $pageTitle = 'Emergency Requests Status';
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
-        border-right: 1px solid var(--card-border);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
         overflow-y: auto;
         background: var(--card-bg);
         padding: 0.75rem;
@@ -599,6 +642,7 @@ $pageTitle = 'Emergency Requests Status';
         text-decoration: none;
         transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
     }
     .ab-list-item:hover { border-color: #1e3a5f; }
     .ab-list-item.active {
@@ -659,6 +703,7 @@ $pageTitle = 'Emergency Requests Status';
         display: flex;
         flex-direction: column;
         scrollbar-width: none;
+        background: var(--bg-dark);
     }
     .ab-detail-pane::-webkit-scrollbar { display: none; }
     .ab-detail-pane > * { position: relative; z-index: 1; }
@@ -671,18 +716,18 @@ $pageTitle = 'Emergency Requests Status';
     .ab-detail-card {
         background: #fff;
         border: 1px solid var(--card-border);
-        border-radius: 12px;
-        padding: 0.8rem;
+        border-radius: 16px;
+        padding: 0.85rem 1rem;
         width: 100%;
         overflow: hidden;
     }
     .ab-detail-card > .ab-detail-header {
-        margin: -0.8rem -0.8rem 0.6rem -0.8rem;
-        border-radius: 12px 12px 0 0;
+        margin: -0.85rem -1rem 0.6rem -1rem;
+        border-radius: 16px 16px 0 0;
     }
     .ab-detail-card > .ab-status-banner {
-        margin: 0 -0.8rem 0.75rem -0.8rem;
-        border-radius: 0;
+        margin: 0 0 0.6rem 0;
+        border-radius: 10px;
     }
     .ab-detail-header {
         display: flex;
@@ -709,9 +754,9 @@ $pageTitle = 'Emergency Requests Status';
         color: #000000;
     }
     .ab-status-badge {
-        padding: 0.15rem 0.45rem;
+        padding: 0.25rem 0.65rem;
         border-radius: 99px;
-        font-size: 0.58rem;
+        font-size: 0.65rem;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.03em;
@@ -719,12 +764,12 @@ $pageTitle = 'Emergency Requests Status';
         background: #ffffff;
         color: #000000;
     }
-    .ab-detail-meta { display: flex; align-items: center; gap: 0.75rem; }
+    .ab-detail-meta { display: flex; align-items: center; gap: 1rem; }
     .ab-detail-meta-item {
         display: inline-flex;
         align-items: center;
-        gap: 0.25rem;
-        font-size: 0.72rem;
+        gap: 0.35rem;
+        font-size: 0.78rem;
         color: #000000;
     }
     .ab-detail-meta-item i { width: 13px; height: 13px; color: #1e40af; }
@@ -754,25 +799,25 @@ $pageTitle = 'Emergency Requests Status';
     .ab-card-title {
         font-size: 0.82rem;
         font-weight: 800;
-        color: var(--text-main);
+        color: #10b981;
         margin-bottom: 0.75rem;
         display: flex;
         align-items: center;
-        gap: 0.3rem;
+        gap: 0.4rem;
     }
-    .ab-card-title i { width: 16px; height: 16px; color: #1e40af; }
+    .ab-card-title i { width: 18px; height: 18px; color: #1e40af; }
 
     .ab-detail-body {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 0.6rem;
     }
-    .ab-detail-col { display: flex; flex-direction: column; gap: 0.5rem; }
+    .ab-detail-col { display: flex; flex-direction: column; gap: 0.55rem; }
     .ab-detail-item { display: flex; align-items: flex-start; gap: 0.55rem; }
     .ab-detail-item-full { grid-column: 1 / -1; }
     .ab-detail-icon {
-        width: 26px;
-        height: 26px;
+        width: 30px;
+        height: 30px;
         border-radius: 8px;
         background: transparent;
         display: flex;
@@ -785,7 +830,7 @@ $pageTitle = 'Emergency Requests Status';
     .ab-detail-icon i { width: 14px; height: 14px; box-shadow: none; }
     .ab-detail-text { display: flex; flex-direction: column; gap: 0.05rem; min-width: 0; }
     .ab-detail-label {
-        font-size: 0.58rem;
+        font-size: 0.6rem;
         font-weight: 700;
         color: #000000;
         text-transform: uppercase;
@@ -804,7 +849,7 @@ $pageTitle = 'Emergency Requests Status';
     .ab-detail-footer {
         display: flex;
         align-items: center;
-        gap: 0.4rem;
+        gap: 0.5rem;
         margin-top: 0.5rem;
         flex-wrap: wrap;
         width: 100%;
@@ -828,14 +873,42 @@ $pageTitle = 'Emergency Requests Status';
     }
     .ab-detail-footer .ab-action-btn:hover { background: rgba(0, 0, 0, 0.08); color: var(--text-main); }
     .ab-detail-footer .ab-action-btn i { width: 12px; height: 12px; }
-    .ab-detail-footer .ab-action-btn.print { background: rgba(30, 58, 95, 0.1); border-color: rgba(30, 58, 95, 0.3); color: #1e3a5f; }
-    .ab-detail-footer .ab-action-btn.print:hover { background: rgba(30, 58, 95, 0.2); }
-    .ab-detail-footer .ab-action-btn.complete { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); color: #15803d; }
-    .ab-detail-footer .ab-action-btn.complete:hover { background: rgba(16, 185, 129, 0.2); }
-    .ab-detail-footer .ab-action-btn.manage { background: rgba(250, 204, 21, 0.1); border-color: rgba(250, 204, 21, 0.3); color: #EAB308; }
-    .ab-detail-footer .ab-action-btn.manage:hover { background: rgba(250, 204, 21, 0.2); }
-    .ab-detail-footer .ab-action-btn.reject { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: #b91c1c; }
-    .ab-detail-footer .ab-action-btn.reject:hover { background: rgba(239, 68, 68, 0.2); }
+    .ab-detail-footer .ab-action-btn.print {
+        background: #1e3a5f; border-color: #1e3a5f; color: #ffffff;
+        padding: 0.45rem 0.9rem; font-size: 0.72rem;
+        box-shadow: 0 2px 8px rgba(30, 58, 95, 0.35);
+    }
+    .ab-detail-footer .ab-action-btn.print:hover {
+        background: #162c49; border-color: #162c49; color: #ffffff;
+        transform: translateY(-1px); box-shadow: 0 4px 12px rgba(30, 58, 95, 0.4);
+    }
+    .ab-detail-footer .ab-action-btn.complete {
+        background: #10b981; border-color: #10b981; color: #ffffff;
+        padding: 0.45rem 0.9rem; font-size: 0.72rem; cursor: pointer;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+    }
+    .ab-detail-footer .ab-action-btn.complete:hover {
+        background: #059669; border-color: #059669; color: #ffffff;
+        transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+    .ab-detail-footer .ab-action-btn.manage {
+        background: #FACC15; border-color: #FACC15; color: #111827;
+        padding: 0.45rem 0.9rem; font-size: 0.72rem; cursor: pointer;
+        box-shadow: 0 2px 8px rgba(250, 204, 21, 0.35);
+    }
+    .ab-detail-footer .ab-action-btn.manage:hover {
+        background: #EAB308; border-color: #EAB308; color: #111827;
+        transform: translateY(-1px); box-shadow: 0 4px 12px rgba(250, 204, 21, 0.4);
+    }
+    .ab-detail-footer .ab-action-btn.reject {
+        background: #ef4444; border-color: #ef4444; color: #ffffff;
+        padding: 0.45rem 0.9rem; font-size: 0.72rem; cursor: pointer;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
+    }
+    .ab-detail-footer .ab-action-btn.reject:hover {
+        background: #dc2626; border-color: #dc2626; color: #ffffff;
+        transform: translateY(-1px); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
 
     .er-actions { display: flex; align-items: center; gap: 0.4rem; }
     .er-action-form { display: none; margin-top: 0.5rem; }
@@ -863,14 +936,439 @@ $pageTitle = 'Emergency Requests Status';
         margin-bottom: 1rem;
     }
 
+    /* ================= Enhanced UI ================= */
+
+    /* Segmented tabs */
+    .ab-tabs {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 14px;
+        padding: 0.3rem;
+        margin-bottom: 0.75rem;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+        width: fit-content;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    .ab-tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        padding: 0.45rem 0.85rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
+    }
+    .ab-tab i, .ab-tab svg { width: 14px; height: 14px; }
+    .ab-tab:hover { color: var(--text-main); background: #f1f5f9; }
+    .ab-tab.active[data-tab="accepted"] { background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.4); color: #047857; }
+    .ab-tab.active[data-tab="declined"] { background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.4); color: #b91c1c; }
+    .ab-tab.active[data-tab="completed"] { background: rgba(30, 58, 95, 0.12); border-color: rgba(30, 58, 95, 0.4); color: #1e3a5f; }
+    .ab-tab-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 20px;
+        height: 18px;
+        padding: 0 0.35rem;
+        border-radius: 99px;
+        background: rgba(0, 0, 0, 0.07);
+        color: var(--text-muted);
+        font-size: 0.62rem;
+        font-weight: 800;
+    }
+    .ab-tab.active[data-tab="accepted"] .ab-tab-count { background: rgba(16, 185, 129, 0.2); color: #047857; }
+    .ab-tab.active[data-tab="declined"] .ab-tab-count { background: rgba(239, 68, 68, 0.2); color: #b91c1c; }
+    .ab-tab.active[data-tab="completed"] .ab-tab-count { background: rgba(30, 58, 95, 0.2); color: #1e3a5f; }
+
+    /* List items */
+    .ab-list-item:hover { border-color: #1e3a5f; transform: translateX(2px); }
+    .ab-list-item.ab-li-accepted.active {
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.14), rgba(16, 185, 129, 0.05));
+        border-color: rgba(16, 185, 129, 0.5);
+        border-left: 3px solid #10b981;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15);
+    }
+    .ab-list-item.ab-li-rejected.active {
+        background: linear-gradient(90deg, rgba(239, 68, 68, 0.14), rgba(239, 68, 68, 0.05));
+        border-color: rgba(239, 68, 68, 0.5);
+        border-left: 3px solid #ef4444;
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.15);
+    }
+    .ab-list-item.ab-li-completed.active {
+        background: linear-gradient(90deg, rgba(30, 58, 95, 0.12), rgba(30, 58, 95, 0.04));
+        border-color: rgba(30, 58, 95, 0.5);
+        border-left: 3px solid #1e3a5f;
+        box-shadow: 0 4px 14px rgba(30, 58, 95, 0.15);
+    }
+    .ab-list-item.ab-li-pending.active {
+        background: linear-gradient(90deg, rgba(250, 204, 21, 0.16), rgba(250, 204, 21, 0.05));
+        border-color: rgba(250, 204, 21, 0.55);
+        border-left: 3px solid #FACC15;
+        box-shadow: 0 4px 14px rgba(250, 204, 21, 0.15);
+    }
+    .ab-list-item.ab-li-accepted.active .ab-list-icon { background: #10b981; color: #ffffff; }
+    .ab-list-item.ab-li-rejected.active .ab-list-icon { background: #ef4444; color: #ffffff; }
+    .ab-list-item.ab-li-completed.active .ab-list-icon { background: #1e3a5f; color: #ffffff; }
+    .ab-list-item.ab-li-pending.active .ab-list-icon { background: #FACC15; color: #111827; }
+    .ab-list-item.ab-li-accepted.active .ab-list-status { background: #10b981; border-color: #10b981; color: #ffffff; }
+    .ab-list-item.ab-li-rejected.active .ab-list-status { background: #ef4444; border-color: #ef4444; color: #ffffff; }
+    .ab-list-item.ab-li-completed.active .ab-list-status { background: #1e3a5f; border-color: #1e3a5f; color: #ffffff; }
+    .ab-list-item.ab-li-pending.active .ab-list-status { background: #FACC15; border-color: #FACC15; color: #111827; }
+    .ab-list-item.ab-li-accepted.active .ab-list-arrow { color: #10b981; }
+    .ab-list-item.ab-li-rejected.active .ab-list-arrow { color: #ef4444; }
+    .ab-list-item.ab-li-completed.active .ab-list-arrow { color: #1e3a5f; }
+    .ab-list-item.ab-li-pending.active .ab-list-arrow { color: #EAB308; }
+    .ab-list-item.active .ab-list-arrow { color: var(--text-main); }
+    .ab-list-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: none;
+    }
+    .ab-list-icon.accepted { background: rgba(16, 185, 129, 0.12); color: #047857; }
+    .ab-list-icon.rejected { background: rgba(239, 68, 68, 0.12); color: #b91c1c; }
+    .ab-list-icon.completed { background: rgba(30, 58, 95, 0.12); color: #1e3a5f; }
+    .ab-list-icon.pending { background: rgba(250, 204, 21, 0.12); color: #b45309; }
+    .ab-list-icon i, .ab-list-icon svg { width: 17px; height: 17px; box-shadow: none; }
+    .ab-list-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+    .ab-list-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        margin-top: 0.2rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .ab-list-meta i, .ab-list-meta svg { width: 10px; height: 10px; flex-shrink: 0; }
+    .ab-list-status.pending { background: rgba(250, 204, 21, 0.12); color: #b45309; border-color: rgba(250, 204, 21, 0.35); }
+    .ab-list-arrow { color: #9ca3af; flex-shrink: 0; transition: transform 0.2s ease; }
+    .ab-list-item:hover .ab-list-arrow { color: #1e3a5f; transform: translateX(2px); }
+    .ab-list-arrow i, .ab-list-arrow svg { width: 16px; height: 16px; }
+
+    /* Status badge variants */
+    .ab-status-badge.accepted { background: rgba(16, 185, 129, 0.12); color: #047857; border-color: rgba(16, 185, 129, 0.35); }
+    .ab-status-badge.rejected { background: rgba(239, 68, 68, 0.12); color: #b91c1c; border-color: rgba(239, 68, 68, 0.35); }
+    .ab-status-badge.completed { background: rgba(30, 58, 95, 0.12); color: #1e3a5f; border-color: rgba(30, 58, 95, 0.35); }
+    .ab-status-badge.pending { background: rgba(250, 204, 21, 0.12); color: #b45309; border-color: rgba(250, 204, 21, 0.35); }
+
+    /* Status banner — horizontal with icon and tint */
+    .ab-status-banner {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.55rem 0.85rem;
+    }
+    .ab-status-banner.accepted { background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); color: #047857; }
+    .ab-status-banner.completed { background: rgba(30, 58, 95, 0.08); border: 1px solid rgba(30, 58, 95, 0.3); color: #1e3a5f; }
+    .ab-status-banner.rejected { background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); color: #b91c1c; }
+    .ab-status-banner.pending { background: rgba(250, 204, 21, 0.08); border: 1px solid rgba(250, 204, 21, 0.35); color: #b45309; }
+    .ab-status-banner-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .ab-status-banner-icon i, .ab-status-banner-icon svg { width: 15px; height: 15px; }
+    .ab-status-banner-content { display: flex; flex-direction: column; gap: 0.1rem; }
+    .ab-status-banner-title { font-size: 0.78rem; }
+    .ab-status-banner-sub { font-size: 0.68rem; opacity: 1; color: var(--text-muted); }
+
+    /* Status progress stepper */
+    .ab-stepper { display: flex; align-items: center; margin: 0 0 0.55rem 0; }
+    .ab-step { display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; }
+    .ab-step-dot {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e5e7eb;
+        color: #9ca3af;
+    }
+    .ab-step-dot i, .ab-step-dot svg { width: 11px; height: 11px; }
+    .ab-step.done .ab-step-dot { background: rgba(16, 185, 129, 0.15); color: #047857; }
+    .ab-step.current .ab-step-dot {
+        background: #10b981;
+        color: #fff;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
+    .ab-step.danger .ab-step-dot { background: rgba(239, 68, 68, 0.15); color: #b91c1c; }
+    .ab-step-label {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--text-muted);
+    }
+    .ab-step.done .ab-step-label,
+    .ab-step.current .ab-step-label { color: var(--text-main); }
+    .ab-step.danger .ab-step-label { color: #b91c1c; }
+    .ab-step-line {
+        flex: 1;
+        height: 2px;
+        background: #e5e7eb;
+        margin: 0 0.6rem;
+        border-radius: 2px;
+        min-width: 24px;
+        max-width: 110px;
+    }
+    .ab-step-line.filled { background: #10b981; }
+    .ab-step-line.filled.danger { background: #ef4444; }
+
+    /* Inline list empty state */
+    .ab-empty-inline {
+        border: none;
+        background: none;
+        box-shadow: none;
+        text-align: center;
+        padding: 2rem 1rem;
+        list-style: none;
+    }
+    .ab-empty-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.75rem;
+    }
+    .ab-empty-icon i, .ab-empty-icon svg { width: 26px; height: 26px; opacity: 0.6; }
+    .ab-empty-inline.accepted .ab-empty-icon { background: rgba(16, 185, 129, 0.1); color: #047857; }
+    .ab-empty-inline.declined .ab-empty-icon,
+    .ab-empty-inline.rejected .ab-empty-icon { background: rgba(239, 68, 68, 0.1); color: #b91c1c; }
+    .ab-empty-inline.completed .ab-empty-icon { background: rgba(30, 58, 95, 0.1); color: #1e3a5f; }
+    .ab-empty-inline h4 { color: var(--text-main); font-weight: 700; margin: 0 0 0.2rem; font-size: 0.9rem; }
+    .ab-empty-inline p { font-size: 0.72rem; color: var(--text-muted); margin: 0; }
+
+    /* Lucide renders <svg>, so size icons with both selectors */
+    .ab-page-title i, .ab-page-title svg { width: 20px; height: 20px; color: #1e3a5f; }
+    .ab-back-btn i, .ab-back-btn svg { width: 13px; height: 13px; }
+    .ab-detail-meta-item i, .ab-detail-meta-item svg { width: 14px; height: 14px; color: #1e40af; }
+    .ab-detail-icon i, .ab-detail-icon svg { width: 14px; height: 14px; box-shadow: none; }
+    .ab-card-title i, .ab-card-title svg { width: 18px; height: 18px; color: #1e40af; }
+    .ab-detail-footer .ab-action-btn i, .ab-detail-footer .ab-action-btn svg { width: 13px; height: 13px; }
+    .ab-master-search svg {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 15px;
+        height: 15px;
+        color: var(--text-muted);
+        pointer-events: none;
+    }
+    .ab-empty-state > i, .ab-empty-state > svg {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 1rem;
+        opacity: 0.4;
+    }
+
+    /* Compact fit — keep the whole detail on screen without scrolling */
+    .ab-detail-pane { padding: 0.75rem; }
+    .ab-detail-content { height: 100%; }
+    .ab-detail-content.active { align-items: stretch; }
+    .ab-detail-grid { flex: 1; display: flex; flex-direction: column; min-height: 0; max-width: none; align-self: stretch; }
+    .ab-detail-card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+    .ab-detail-card > .ab-detail-header {
+        background: #f8fafc;
+        border-bottom: 1px solid var(--card-border);
+        padding: 0.6rem 1rem;
+        margin-bottom: 0.6rem;
+    }
+    .ab-detail-vehicle-img { width: 140px; height: 88px; }
+    .ab-card-title { margin-bottom: 0.55rem; font-size: 0.8rem; }
+    .ab-detail-body {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+        flex: 1;
+        align-content: start;
+    }
+    .ab-detail-col { gap: 0.55rem; }
+    .ab-detail-icon { width: 30px; height: 30px; }
+    .ab-detail-footer {
+        margin-top: auto;
+        padding-top: 0.6rem;
+        max-width: none;
+        align-self: stretch;
+        justify-content: flex-end;
+    }
+    .er-action-form { width: 100%; }
+
+    @media (max-width: 1200px) {
+        .ab-detail-body { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
     @media (max-width: 991px) {
         .ab-pane-layout { grid-template-columns: 1fr; grid-template-rows: 32% 68%; }
-        .ab-master-pane { border-right: none; border-bottom: 1px solid var(--card-border); }
         .ab-tabs { overflow-x: auto; flex-wrap: nowrap; }
     }
     @media (max-width: 767px) {
         .ab-detail-body { grid-template-columns: 1fr; }
         .ab-detail-header { flex-direction: column; align-items: flex-start; }
+        .ab-step-label { display: none; }
+        .ab-step-line { max-width: none; }
+    }
+
+    /* ================= Dark mode ================= */
+    html[data-theme="dark"] .ab-detail-pane { background: var(--bg-dark); }
+    html[data-theme="dark"] .ab-tabs { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
+    html[data-theme="dark"] .ab-list-item {
+        background: var(--card-bg);
+        border-color: var(--card-border);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    }
+    html[data-theme="dark"] .ab-list-item:hover { border-color: rgba(255, 255, 255, 0.28); }
+    html[data-theme="dark"] .ab-list-item.ab-li-accepted.active {
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.07));
+        border-color: rgba(16, 185, 129, 0.55);
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
+    }
+    html[data-theme="dark"] .ab-list-item.ab-li-rejected.active {
+        background: linear-gradient(90deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.07));
+        border-color: rgba(239, 68, 68, 0.55);
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.2);
+    }
+    html[data-theme="dark"] .ab-list-item.ab-li-completed.active {
+        background: linear-gradient(90deg, rgba(96, 165, 250, 0.2), rgba(96, 165, 250, 0.07));
+        border-color: rgba(96, 165, 250, 0.55);
+        box-shadow: 0 4px 14px rgba(96, 165, 250, 0.2);
+    }
+    html[data-theme="dark"] .ab-list-item.ab-li-pending.active {
+        background: linear-gradient(90deg, rgba(250, 204, 21, 0.18), rgba(250, 204, 21, 0.06));
+        border-color: rgba(250, 204, 21, 0.55);
+        box-shadow: 0 4px 14px rgba(250, 204, 21, 0.18);
+    }
+    html[data-theme="dark"] .ab-list-item.ab-li-completed.active .ab-list-icon { background: #3b82f6; color: #ffffff; }
+    html[data-theme="dark"] .ab-list-item.ab-li-completed.active .ab-list-status { background: #3b82f6; border-color: #3b82f6; color: #ffffff; }
+    html[data-theme="dark"] .ab-list-item.ab-li-accepted.active .ab-list-arrow { color: #34d399; }
+    html[data-theme="dark"] .ab-list-item.ab-li-rejected.active .ab-list-arrow { color: #f87171; }
+    html[data-theme="dark"] .ab-list-item.ab-li-completed.active .ab-list-arrow { color: #93c5fd; }
+    html[data-theme="dark"] .ab-list-item.ab-li-pending.active .ab-list-arrow { color: #fde047; }
+    html[data-theme="dark"] .ab-list-search {
+        background: var(--bg-dark);
+        border-color: var(--card-border);
+        color: var(--text-main);
+    }
+    html[data-theme="dark"] .ab-list-search::placeholder { color: var(--text-muted); }
+    html[data-theme="dark"] .ab-list-search:focus {
+        border-color: #60a5fa;
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+    }
+    html[data-theme="dark"] .ab-detail-card {
+        background: var(--card-bg);
+        border-color: var(--card-border);
+    }
+    html[data-theme="dark"] .ab-detail-card > .ab-detail-header {
+        background: rgba(255, 255, 255, 0.03);
+        border-bottom-color: var(--card-border);
+    }
+
+    html[data-theme="dark"] .ab-tab { color: var(--text-muted); }
+    html[data-theme="dark"] .ab-tab:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.06); }
+    html[data-theme="dark"] .ab-tab.active[data-tab="accepted"] { color: #34d399; }
+    html[data-theme="dark"] .ab-tab.active[data-tab="declined"] { color: #f87171; }
+    html[data-theme="dark"] .ab-tab.active[data-tab="completed"] { color: #93c5fd; }
+    html[data-theme="dark"] .ab-tab-count { background: rgba(255, 255, 255, 0.1); color: var(--text-muted); }
+    html[data-theme="dark"] .ab-tab.active[data-tab="accepted"] .ab-tab-count { background: rgba(16, 185, 129, 0.25); color: #34d399; }
+    html[data-theme="dark"] .ab-tab.active[data-tab="declined"] .ab-tab-count { background: rgba(239, 68, 68, 0.25); color: #f87171; }
+    html[data-theme="dark"] .ab-tab.active[data-tab="completed"] .ab-tab-count { background: rgba(96, 165, 250, 0.25); color: #93c5fd; }
+
+    html[data-theme="dark"] .ab-page-title,
+    html[data-theme="dark"] .ab-list-customer,
+    html[data-theme="dark"] .ab-detail-id,
+    html[data-theme="dark"] .ab-detail-meta-item,
+    html[data-theme="dark"] .ab-detail-value { color: var(--text-main); }
+    html[data-theme="dark"] .ab-detail-label { color: var(--text-muted); }
+    html[data-theme="dark"] .ab-empty-inline h4 { color: var(--text-main); }
+    html[data-theme="dark"] .ab-page-title i,
+    html[data-theme="dark"] .ab-page-title svg { color: #FACC15; }
+
+    html[data-theme="dark"] .ab-detail-icon,
+    html[data-theme="dark"] .ab-detail-meta-item i,
+    html[data-theme="dark"] .ab-detail-meta-item svg,
+    html[data-theme="dark"] .ab-card-title i,
+    html[data-theme="dark"] .ab-card-title svg { color: #93c5fd; }
+    html[data-theme="dark"] .ab-card-title { color: #34d399; }
+    html[data-theme="dark"] .ab-list-icon.accepted { color: #34d399; }
+    html[data-theme="dark"] .ab-list-icon.rejected { color: #f87171; }
+    html[data-theme="dark"] .ab-list-icon.completed { color: #93c5fd; }
+    html[data-theme="dark"] .ab-list-icon.pending { color: #fde047; }
+    html[data-theme="dark"] .ab-list-arrow { color: var(--text-muted); }
+    html[data-theme="dark"] .ab-list-item:hover .ab-list-arrow { color: var(--text-main); }
+    html[data-theme="dark"] .ab-empty-icon { background: rgba(255, 255, 255, 0.06); }
+    html[data-theme="dark"] .ab-empty-inline.accepted .ab-empty-icon { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    html[data-theme="dark"] .ab-empty-inline.declined .ab-empty-icon,
+    html[data-theme="dark"] .ab-empty-inline.rejected .ab-empty-icon { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+    html[data-theme="dark"] .ab-empty-inline.completed .ab-empty-icon { background: rgba(96, 165, 250, 0.15); color: #93c5fd; }
+
+    html[data-theme="dark"] .ab-list-status.accepted { color: #34d399; }
+    html[data-theme="dark"] .ab-list-status.rejected { color: #f87171; }
+    html[data-theme="dark"] .ab-list-status.completed { color: #93c5fd; }
+    html[data-theme="dark"] .ab-list-status.pending { color: #fde047; }
+    html[data-theme="dark"] .ab-status-badge { background: rgba(255, 255, 255, 0.06); border-color: var(--card-border); color: var(--text-main); }
+    html[data-theme="dark"] .ab-status-badge.accepted { background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.4); }
+    html[data-theme="dark"] .ab-status-badge.rejected { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.4); }
+    html[data-theme="dark"] .ab-status-badge.completed { background: rgba(96, 165, 250, 0.15); color: #93c5fd; border-color: rgba(96, 165, 250, 0.4); }
+    html[data-theme="dark"] .ab-status-badge.pending { background: rgba(250, 204, 21, 0.15); color: #fde047; border-color: rgba(250, 204, 21, 0.4); }
+    html[data-theme="dark"] .ab-status-banner.accepted { color: #34d399; }
+    html[data-theme="dark"] .ab-status-banner.completed { color: #93c5fd; border-color: rgba(96, 165, 250, 0.35); background: rgba(96, 165, 250, 0.08); }
+    html[data-theme="dark"] .ab-status-banner.rejected { color: #f87171; }
+    html[data-theme="dark"] .ab-status-banner.pending { color: #fde047; }
+
+    html[data-theme="dark"] .ab-step-dot { background: rgba(255, 255, 255, 0.12); color: var(--text-muted); }
+    html[data-theme="dark"] .ab-step.done .ab-step-dot { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    html[data-theme="dark"] .ab-step.current .ab-step-dot { background: #10b981; color: #fff; }
+    html[data-theme="dark"] .ab-step.danger .ab-step-dot { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    html[data-theme="dark"] .ab-step.danger .ab-step-label { color: #f87171; }
+    html[data-theme="dark"] .ab-step-line { background: rgba(255, 255, 255, 0.12); }
+
+    html[data-theme="dark"] .ab-back-btn { background: rgba(255, 255, 255, 0.06); border-color: var(--card-border); color: var(--text-main); }
+    html[data-theme="dark"] .ab-back-btn:hover { background: rgba(255, 255, 255, 0.12); color: var(--text-main); }
+    html[data-theme="dark"] .ab-detail-footer .ab-action-btn { background: rgba(255, 255, 255, 0.06); border-color: var(--card-border); color: var(--text-main); }
+    html[data-theme="dark"] .ab-detail-footer .ab-action-btn:hover { background: rgba(255, 255, 255, 0.12); }
+    html[data-theme="dark"] .ab-detail-footer .ab-action-btn.print { background: #27476f; border-color: #3b5f8f; color: #ffffff; }
+    html[data-theme="dark"] .ab-detail-footer .ab-action-btn.print:hover { background: #315787; border-color: #3b5f8f; color: #ffffff; }
+    html[data-theme="dark"] .ab-detail-footer .ab-action-btn.complete { background: #10b981; border-color: #10b981; color: #ffffff; }
+    html[data-theme="dark"] .ab-detail-footer .ab-action-btn.manage { background: #FACC15; border-color: #FACC15; color: #111827; }
+    html[data-theme="dark"] .ab-detail-footer .ab-action-btn.reject { background: #ef4444; border-color: #ef4444; color: #ffffff; }
+    html[data-theme="dark"] .ab-error { color: #f87171; }
+    html[data-theme="dark"] .ab-detail-vehicle-img { opacity: 0.9; }
+    html[data-theme="dark"] .er-action-form .er-input,
+    html[data-theme="dark"] .er-action-form select,
+    html[data-theme="dark"] .er-action-form textarea {
+        background: var(--bg-dark);
+        border-color: var(--card-border);
+        color: var(--text-main);
     }
 </style>
 
@@ -890,10 +1388,18 @@ $pageTitle = 'Emergency Requests Status';
     }
     ?>
 
+    <div class="ab-header">
+        <div class="ab-header-text">
+            <h1 class="ab-page-title"><i data-lucide="siren"></i> Emergency Requests</h1>
+            <div class="ab-page-subtitle">Track accepted, rejected and completed emergency requests</div>
+        </div>
+        <a href="admin_emergency_requests.php" class="ab-back-btn"><i data-lucide="map"></i> View Map</a>
+    </div>
+
     <div class="ab-tabs">
-        <a href="?tab=accepted" class="ab-tab <?= $activeTab === 'accepted' ? 'active' : '' ?>" data-tab="accepted"><i data-lucide="check-circle"></i> Accepted</a>
-        <a href="?tab=declined" class="ab-tab <?= $activeTab === 'declined' ? 'active' : '' ?>" data-tab="declined"><i data-lucide="x-circle"></i> Rejected</a>
-        <a href="?tab=completed" class="ab-tab <?= $activeTab === 'completed' ? 'active' : '' ?>" data-tab="completed"><i data-lucide="flag"></i> Completed</a>
+        <a href="?tab=accepted" class="ab-tab <?= $activeTab === 'accepted' ? 'active' : '' ?>" data-tab="accepted"><i data-lucide="check-circle"></i> Accepted <span class="ab-tab-count"><?= $counts['accepted'] ?></span></a>
+        <a href="?tab=declined" class="ab-tab <?= $activeTab === 'declined' ? 'active' : '' ?>" data-tab="declined"><i data-lucide="x-circle"></i> Rejected <span class="ab-tab-count"><?= $counts['declined'] ?></span></a>
+        <a href="?tab=completed" class="ab-tab <?= $activeTab === 'completed' ? 'active' : '' ?>" data-tab="completed"><i data-lucide="flag"></i> Completed <span class="ab-tab-count"><?= $counts['completed'] ?></span></a>
     </div>
 
     <div class="ab-main-card">
@@ -918,7 +1424,7 @@ $pageTitle = 'Emergency Requests Status';
 
                 <div class="ab-detail-pane">
                     <div id="detailPlaceholder" class="ab-empty-state">
-                        <i data-lucide="arrow-left-square"></i>
+                        <i data-lucide="panel-left"></i>
                         <h4 style="color: var(--text-main); font-weight: 700;">Select a request</h4>
                         <p>Click an emergency request on the left to view details.</p>
                     </div>

@@ -130,9 +130,12 @@ function renderList($bookings, $listId, $activeTab, $tabKey) {
     $activeClass = ($activeTab === $tabKey) ? ' active' : '';
     echo '<ul class="ab-list' . $activeClass . '" id="' . $listId . '" data-tab-list="' . $tabKey . '">';
     if (empty($bookings)) {
-        echo '<li class="ab-empty-state" style="border: none; background: none; box-shadow: none; text-align: center; padding: 2rem 1rem;">';
-        echo '<i data-lucide="inbox" style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.4;"></i>';
-        echo '<h4 style="color: var(--text-main); font-weight: 700;">No ' . ucfirst($tabKey) . ' bookings</h4>';
+        $empty_icons = ['accepted' => 'check-circle', 'rejected' => 'x-circle', 'completed' => 'flag'];
+        $empty_icon = $empty_icons[$tabKey] ?? 'inbox';
+        echo '<li class="ab-empty-state ab-empty-inline ' . $tabKey . '">';
+        echo '<div class="ab-empty-icon"><i data-lucide="' . $empty_icon . '"></i></div>';
+        echo '<h4>No ' . ucfirst($tabKey) . ' bookings</h4>';
+        echo '<p>Bookings will appear here once they are ' . $tabKey . '.</p>';
         echo '</li>';
     } else {
         foreach ($bookings as $b) {
@@ -142,14 +145,15 @@ function renderList($bookings, $listId, $activeTab, $tabKey) {
             $is_completed = ($status === 'completed');
             $status_label = $is_rejected ? ucfirst(str_replace('_', ' ', $status)) : ($is_completed ? 'Completed' : 'Accepted');
             $status_class = $is_rejected ? 'rejected' : ($is_completed ? 'completed' : 'accepted');
-            $date = htmlspecialchars($b['schedule_date']);
-            echo '<li class="ab-list-item" data-booking-id="' . $b['id'] . '">';
-            echo '<div class="ab-list-icon"><i data-lucide="calendar"></i></div>';
+            $status_icon = $is_rejected ? 'x-circle' : ($is_completed ? 'flag' : 'check-circle');
+            $date = htmlspecialchars(date('M d, Y', strtotime($b['schedule_date'])));
+            $time = htmlspecialchars(date('g:i A', strtotime($b['schedule_start_time'])));
+            echo '<li class="ab-list-item ab-li-' . $status_class . '" data-booking-id="' . $b['id'] . '">';
+            echo '<div class="ab-list-icon ' . $status_class . '"><i data-lucide="' . $status_icon . '"></i></div>';
             echo '<div class="ab-list-main">';
-            echo '<div class="ab-list-customer">' . $customer . '</div>';
-            echo '<div class="ab-list-meta">Booking #' . sprintf('%04d', $b['id']) . ' &middot; ' . $date . '</div>';
+            echo '<div class="ab-list-top"><span class="ab-list-customer">' . $customer . '</span><span class="ab-list-status ' . $status_class . '">' . $status_label . '</span></div>';
+            echo '<div class="ab-list-meta"><i data-lucide="hash"></i>' . sprintf('%04d', $b['id']) . '<i data-lucide="calendar"></i>' . $date . '<i data-lucide="clock"></i>' . $time . '</div>';
             echo '</div>';
-            echo '<div class="ab-list-status ' . $status_class . '">' . $status_label . '</div>';
             echo '<div class="ab-list-arrow"><i data-lucide="chevron-right"></i></div>';
             echo '</li>';
         }
@@ -208,30 +212,44 @@ function renderBookingDetail($b, $pdo) {
     if ($is_rejected) {
         $reason = ($status == 'deposit_rejected') ? 'Deposit failed verification.' : 'Manually rejected by Admin.';
         $box_class = 'ab-status-banner rejected';
-        $box_icon = '';
+        $box_icon = 'x-circle';
         $box_text = 'Booking Rejected';
         $box_subtext = 'This booking has been rejected.';
     } elseif ($is_completed) {
         $box_class = 'ab-status-banner completed';
-        $box_icon = '';
+        $box_icon = 'check-circle-2';
         $box_text = 'Service Completed';
         $box_subtext = 'This service has been completed successfully.';
     } else {
         $box_class = 'ab-status-banner accepted';
-        $box_icon = '';
+        $box_icon = 'check-circle';
         $box_text = 'Booking Confirmed';
         $box_subtext = 'This booking has been confirmed and is ready for service.';
     }
 
+    // Status progress stepper
+    if ($is_rejected) {
+        $steps = [
+            ['label' => 'Booked', 'state' => 'done', 'icon' => 'check'],
+            ['label' => 'Rejected', 'state' => 'danger', 'icon' => 'x'],
+        ];
+    } else {
+        $steps = [
+            ['label' => 'Booked', 'state' => 'done', 'icon' => 'check'],
+            ['label' => 'Accepted', 'state' => $is_completed ? 'done' : 'current', 'icon' => 'check'],
+            ['label' => 'Completed', 'state' => $is_completed ? 'done' : 'todo', 'icon' => 'flag'],
+        ];
+    }
+
     $actionBtns = '';
-    if (!$is_rejected) {
-        $actionBtns .= '<a href="print_receipt.php?booking_id=' . $b['id'] . '" target="_blank" class="ab-action-btn print"><i data-lucide="printer"></i> Print</a>';
+    if ($is_completed) {
+        $actionBtns .= '<a href="print_receipt.php?booking_id=' . $b['id'] . '" target="_blank" class="ab-action-btn print"><i data-lucide="printer"></i> Print Receipt</a>';
     }
     if (!$is_rejected && !$is_completed) {
         $actionBtns .= '<form method="POST" action="bookings_status.php?tab=accepted" style="display:inline;margin:0;padding:0;">
             <input type="hidden" name="booking_id" value="' . $b['id'] . '">
             <input type="hidden" name="action" value="complete">
-            <button type="submit" class="ab-action-btn complete" style="margin:0;"><i data-lucide="flag"></i> Complete</button>
+            <button type="submit" class="ab-action-btn complete" style="margin:0;" onclick="return confirm(\'Mark Booking #' . sprintf('%04d', $b['id']) . ' as completed?\')"><i data-lucide="check-circle"></i> Mark as Completed</button>
         </form>';
     }
     $payment_method_label = !empty($b['payment_method']) ? htmlspecialchars(ucfirst($b['payment_method'])) : 'N/A';
@@ -262,7 +280,7 @@ function renderBookingDetail($b, $pdo) {
                 <div class="ab-detail-header-main">
                     <div class="ab-detail-header-top">
                         <div class="ab-detail-id">Booking #<?= sprintf('%04d', $b['id']) ?></div>
-                        <span class="ab-status-badge"><?= $status_label ?></span>
+                        <span class="ab-status-badge <?= $status_class ?>"><?= $status_label ?></span>
                     </div>
                     <div class="ab-detail-meta">
                         <span class="ab-detail-meta-item"><i data-lucide="calendar"></i> <?= $date_display ?></span>
@@ -282,6 +300,17 @@ function renderBookingDetail($b, $pdo) {
                     <div class="ab-status-banner-sub"><?= $box_subtext ?></div>
                 </div>
             </div>
+            <div class="ab-stepper">
+                <?php foreach ($steps as $i => $s): ?>
+                    <?php if ($i > 0): ?>
+                        <div class="ab-step-line<?= $s['state'] === 'done' ? ' filled' : ($s['state'] === 'danger' ? ' filled danger' : '') ?>"></div>
+                    <?php endif; ?>
+                    <div class="ab-step <?= $s['state'] ?>">
+                        <div class="ab-step-dot"><i data-lucide="<?= $s['icon'] ?>"></i></div>
+                        <div class="ab-step-label"><?= $s['label'] ?></div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
             <div class="ab-card-title"><i data-lucide="file-text"></i> Booking Details</div>
             <div class="ab-detail-body">
                 <div class="ab-detail-col">
@@ -289,20 +318,24 @@ function renderBookingDetail($b, $pdo) {
                     <?= $detailItem('mail', 'Email', htmlspecialchars($b['customer_email'] ?: 'N/A')) ?>
                     <?= $detailItem('phone', 'Phone', !empty($b['customer_phone']) ? format_phone($b['customer_phone']) : 'No contact') ?>
                     <?= $detailItem('motorbike', 'Vehicle', htmlspecialchars($vehicle_display)) ?>
-                    <?= $detailItem('calendar', 'Date', $date_display) ?>
-                    <?= $detailItem('clock', 'Time', $time_display) ?>
                 </div>
                 <div class="ab-detail-col">
+                    <?= $detailItem('calendar', 'Date', $date_display) ?>
+                    <?= $detailItem('clock', 'Time', $time_display) ?>
                     <?= $detailItem('wrench', 'Mechanic', $mechanics, $is_rejected ? 'ab-text-muted' : '') ?>
+                    <?php if (!$is_rejected): ?>
+                        <?= $detailItem('file-text', 'Service', htmlspecialchars($services)) ?>
+                    <?php endif; ?>
+                </div>
+                <div class="ab-detail-col">
                     <?php if (!$is_rejected): ?>
                         <?= $detailItem('credit-card', 'Payment', '<span class="ab-status-pill ' . $payment_pill_class . '">' . $payment_status . '</span>') ?>
                         <?= $detailItem('banknote', 'Total', '₱' . number_format($total_price, 2)) ?>
                         <?= $detailItem('banknote', 'Paid', $paid_html) ?>
                         <?= $detailItem('wallet', 'Method', $payment_method_label) ?>
                         <?= $detailItem('banknote', 'Balance Due', '₱' . number_format($balance_due, 2), $balance_class) ?>
-                        <?= $detailItem('file-text', 'Service', htmlspecialchars($services)) ?>
                     <?php else: ?>
-                        <?= $detailItem('x-octagon', 'Reason', htmlspecialchars($reason), '', true) ?>
+                        <?= $detailItem('x-octagon', 'Reason', htmlspecialchars($reason)) ?>
                     <?php endif; ?>
                 </div>
             </div>
@@ -456,43 +489,74 @@ $pageTitle = 'Bookings Status';
     .ab-back-btn i { width: 13px; height: 13px; }
 
     .ab-tabs {
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.3rem;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 14px;
+        padding: 0.3rem;
         margin-bottom: 0.75rem;
         flex-shrink: 0;
         flex-wrap: wrap;
+        width: fit-content;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
     .ab-tab {
         display: inline-flex;
         align-items: center;
         gap: 0.4rem;
-        background: var(--card-bg);
-        border: 1px solid var(--card-border);
+        background: transparent;
+        border: 1px solid transparent;
         border-radius: 10px;
-        padding: 0.5rem 0.9rem;
+        padding: 0.45rem 0.85rem;
         font-size: 0.78rem;
         font-weight: 700;
-        color: var(--text-main);
+        color: var(--text-muted);
         text-decoration: none;
         transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
     }
-    .ab-tab i { width: 14px; height: 14px; }
-    .ab-tab:hover { border-color: #1e3a5f; }
-    .ab-tab.active {
-        background: #fff;
-        border-color: #FACC15;
+    .ab-tab i, .ab-tab svg { width: 14px; height: 14px; }
+    .ab-tab:hover { color: var(--text-main); background: #f1f5f9; }
+    .ab-tab.active[data-tab="accepted"] {
+        background: rgba(16, 185, 129, 0.12);
+        border-color: rgba(16, 185, 129, 0.4);
+        color: #047857;
     }
+    .ab-tab.active[data-tab="rejected"] {
+        background: rgba(239, 68, 68, 0.12);
+        border-color: rgba(239, 68, 68, 0.4);
+        color: #b91c1c;
+    }
+    .ab-tab.active[data-tab="completed"] {
+        background: rgba(30, 58, 95, 0.12);
+        border-color: rgba(30, 58, 95, 0.4);
+        color: #1e3a5f;
+    }
+    .ab-tab-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 20px;
+        height: 18px;
+        padding: 0 0.35rem;
+        border-radius: 99px;
+        background: rgba(0, 0, 0, 0.07);
+        color: var(--text-muted);
+        font-size: 0.62rem;
+        font-weight: 800;
+    }
+    .ab-tab.active[data-tab="accepted"] .ab-tab-count { background: rgba(16, 185, 129, 0.2); color: #047857; }
+    .ab-tab.active[data-tab="rejected"] .ab-tab-count { background: rgba(239, 68, 68, 0.2); color: #b91c1c; }
+    .ab-tab.active[data-tab="completed"] .ab-tab-count { background: rgba(30, 58, 95, 0.2); color: #1e3a5f; }
 
     .ab-main-card {
         flex: 1;
         display: flex;
         flex-direction: column;
-        background: var(--card-bg);
-        border: 1px solid var(--card-border);
+        background: transparent;
+        border: none;
         border-radius: 16px;
-        backdrop-filter: blur(24px);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
         overflow: hidden;
         min-height: 0;
     }
@@ -505,7 +569,8 @@ $pageTitle = 'Bookings Status';
     }
 
     .ab-master-pane {
-        border-right: 1px solid var(--card-border);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
         overflow-y: auto;
         background: var(--card-bg);
         padding: 0.5rem;
@@ -563,6 +628,7 @@ $pageTitle = 'Bookings Status';
         display: flex;
         flex-direction: column;
         scrollbar-width: none;
+        background: var(--bg-dark);
     }
     .ab-detail-pane::-webkit-scrollbar { display: none; }
     .ab-detail-pane > * { position: relative; z-index: 1; }
@@ -839,12 +905,11 @@ $pageTitle = 'Bookings Status';
 
     @media (max-width: 991px) {
         .ab-pane-layout { grid-template-columns: 1fr; grid-template-rows: 32% 68%; }
-        .ab-master-pane { border-right: none; border-bottom: 1px solid var(--card-border); }
         .ab-tabs { overflow-x: auto; flex-wrap: nowrap; }
     }
 
     /* Refreshed layout */
-    .ab-pane-layout { grid-template-columns: 320px 1fr; }
+    .ab-pane-layout { grid-template-columns: 320px 1fr; gap: 0.9rem; }
 
     .ab-master-pane {
         display: flex;
@@ -899,29 +964,56 @@ $pageTitle = 'Bookings Status';
         transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, max-height 0.2s ease;
         cursor: pointer;
     }
-    .ab-list-item:hover { border-color: #1e3a5f; }
-    .ab-list-item.active {
-        background: rgba(250, 204, 21, 0.12);
-        border-left: 3px solid #FACC15;
+    .ab-list-item:hover { border-color: #1e3a5f; transform: translateX(2px); }
+    .ab-list-item.ab-li-accepted.active {
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.14), rgba(16, 185, 129, 0.05));
+        border-color: rgba(16, 185, 129, 0.5);
+        border-left: 3px solid #10b981;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15);
     }
-    .ab-list-item.active .ab-list-icon {
-        background: transparent;
-        color: #1e40af;
+    .ab-list-item.ab-li-rejected.active {
+        background: linear-gradient(90deg, rgba(239, 68, 68, 0.14), rgba(239, 68, 68, 0.05));
+        border-color: rgba(239, 68, 68, 0.5);
+        border-left: 3px solid #ef4444;
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.15);
     }
+    .ab-list-item.ab-li-completed.active {
+        background: linear-gradient(90deg, rgba(30, 58, 95, 0.12), rgba(30, 58, 95, 0.04));
+        border-color: rgba(30, 58, 95, 0.5);
+        border-left: 3px solid #1e3a5f;
+        box-shadow: 0 4px 14px rgba(30, 58, 95, 0.15);
+    }
+    .ab-list-item.ab-li-accepted.active .ab-list-icon { background: #10b981; color: #ffffff; }
+    .ab-list-item.ab-li-rejected.active .ab-list-icon { background: #ef4444; color: #ffffff; }
+    .ab-list-item.ab-li-completed.active .ab-list-icon { background: #1e3a5f; color: #ffffff; }
+    .ab-list-item.ab-li-accepted.active .ab-list-status { background: #10b981; border-color: #10b981; color: #ffffff; }
+    .ab-list-item.ab-li-rejected.active .ab-list-status { background: #ef4444; border-color: #ef4444; color: #ffffff; }
+    .ab-list-item.ab-li-completed.active .ab-list-status { background: #1e3a5f; border-color: #1e3a5f; color: #ffffff; }
+    .ab-list-item.ab-li-accepted.active .ab-list-arrow { color: #10b981; }
+    .ab-list-item.ab-li-rejected.active .ab-list-arrow { color: #ef4444; }
+    .ab-list-item.ab-li-completed.active .ab-list-arrow { color: #1e3a5f; }
+    .ab-list-item.active .ab-list-arrow { color: var(--text-main); }
     .ab-list-icon {
-        width: 36px;
-        height: 36px;
+        width: 38px;
+        height: 38px;
         border-radius: 10px;
-        background: transparent;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #1e40af;
         flex-shrink: 0;
         box-shadow: none;
     }
-    .ab-list-icon i { width: 16px; height: 16px; box-shadow: none; }
+    .ab-list-icon.accepted { background: rgba(16, 185, 129, 0.12); color: #047857; }
+    .ab-list-icon.rejected { background: rgba(239, 68, 68, 0.12); color: #b91c1c; }
+    .ab-list-icon.completed { background: rgba(30, 58, 95, 0.12); color: #1e3a5f; }
+    .ab-list-icon i, .ab-list-icon svg { width: 17px; height: 17px; box-shadow: none; }
     .ab-list-main { flex: 1; min-width: 0; }
+    .ab-list-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
     .ab-list-customer {
         font-size: 0.85rem;
         font-weight: 800;
@@ -929,12 +1021,20 @@ $pageTitle = 'Bookings Status';
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        min-width: 0;
     }
     .ab-list-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
         font-size: 0.68rem;
         color: var(--text-muted);
-        margin-top: 0.1rem;
+        margin-top: 0.2rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
+    .ab-list-meta i, .ab-list-meta svg { width: 10px; height: 10px; flex-shrink: 0; }
     .ab-list-status {
         font-size: 0.58rem;
         font-weight: 800;
@@ -948,8 +1048,9 @@ $pageTitle = 'Bookings Status';
     .ab-list-status.accepted { background: rgba(16, 185, 129, 0.12); color: #047857; border-color: rgba(16, 185, 129, 0.35); }
     .ab-list-status.rejected { background: rgba(239, 68, 68, 0.12); color: #b91c1c; border-color: rgba(239, 68, 68, 0.35); }
     .ab-list-status.completed { background: rgba(30, 58, 95, 0.12); color: #1d4ed8; border-color: rgba(30, 58, 95, 0.35); }
-    .ab-list-arrow { color: #1e40af; }
-    .ab-list-arrow i { width: 16px; height: 16px; }
+    .ab-list-arrow { color: #9ca3af; flex-shrink: 0; transition: transform 0.2s ease; }
+    .ab-list-item:hover .ab-list-arrow { color: #1e3a5f; transform: translateX(2px); }
+    .ab-list-arrow i, .ab-list-arrow svg { width: 16px; height: 16px; }
 
     .ab-detail-header {
         display: flex;
@@ -1011,13 +1112,8 @@ $pageTitle = 'Bookings Status';
         margin-top: 0.75rem;
         flex-wrap: wrap;
     }
-    .ab-detail-footer.accepted { justify-content: flex-end; }
-    .ab-detail-footer.accepted .ab-action-btn {
-        background: transparent;
-        border: none;
-        padding: 0;
-    }
-    .ab-detail-footer.accepted .ab-action-btn:hover { background: transparent; }
+    .ab-detail-footer.accepted,
+    .ab-detail-footer.completed { justify-content: flex-end; }
     .ab-action-btn {
         display: inline-flex;
         align-items: center;
@@ -1034,10 +1130,37 @@ $pageTitle = 'Bookings Status';
     }
     .ab-action-btn:hover { background: rgba(0, 0, 0, 0.08); color: var(--text-main); }
     .ab-action-btn i { width: 14px; height: 14px; }
-    .ab-action-btn.print { background: rgba(30, 58, 95, 0.1); border-color: rgba(30, 58, 95, 0.3); color: #1e3a5f; }
-    .ab-action-btn.print:hover { background: rgba(30, 58, 95, 0.2); }
-    .ab-action-btn.complete { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); color: #15803d; }
-    .ab-action-btn.complete:hover { background: rgba(16, 185, 129, 0.2); }
+    .ab-action-btn.print {
+        background: #1e3a5f;
+        border-color: #1e3a5f;
+        color: #ffffff;
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+        box-shadow: 0 2px 8px rgba(30, 58, 95, 0.35);
+    }
+    .ab-action-btn.print:hover {
+        background: #162c49;
+        border-color: #162c49;
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(30, 58, 95, 0.4);
+    }
+    .ab-action-btn.complete {
+        background: #10b981;
+        border-color: #10b981;
+        color: #ffffff;
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+    }
+    .ab-action-btn.complete:hover {
+        background: #059669;
+        border-color: #059669;
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
     .ab-action-btn.manage { background: rgba(250, 204, 21, 0.1); border-color: rgba(250, 204, 21, 0.3); color: #EAB308; }
     .ab-action-btn.manage:hover { background: rgba(250, 204, 21, 0.2); }
 
@@ -1061,10 +1184,9 @@ $pageTitle = 'Bookings Status';
     .ab-detail-card > .ab-status-banner.accepted,
     .ab-detail-card > .ab-status-banner.completed,
     .ab-detail-card > .ab-status-banner.rejected {
-        margin: 0 0 0.5rem 0;
-        padding: 0.25rem 0;
-        background: transparent;
-        border: none;
+        margin: 0 0 0.85rem 0;
+        padding: 0.7rem 1rem;
+        border-radius: 12px;
     }
     .ab-card-title {
         font-size: 0.9rem;
@@ -1125,9 +1247,9 @@ $pageTitle = 'Bookings Status';
         padding: 0.9rem 1rem;
         margin-top: 0.75rem;
     }
-    .ab-status-banner.accepted { background: transparent; border: none; color: var(--accent-green); }
-    .ab-status-banner.completed { background: transparent; border: none; color: #1d4ed8; }
-    .ab-status-banner.rejected { background: transparent; border: none; color: #b91c1c; }
+    .ab-status-banner.accepted { background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); color: #047857; }
+    .ab-status-banner.completed { background: rgba(30, 58, 95, 0.08); border: 1px solid rgba(30, 58, 95, 0.3); color: #1e3a5f; }
+    .ab-status-banner.rejected { background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); color: #b91c1c; }
     .ab-status-banner-icon {
         width: 38px;
         height: 38px;
@@ -1139,15 +1261,313 @@ $pageTitle = 'Bookings Status';
         color: inherit;
         box-shadow: none;
     }
-    .ab-status-banner-icon i { width: 18px; height: 18px; box-shadow: none; }
+    .ab-status-banner-icon i, .ab-status-banner-icon svg { width: 18px; height: 18px; box-shadow: none; }
     .ab-status-banner-content { display: flex; flex-direction: column; gap: 0.1rem; }
-    .ab-status-banner-title { font-weight: 800; font-size: 0.75rem; }
-    .ab-status-banner-sub { font-size: 0.75rem; color: #000000; opacity: 1; }
+    .ab-status-banner-title { font-weight: 800; font-size: 0.85rem; }
+    .ab-status-banner-sub { font-size: 0.75rem; color: var(--text-muted); opacity: 1; }
+
+    /* Status badge variants */
+    .ab-status-badge.accepted { background: rgba(16, 185, 129, 0.12); color: #047857; border-color: rgba(16, 185, 129, 0.35); }
+    .ab-status-badge.rejected { background: rgba(239, 68, 68, 0.12); color: #b91c1c; border-color: rgba(239, 68, 68, 0.35); }
+    .ab-status-badge.completed { background: rgba(30, 58, 95, 0.12); color: #1e3a5f; border-color: rgba(30, 58, 95, 0.35); }
+
+    /* Status progress stepper */
+    .ab-stepper {
+        display: flex;
+        align-items: center;
+        margin: 0 0 0.9rem 0;
+    }
+    .ab-step {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        flex-shrink: 0;
+    }
+    .ab-step-dot {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e5e7eb;
+        color: #9ca3af;
+    }
+    .ab-step-dot i, .ab-step-dot svg { width: 13px; height: 13px; }
+    .ab-step.done .ab-step-dot { background: rgba(16, 185, 129, 0.15); color: #047857; }
+    .ab-step.current .ab-step-dot {
+        background: #10b981;
+        color: #fff;
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+    }
+    .ab-step.danger .ab-step-dot { background: rgba(239, 68, 68, 0.15); color: #b91c1c; }
+    .ab-step-label {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--text-muted);
+    }
+    .ab-step.done .ab-step-label,
+    .ab-step.current .ab-step-label { color: var(--text-main); }
+    .ab-step.danger .ab-step-label { color: #b91c1c; }
+    .ab-step-line {
+        flex: 1;
+        height: 2px;
+        background: #e5e7eb;
+        margin: 0 0.6rem;
+        border-radius: 2px;
+        min-width: 24px;
+        max-width: 110px;
+    }
+    .ab-step-line.filled { background: #10b981; }
+    .ab-step-line.filled.danger { background: #ef4444; }
+
+    /* Inline list empty state */
+    .ab-empty-inline {
+        border: none;
+        background: none;
+        box-shadow: none;
+        text-align: center;
+        padding: 2rem 1rem;
+        list-style: none;
+    }
+    .ab-empty-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.75rem;
+    }
+    .ab-empty-icon i, .ab-empty-icon svg { width: 26px; height: 26px; opacity: 0.6; }
+    .ab-empty-inline.accepted .ab-empty-icon { background: rgba(16, 185, 129, 0.1); color: #047857; }
+    .ab-empty-inline.rejected .ab-empty-icon { background: rgba(239, 68, 68, 0.1); color: #b91c1c; }
+    .ab-empty-inline.completed .ab-empty-icon { background: rgba(30, 58, 95, 0.1); color: #1e3a5f; }
+    .ab-empty-inline h4 { color: var(--text-main); font-weight: 700; margin: 0 0 0.2rem; font-size: 0.9rem; }
+    .ab-empty-inline p { font-size: 0.72rem; color: var(--text-muted); margin: 0; }
+
+    /* Lucide renders <svg>, so size icons with both selectors */
+    .ab-page-title i, .ab-page-title svg { width: 20px; height: 20px; color: #1e3a5f; }
+    .ab-back-btn i, .ab-back-btn svg { width: 13px; height: 13px; }
+    .ab-detail-meta-item i, .ab-detail-meta-item svg { width: 14px; height: 14px; color: #1e40af; }
+    .ab-detail-icon i, .ab-detail-icon svg { width: 16px; height: 16px; box-shadow: none; }
+    .ab-card-title i, .ab-card-title svg { width: 18px; height: 18px; color: #1e40af; }
+    .ab-action-btn i, .ab-action-btn svg { width: 14px; height: 14px; }
+    .ab-master-search i, .ab-master-search svg {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 15px;
+        height: 15px;
+        color: var(--text-muted);
+        pointer-events: none;
+    }
+    .ab-empty-state > i, .ab-empty-state > svg {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 1rem;
+        opacity: 0.4;
+    }
+
+    /* Compact fit — keep the whole detail on screen without scrolling */
+    .ab-detail-pane { padding: 0.75rem; }
+    .ab-detail-content { height: 100%; }
+    .ab-detail-grid { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+    .ab-detail-card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 0.85rem 1rem;
+        min-height: 0;
+    }
+    .ab-detail-card > .ab-detail-header {
+        margin: -0.85rem -1rem 0.6rem -1rem;
+        padding: 0.6rem 1rem;
+        background: #f8fafc;
+        border-bottom: 1px solid var(--card-border);
+        border-radius: 16px 16px 0 0;
+    }
+    .ab-detail-id { font-size: 1.05rem; }
+    .ab-detail-vehicle-img { width: 140px; height: 88px; }
+    .ab-detail-card > .ab-status-banner.accepted,
+    .ab-detail-card > .ab-status-banner.completed,
+    .ab-detail-card > .ab-status-banner.rejected {
+        margin: 0 0 0.55rem 0;
+        padding: 0.5rem 0.85rem;
+        border-radius: 10px;
+    }
+    .ab-status-banner { gap: 0.6rem; }
+    .ab-status-banner-icon { width: 30px; height: 30px; }
+    .ab-status-banner-icon i, .ab-status-banner-icon svg { width: 15px; height: 15px; }
+    .ab-status-banner-title { font-size: 0.78rem; }
+    .ab-status-banner-sub { font-size: 0.68rem; }
+    .ab-stepper { margin-bottom: 0.55rem; }
+    .ab-step-dot { width: 22px; height: 22px; }
+    .ab-step-dot i, .ab-step-dot svg { width: 11px; height: 11px; }
+    .ab-step.current .ab-step-dot { box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15); }
+    .ab-card-title { margin-bottom: 0.55rem; font-size: 0.8rem; }
+    .ab-detail-body {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+        flex: 1;
+        align-content: start;
+    }
+    .ab-detail-col { gap: 0.55rem; }
+    .ab-detail-item { gap: 0.55rem; }
+    .ab-detail-icon { width: 30px; height: 30px; border-radius: 8px; }
+    .ab-detail-icon i, .ab-detail-icon svg { width: 14px; height: 14px; }
+    .ab-detail-label { font-size: 0.6rem; }
+    .ab-detail-value { font-size: 0.78rem; }
+    .ab-detail-footer { margin-top: auto; padding-top: 0.6rem; }
+
+    @media (max-width: 1200px) {
+        .ab-detail-body { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
 
     @media (max-width: 767px) {
         .ab-detail-body { grid-template-columns: 1fr; }
         .ab-detail-header { flex-direction: column; align-items: flex-start; }
+        .ab-step-label { display: none; }
+        .ab-step-line { max-width: none; }
     }
+
+    /* ================= Dark mode ================= */
+    html[data-theme="dark"] .booking-status-page,
+    html[data-theme="dark"] .booking-status-page * {
+        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
+
+    /* Surfaces */
+    html[data-theme="dark"] .ab-detail-pane { background: var(--bg-dark); }
+    html[data-theme="dark"] .ab-tabs { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
+    html[data-theme="dark"] .ab-list-item {
+        background: var(--card-bg);
+        border-color: var(--card-border);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    }
+    html[data-theme="dark"] .ab-list-item:hover { border-color: rgba(255, 255, 255, 0.28); }
+    html[data-theme="dark"] .ab-list-item.ab-li-accepted.active {
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.07));
+        border-color: rgba(16, 185, 129, 0.55);
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
+    }
+    html[data-theme="dark"] .ab-list-item.ab-li-rejected.active {
+        background: linear-gradient(90deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.07));
+        border-color: rgba(239, 68, 68, 0.55);
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.2);
+    }
+    html[data-theme="dark"] .ab-list-item.ab-li-completed.active {
+        background: linear-gradient(90deg, rgba(96, 165, 250, 0.2), rgba(96, 165, 250, 0.07));
+        border-color: rgba(96, 165, 250, 0.55);
+        box-shadow: 0 4px 14px rgba(96, 165, 250, 0.2);
+    }
+    html[data-theme="dark"] .ab-list-item.ab-li-completed.active .ab-list-icon { background: #3b82f6; color: #ffffff; }
+    html[data-theme="dark"] .ab-list-item.ab-li-completed.active .ab-list-status { background: #3b82f6; border-color: #3b82f6; color: #ffffff; }
+    html[data-theme="dark"] .ab-list-item.ab-li-accepted.active .ab-list-arrow { color: #34d399; }
+    html[data-theme="dark"] .ab-list-item.ab-li-rejected.active .ab-list-arrow { color: #f87171; }
+    html[data-theme="dark"] .ab-list-item.ab-li-completed.active .ab-list-arrow { color: #93c5fd; }
+    html[data-theme="dark"] .ab-list-search {
+        background: var(--bg-dark);
+        border-color: var(--card-border);
+        color: var(--text-main);
+    }
+    html[data-theme="dark"] .ab-list-search::placeholder { color: var(--text-muted); }
+    html[data-theme="dark"] .ab-list-search:focus {
+        border-color: #60a5fa;
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+    }
+    html[data-theme="dark"] .ab-detail-card {
+        background: var(--card-bg);
+        border-color: var(--card-border);
+    }
+    html[data-theme="dark"] .ab-detail-card > .ab-detail-header {
+        background: rgba(255, 255, 255, 0.03);
+        border-bottom-color: var(--card-border);
+    }
+    html[data-theme="dark"] .ab-payment-card { background: rgba(250, 204, 21, 0.06); }
+    html[data-theme="dark"] .ab-rejection-card { background: rgba(239, 68, 68, 0.06); }
+
+    /* Tabs */
+    html[data-theme="dark"] .ab-tab { color: var(--text-muted); }
+    html[data-theme="dark"] .ab-tab:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.06); }
+    html[data-theme="dark"] .ab-tab.active[data-tab="accepted"] { color: #34d399; }
+    html[data-theme="dark"] .ab-tab.active[data-tab="rejected"] { color: #f87171; }
+    html[data-theme="dark"] .ab-tab.active[data-tab="completed"] { color: #93c5fd; }
+    html[data-theme="dark"] .ab-tab-count { background: rgba(255, 255, 255, 0.1); color: var(--text-muted); }
+    html[data-theme="dark"] .ab-tab.active[data-tab="accepted"] .ab-tab-count { background: rgba(16, 185, 129, 0.25); color: #34d399; }
+    html[data-theme="dark"] .ab-tab.active[data-tab="rejected"] .ab-tab-count { background: rgba(239, 68, 68, 0.25); color: #f87171; }
+    html[data-theme="dark"] .ab-tab.active[data-tab="completed"] .ab-tab-count { background: rgba(96, 165, 250, 0.25); color: #93c5fd; }
+
+    /* Text */
+    html[data-theme="dark"] .ab-page-title,
+    html[data-theme="dark"] .ab-list-customer,
+    html[data-theme="dark"] .ab-detail-id,
+    html[data-theme="dark"] .ab-detail-meta-item,
+    html[data-theme="dark"] .ab-detail-value,
+    html[data-theme="dark"] .ab-rejection-value,
+    html[data-theme="dark"] .ab-detail-block { color: var(--text-main); }
+    html[data-theme="dark"] .ab-detail-label { color: var(--text-muted); }
+    html[data-theme="dark"] .ab-empty-inline h4 { color: var(--text-main); }
+    html[data-theme="dark"] .ab-page-title i,
+    html[data-theme="dark"] .ab-page-title svg { color: #FACC15; }
+
+    /* Icons & accents */
+    html[data-theme="dark"] .ab-detail-icon,
+    html[data-theme="dark"] .ab-detail-meta-item i,
+    html[data-theme="dark"] .ab-detail-meta-item svg,
+    html[data-theme="dark"] .ab-card-title i,
+    html[data-theme="dark"] .ab-card-title svg { color: #93c5fd; }
+    html[data-theme="dark"] .ab-card-title { color: #34d399; }
+    html[data-theme="dark"] .ab-list-icon.accepted { color: #34d399; }
+    html[data-theme="dark"] .ab-list-icon.rejected { color: #f87171; }
+    html[data-theme="dark"] .ab-list-icon.completed { color: #93c5fd; }
+    html[data-theme="dark"] .ab-list-arrow { color: var(--text-muted); }
+    html[data-theme="dark"] .ab-list-item:hover .ab-list-arrow { color: var(--text-main); }
+    html[data-theme="dark"] .ab-empty-icon { background: rgba(255, 255, 255, 0.06); }
+    html[data-theme="dark"] .ab-empty-inline.accepted .ab-empty-icon { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    html[data-theme="dark"] .ab-empty-inline.rejected .ab-empty-icon { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+    html[data-theme="dark"] .ab-empty-inline.completed .ab-empty-icon { background: rgba(96, 165, 250, 0.15); color: #93c5fd; }
+
+    /* Status pills, badges, banners */
+    html[data-theme="dark"] .ab-list-status.accepted { color: #34d399; }
+    html[data-theme="dark"] .ab-list-status.rejected { color: #f87171; }
+    html[data-theme="dark"] .ab-list-status.completed { color: #93c5fd; }
+    html[data-theme="dark"] .ab-status-badge { background: rgba(255, 255, 255, 0.06); border-color: var(--card-border); color: var(--text-main); }
+    html[data-theme="dark"] .ab-status-badge.accepted { background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.4); }
+    html[data-theme="dark"] .ab-status-badge.rejected { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.4); }
+    html[data-theme="dark"] .ab-status-badge.completed { background: rgba(96, 165, 250, 0.15); color: #93c5fd; border-color: rgba(96, 165, 250, 0.4); }
+    html[data-theme="dark"] .ab-status-pill.pending { color: #fde047; }
+    html[data-theme="dark"] .ab-status-pill.partial { color: #93c5fd; border-color: rgba(96, 165, 250, 0.4); background: rgba(96, 165, 250, 0.15); }
+    html[data-theme="dark"] .ab-status-pill.completed { color: #34d399; }
+    html[data-theme="dark"] .ab-status-banner.accepted { color: #34d399; }
+    html[data-theme="dark"] .ab-status-banner.completed { color: #93c5fd; border-color: rgba(96, 165, 250, 0.35); background: rgba(96, 165, 250, 0.08); }
+    html[data-theme="dark"] .ab-status-banner.rejected { color: #f87171; }
+    html[data-theme="dark"] .ab-status-banner-sub { color: var(--text-muted); }
+
+    /* Stepper */
+    html[data-theme="dark"] .ab-step-dot { background: rgba(255, 255, 255, 0.12); color: var(--text-muted); }
+    html[data-theme="dark"] .ab-step.done .ab-step-dot { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    html[data-theme="dark"] .ab-step.current .ab-step-dot { background: #10b981; color: #fff; }
+    html[data-theme="dark"] .ab-step.danger .ab-step-dot { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    html[data-theme="dark"] .ab-step.danger .ab-step-label { color: #f87171; }
+    html[data-theme="dark"] .ab-step-line { background: rgba(255, 255, 255, 0.12); }
+
+    /* Buttons & misc */
+    html[data-theme="dark"] .ab-back-btn { background: rgba(255, 255, 255, 0.06); border-color: var(--card-border); color: var(--text-main); }
+    html[data-theme="dark"] .ab-back-btn:hover { background: rgba(255, 255, 255, 0.12); color: var(--text-main); }
+    html[data-theme="dark"] .ab-action-btn { background: rgba(255, 255, 255, 0.06); border-color: var(--card-border); color: var(--text-main); }
+    html[data-theme="dark"] .ab-action-btn:hover { background: rgba(255, 255, 255, 0.12); }
+    html[data-theme="dark"] .ab-action-btn.print { background: #27476f; border-color: #3b5f8f; }
+    html[data-theme="dark"] .ab-action-btn.print:hover { background: #315787; border-color: #3b5f8f; }
+    html[data-theme="dark"] .ab-error { color: #f87171; }
+    html[data-theme="dark"] .ab-rejection-title,
+    html[data-theme="dark"] .ab-rejection-status,
+    html[data-theme="dark"] .ab-rejection-value.lg { color: #f87171; }
+    html[data-theme="dark"] .ab-payment-status { color: #34d399; }
+    html[data-theme="dark"] .ab-detail-vehicle-img { opacity: 0.9; }
 </style>
 
 <div class="booking-status-page">
@@ -1158,12 +1578,18 @@ $pageTitle = 'Bookings Status';
         <div class="ab-error" style="background: rgba(250, 204, 21, 0.1); border-color: rgba(250, 204, 21, 0.2); color: #EAB308;"><i data-lucide="info" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i><?= htmlspecialchars($flash) ?></div>
     <?php endif; ?>
 
-    
+    <div class="ab-header">
+        <div class="ab-header-text">
+            <h1 class="ab-page-title"><i data-lucide="calendar-check-2"></i> Bookings Status</h1>
+            <div class="ab-page-subtitle">Track accepted, rejected and completed service bookings</div>
+        </div>
+        <a href="manage_bookings.php" class="ab-back-btn"><i data-lucide="settings"></i> Manage Bookings</a>
+    </div>
 
     <div class="ab-tabs">
-        <a href="?tab=accepted" class="ab-tab <?= $activeTab === 'accepted' ? 'active' : '' ?>" data-tab="accepted"><i data-lucide="check-circle"></i> Accepted</a>
-        <a href="?tab=rejected" class="ab-tab <?= $activeTab === 'rejected' ? 'active' : '' ?>" data-tab="rejected"><i data-lucide="x-circle"></i> Rejected</a>
-        <a href="?tab=completed" class="ab-tab <?= $activeTab === 'completed' ? 'active' : '' ?>" data-tab="completed"><i data-lucide="check-circle-2"></i> Completed</a>
+        <a href="?tab=accepted" class="ab-tab <?= $activeTab === 'accepted' ? 'active' : '' ?>" data-tab="accepted"><i data-lucide="check-circle"></i> Accepted <span class="ab-tab-count"><?= count($acceptedBookings) ?></span></a>
+        <a href="?tab=rejected" class="ab-tab <?= $activeTab === 'rejected' ? 'active' : '' ?>" data-tab="rejected"><i data-lucide="x-circle"></i> Rejected <span class="ab-tab-count"><?= count($rejectedBookings) ?></span></a>
+        <a href="?tab=completed" class="ab-tab <?= $activeTab === 'completed' ? 'active' : '' ?>" data-tab="completed"><i data-lucide="flag"></i> Completed <span class="ab-tab-count"><?= count($completedBookings) ?></span></a>
     </div>
 
     <div class="ab-main-card">
@@ -1189,7 +1615,7 @@ $pageTitle = 'Bookings Status';
 
                 <div class="ab-detail-pane">
                     <div id="detailPlaceholder" class="ab-empty-state">
-                        <i data-lucide="arrow-left-square"></i>
+                        <i data-lucide="panel-left"></i>
                         <h4 style="color: var(--text-main); font-weight: 700;">Select a booking</h4>
                         <p>Click a booking on the left to view details.</p>
                     </div>

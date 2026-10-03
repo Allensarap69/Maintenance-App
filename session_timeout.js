@@ -374,7 +374,7 @@
         hideWarning();
         
         // Send heartbeat to server to keep session alive
-        fetch('heartbeat.php', { 
+        fetch('api/heartbeat.php', { 
             method: 'POST',
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         }).catch(() => {}); // Silently fail if not implemented

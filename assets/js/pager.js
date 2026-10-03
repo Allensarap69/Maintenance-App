@@ -118,6 +118,7 @@
 
         function apply() {
             var cands = candidates();
+            lastKeys = keysOf(cands);
             var total = cands.length;
             var totalPages = Math.max(1, Math.ceil(total / perPage));
             if (page > totalPages) page = totalPages;
@@ -152,11 +153,30 @@
             apply();
         }
 
-        // Debounced refresh whenever filters toggle inline display/classes
+        // Debounced refresh whenever filters toggle inline display/classes.
+        // Resetting to page 1 must only happen when the SET of items
+        // changes — compared by stable row keys, not element identity,
+        // so AJAX re-renders that recreate elements (manage_customers_
+        // motorcycles polls #customerRows every 5s) don't reset the page.
+        function candKey(el) {
+            return el.getAttribute('data-username')
+                || el.getAttribute('data-booking-id')
+                || el.getAttribute('data-id')
+                || el.textContent.trim().slice(0, 80);
+        }
+
+        var lastKeys = '';
+        function keysOf(list) {
+            return list.map(candKey).join('');
+        }
+
         var t = null;
         function schedule() {
             clearTimeout(t);
-            t = setTimeout(function () { page = 1; apply(); }, 60);
+            t = setTimeout(function () {
+                if (keysOf(candidates()) !== lastKeys) page = 1;
+                apply();
+            }, 60);
         }
 
         var mo = new MutationObserver(function () { schedule(); });

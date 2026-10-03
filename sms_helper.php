@@ -1,7 +1,7 @@
 <?php
 // sms_helper.php — reusable IPROG SMS helper with history logging
 
-require_once 'db.php';
+require_once __DIR__ . '/db.php';
 require_once 'sms_config.php';
 
 // Fallback endpoint: sends via the IPROGREMIND sender name, which supports ALL

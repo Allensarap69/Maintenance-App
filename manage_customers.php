@@ -760,7 +760,7 @@ $pageTitle = 'Manage Customers';
     // Edit Customer
     function editCustomer(id) {
         // Fetch customer data via AJAX
-        fetch(`get_customer_data.php?id=${id}`)
+        fetch(`api/get_customer_data.php?id=${id}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -784,7 +784,7 @@ $pageTitle = 'Manage Customers';
 
     // View Customer Profile
     function viewCustomer(id) {
-        fetch(`get_customer_data.php?id=${id}`)
+        fetch(`api/get_customer_data.php?id=${id}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {

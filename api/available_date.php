@@ -1,5 +1,5 @@
 <?php
-require 'db.php';
+require __DIR__ . '/../db.php';
 
 // Example: fetch available slots
 $stmt = $pdo->query("SELECT id, date, start_time, end_time FROM slots WHERE is_booked=0");

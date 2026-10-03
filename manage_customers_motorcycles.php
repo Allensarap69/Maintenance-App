@@ -1470,7 +1470,7 @@ function liveSearchCustomers(query) {
 
 function editCustomer(customerId) {
     // Fetch customer data via AJAX
-    fetch('get_customer_data.php?id=' + customerId)
+    fetch('api/get_customer_data.php?id=' + customerId)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -1572,7 +1572,7 @@ function showCustomerDetail(customerId) {
     body.innerHTML = `<div class='text-center py-5'><div class='spinner-border text-primary' role='status'><span class='visually-hidden'>Loading...</span></div></div>`;
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
 
-    fetch('get_customer_data.php?id=' + customerId + '&include_motorcycles=1')
+    fetch('api/get_customer_data.php?id=' + customerId + '&include_motorcycles=1')
         .then(response => response.json())
         .then(data => {
             if (!data.success) {
@@ -1731,14 +1731,6 @@ document.addEventListener('click', function(e) {
         if (!document.hidden) refreshCustomerList();
     });
 })();
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    if (window.attachPager) {
-        attachPager({ items: '.customer-row', container: '#customerRows', perPage: 15 });
-    }
-});
 </script>
 
 <?php require 'admin_sidebar_footer.php'; ?>

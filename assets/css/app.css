@@ -1,0 +1,31 @@
+/* ==========================================================
+   app.css — canonical design tokens for AutoCare Pro /
+   Mindanao Eversure. Loaded FIRST (before portal CSS and
+   ui.css); page-level :root blocks may still override these.
+   ========================================================== */
+:root {
+    /* Brand palette */
+    --primary-color: #0f172a;
+    --primary-gradient: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    --accent-color: #f59e0b;
+    --accent-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+
+    /* Surfaces & text */
+    --bg-light: #f8fafc;
+    --bg-dark: #0f172a;
+    --text-dark: #1e293b;
+    --text-light: #64748b;
+    --white: #ffffff;
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --border-color: #e2e8f0;
+
+    /* Semantic */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --danger: #ef4444;
+
+    /* Layout */
+    --sidebar-width: 280px;
+}

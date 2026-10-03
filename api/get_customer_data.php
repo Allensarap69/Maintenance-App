@@ -1,7 +1,7 @@
 <?php
 session_start();
-require 'db.php';
-require 'motorcycle_health_helper.php';
+require __DIR__ . '/../db.php';
+require __DIR__ . '/../motorcycle_health_helper.php';
 
 // Check if the user is logged in as Admin
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {

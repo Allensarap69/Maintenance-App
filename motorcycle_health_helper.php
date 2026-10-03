@@ -4,7 +4,7 @@
  * Provides functions for calculating health scores, warranty status, and maintenance schedules
  */
 
-require_once 'db.php';
+require_once __DIR__ . '/db.php';
 
 const INSPECTION_VALUES = [
     'Good' => 100,

@@ -17,7 +17,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'mechanic') {
 }
 
 try {
-    require_once 'db.php';
+    require_once __DIR__ . '/../db.php';
 
     // Resolve the mechanic record linked to this user
     $mechanicId = null;

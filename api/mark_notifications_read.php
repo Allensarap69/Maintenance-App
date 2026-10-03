@@ -16,7 +16,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 try {
-    require_once 'db.php';
+    require_once __DIR__ . '/../db.php';
 
     $customerId = (int) $_SESSION['user_id'];
 

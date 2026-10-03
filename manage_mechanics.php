@@ -1158,7 +1158,7 @@ $pageTitle = 'Manage Mechanics';
             passwordHelp.textContent = 'Leave blank to keep the current password.';
             
             // Fetch mechanic data
-            fetch(`get_mechanic_data.php?id=${id}`)
+            fetch(`api/get_mechanic_data.php?id=${id}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -1202,7 +1202,7 @@ $pageTitle = 'Manage Mechanics';
     function openViewMechanicModal(id) {
         const modal = new bootstrap.Modal(document.getElementById('viewMechanicModal'));
 
-        fetch(`get_mechanic_data.php?id=${id}`)
+        fetch(`api/get_mechanic_data.php?id=${id}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {

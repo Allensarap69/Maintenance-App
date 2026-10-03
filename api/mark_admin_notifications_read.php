@@ -18,7 +18,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 }
 
 try {
-    require_once 'db.php';
+    require_once __DIR__ . '/../db.php';
 
     $seenMap = [
         'admin_seen_booking_ids'   => "SELECT id FROM bookings WHERE status IN ('pending', 'unassigned', 'deposit_submitted')",

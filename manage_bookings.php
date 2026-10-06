@@ -7,6 +7,7 @@ require 'db.php'; // Make sure this file correctly sets up your $pdo connection
 require_once 'sms_helper.php';
 require_once 'sms_config.php';
 require_once 'SMSTemplates.php';
+require_once 'management_helper.php';
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
@@ -208,6 +209,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'accept' && isset($_GET['id'])
         if ($stmt_booking->rowCount() > 0) {
             $report_success = create_report_record($pdo, $booking_id, 'Confirmation Slip');
             $pdo->commit();
+            log_audit($pdo, 'booking_accepted', 'booking', $booking_id, count($assigned_mechanic_ids) . ' mechanic(s) assigned');
 
             // Send appointment confirmation SMS after commit (best-effort; does not fail the booking)
             $sms = new SMSHelper();
@@ -286,6 +288,7 @@ if (isset($_GET['action']) && in_array($_GET['action'], ['deposit_approved', 'de
             $stmt_payment = $pdo->prepare("UPDATE payments SET status='verified' WHERE id=?");
             $stmt_payment->execute([$payment_id]);
 
+            log_audit($pdo, 'deposit_approved', 'booking', $booking_id);
             $msg = "Deposit for Booking #{$booking_id} APPROVED.";
             $msg_type = "success";
         } elseif ($action === 'deposit_rejected') {
@@ -295,6 +298,7 @@ if (isset($_GET['action']) && in_array($_GET['action'], ['deposit_approved', 'de
             $stmt_payment = $pdo->prepare("UPDATE payments SET status='failed' WHERE id=?");
             $stmt_payment->execute([$payment_id]);
 
+            log_audit($pdo, 'deposit_rejected', 'booking', $booking_id);
             $msg = "Deposit for Booking #{$booking_id} REJECTED.";
             $msg_type = "error";
         }
@@ -349,6 +353,7 @@ if (isset($_GET['action'], $_GET['id'])) {
             }
 
             $pdo->commit();
+            log_audit($pdo, 'booking_rejected', 'booking', (int)$id);
             $msg = "Booking #{$id} has been rejected.";
             $msg_type = "success";
         } catch (Exception $e) {

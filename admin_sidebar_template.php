@@ -339,6 +339,26 @@ require __DIR__ . '/partials/head.php';
             </div>
 
             <div class="menu-section">
+                <div class="menu-title">Management</div>
+                <a href="admin_inventory.php" class="menu-item <?= $currentPage == 'admin_inventory' ? 'active' : '' ?>" data-tooltip="Inventory">
+                    <i data-lucide="boxes"></i>
+                    <span>Inventory</span>
+                </a>
+                <a href="admin_invoices.php" class="menu-item <?= $currentPage == 'admin_invoices' ? 'active' : '' ?>" data-tooltip="Invoices &amp; Payments">
+                    <i data-lucide="receipt"></i>
+                    <span>Invoices &amp; Payments</span>
+                </a>
+                <a href="admin_receipts.php" class="menu-item <?= $currentPage == 'admin_receipts' ? 'active' : '' ?>" data-tooltip="Receipts">
+                    <i data-lucide="file-image"></i>
+                    <span>Receipts</span>
+                </a>
+                <a href="reports.php" class="menu-item <?= $currentPage == 'reports' ? 'active' : '' ?>" data-tooltip="Reports">
+                    <i data-lucide="bar-chart-3"></i>
+                    <span>Reports</span>
+                </a>
+            </div>
+
+            <div class="menu-section">
                 <div class="menu-title">Communication</div>
                 <a href="sms_history.php" class="menu-item <?= $currentPage == 'sms_history' ? 'active' : '' ?>" data-tooltip="SMS History">
                     <i data-lucide="message-square"></i>
@@ -350,7 +370,11 @@ require __DIR__ . '/partials/head.php';
                 </a>
             </div>
             <div class="menu-section">
-                <div class="menu-title">Account</div>
+                <div class="menu-title">System</div>
+                <a href="admin_audit_log.php" class="menu-item <?= $currentPage == 'admin_audit_log' ? 'active' : '' ?>" data-tooltip="Audit Log">
+                    <i data-lucide="scroll-text"></i>
+                    <span>Audit Log</span>
+                </a>
                 <a href="admin_profile.php" class="menu-item <?= $currentPage == 'admin_profile' ? 'active' : '' ?>" data-tooltip="Profile Settings">
                     <i data-lucide="user-cog"></i>
                     <span>Profile Settings</span>

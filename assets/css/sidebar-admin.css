@@ -294,7 +294,7 @@
         }
 
         .sidebar-menu {
-            padding: 20px 0;
+            padding: 14px 0;
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
@@ -309,14 +309,14 @@
             border-radius: 2px;
         }
 
-        .menu-section { padding: 0 20px; margin-bottom: 20px; }
+        .menu-section { padding: 0 16px; margin-bottom: 12px; }
 
         .menu-title {
             color: rgba(255, 255, 255, 0.8);
             font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
             padding-left: 15px;
             position: sticky;
             top: 0;
@@ -329,12 +329,12 @@
         .menu-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
+            gap: 10px;
+            padding: 9px 14px;
             color: #ffffff;
             text-decoration: none;
-            border-radius: 12px;
-            margin: 4px 15px;
+            border-radius: 10px;
+            margin: 2px 12px;
             
             position: relative;
             overflow: hidden;
@@ -369,19 +369,19 @@
         }
 
         .menu-item i,
-        .menu-item svg { width: 21px; height: 21px; flex-shrink: 0; }
-        .menu-item span { font-size: 0.88rem; font-weight: 500; }
+        .menu-item svg { width: 19px; height: 19px; flex-shrink: 0; }
+        .menu-item span { font-size: 0.84rem; font-weight: 500; }
         .menu-title { color: rgba(255, 255, 255, 0.5); font-size: 0.75rem; font-weight: 700; }
 
         .menu-badge {
             margin-left: auto;
             background: #FACC15;
             color: #111827;
-            min-width: 24px;
-            height: 24px;
-            padding: 0 7px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
             border-radius: 999px;
-            font-size: 0.72rem;
+            font-size: 0.66rem;
             font-weight: 700;
             display: inline-flex;
             align-items: center;
@@ -421,12 +421,12 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 9px 20px 9px 52px;
-            margin: 2px 15px;
+            padding: 7px 14px 7px 44px;
+            margin: 2px 12px;
             color: rgba(255, 255, 255, 0.75);
             text-decoration: none;
             border-radius: 10px;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: 500;
             
             position: relative;
@@ -434,7 +434,7 @@
         .submenu-item::before {
             content: '';
             position: absolute;
-            left: 34px;
+            left: 28px;
             top: 50%;
             transform: translateY(-50%);
             width: 5px;
@@ -459,7 +459,7 @@
         /* Pulse animation removed to prevent sidebar flicker */
 
         .sidebar-footer {
-            padding: 20px;
+            padding: 12px 16px;
             border-top: 1px solid rgba(30, 41, 59, 0.1);
             background: #ffffff;
             flex-shrink: 0;
@@ -474,9 +474,9 @@
             justify-content: center;
             gap: 8px;
             color: #111827;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .sidebar-footer-text i,
@@ -571,7 +571,7 @@
             border-bottom: 2px solid rgba(30, 58, 95, 0.3);
             overflow: visible;
             height: 60px;
-            transition: left 0.3s ease;
+            transition: left 0.3s ease, padding-left 0.3s ease;
         }
 
         .top-header::after { display: none; }
@@ -1018,7 +1018,7 @@
             color: rgba(255, 255, 255, 0.55) !important;
         }
         .menu-subtitle::after { content: ''; flex: 1; height: 1px; background: rgba(255, 255, 255, 0.07); }
-        .menu-section + .menu-section { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 14px; }
+        .menu-section + .menu-section { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 10px; }
         .menu-item { color: rgba(255, 255, 255, 0.85) !important; transition: transform 0.2s ease; }
         .menu-item i, .menu-item svg { color: rgba(255, 255, 255, 0.65) !important; transition: color 0.2s ease; }
         .menu-item:hover { color: #ffffff !important; background: rgba(255, 255, 255, 0.08) !important; transform: translateX(3px) !important; }
@@ -1057,15 +1057,21 @@
     /* Collapsible sidebar */
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     body.collapsed { --sidebar-width: 80px; }
-    body.collapsed .menu-section { padding: 0; margin-bottom: 18px; }
-    body.collapsed .menu-item { justify-content: center; padding: 12px 0; margin: 4px 15px; overflow: visible; }
+    /* Keep top-header content anchored when the sidebar collapses:
+       the bar follows the sidebar edge, padding compensates the 200px shift
+       so the title/bell/avatar stay at the same screen position. */
+    @media (min-width: 992px) {
+        body.collapsed .top-header { padding-left: calc(310px - var(--sidebar-width)); }
+    }
+    body.collapsed .menu-section { padding: 0; margin-bottom: 12px; }
+    body.collapsed .menu-item { justify-content: center; padding: 10px 0; margin: 3px 12px; overflow: visible; }
     body.collapsed .menu-item span,
     body.collapsed .menu-title,
     body.collapsed .menu-subtitle,
     body.collapsed .menu-caret,
     body.collapsed .submenu,
     body.collapsed .sidebar-brand span,
-    body.collapsed .user-info,
+    body.collapsed .sidebar .user-info,
     body.collapsed .btn-logout-sm { display: none !important; }
     body.collapsed .menu-item .menu-badge {
         position: absolute;
@@ -1104,8 +1110,8 @@
     body.collapsed .sidebar-brand i,
     body.collapsed .sidebar-brand svg { width: 30px; height: 30px; }
     body.collapsed .sidebar-collapse-btn { width: 24px; height: 24px; }
-    body.collapsed .user-avatar { width: 35px; height: 35px; font-size: 1rem; }
-    body.collapsed .user-profile { padding: 10px; justify-content: center; }
+    body.collapsed .sidebar .user-avatar { width: 35px; height: 35px; font-size: 1rem; }
+    body.collapsed .sidebar .user-profile { padding: 10px; justify-content: center; }
     body.collapsed .sidebar-footer { padding: 10px; }
     body.collapsed .sidebar-footer-text span,
     body.collapsed .sidebar-footer-copyright { display: none !important; }

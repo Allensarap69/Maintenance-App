@@ -144,7 +144,34 @@ if (isset($_SESSION['user_id'])) {
             ];
         }
 
-        $customerNotificationItems = array_merge($unreadHealthItems, $unreadBookingItems);
+        // Parts awaiting the customer's approval (computed live — clears once decided)
+        $unreadPartItems = [];
+        try {
+            $stmt = $pdo->prepare("
+                SELECT bp.booking_id, COUNT(*) AS cnt, SUM(bp.quantity * bp.unit_price) AS total
+                FROM booking_parts bp
+                JOIN bookings b ON b.id = bp.booking_id
+                WHERE b.user_id = ? AND bp.status = 'pending'
+                  AND b.status IN ('pending','deposit_submitted','accepted','assigned','in_progress')
+                GROUP BY bp.booking_id
+                ORDER BY bp.booking_id DESC
+                LIMIT 5
+            ");
+            $stmt->execute([$_SESSION['user_id']]);
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $unreadPartItems[] = [
+                    'type' => 'part',
+                    'title' => 'Parts approval needed',
+                    'message' => 'Booking #' . $row['booking_id'] . ': ' . (int)$row['cnt'] . ' part(s) added — ₱' . number_format((float)$row['total'], 2) . ' awaiting your approval',
+                    'link' => 'my_bookings.php',
+                    'time_label' => ''
+                ];
+            }
+        } catch (PDOException $e) {
+            error_log('Sidebar parts notification error: ' . $e->getMessage());
+        }
+
+        $customerNotificationItems = array_merge($unreadPartItems, $unreadHealthItems, $unreadBookingItems);
     } catch (PDOException $e) {
         error_log("Sidebar notification query error: " . $e->getMessage());
     }
@@ -319,7 +346,8 @@ $totalNotificationCount = count($customerNotificationItems);
                 booking: 'bi-journal-text',
                 emergency: 'bi-exclamation-triangle-fill',
                 warranty: 'bi-shield-check',
-                health: 'bi-heart-pulse'
+                health: 'bi-heart-pulse',
+                part: 'bi-gear-fill'
             };
 
             let dropdownHTML = '<div class="notification-dropdown-header">' +

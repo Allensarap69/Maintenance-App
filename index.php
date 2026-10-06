@@ -2,6 +2,7 @@
 session_start();
 require 'db.php'; // Ensure your database connection is correct
 require 'security.php'; // Security functions and headers
+require 'management_helper.php'; // Audit logging
 
 /**
  * Secure password verification - supports both old MD5 and new bcrypt
@@ -112,6 +113,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
                     $_SESSION['username'] = $user['username'];
                     $_SESSION['last_login'] = time();
 
+                    log_audit($pdo, 'login_success', 'user', $user['id'], $email);
+
                     // Redirect based on role
                     $dashboard_files = [
                         'admin' => 'dashboard_admin.php',
@@ -124,6 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
                 } else {
                     // Failed login - record attempt and show delay
                     record_failed_login($pdo, $email);
+                    log_audit($pdo, 'login_failed', 'user', null, $email);
                     $delay_info = check_login_delay($pdo, $email);
                     
                     if ($delay_info['delay'] > 0) {
@@ -170,7 +174,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submit'])) {
             } else {
                 $stmt = $pdo->prepare("INSERT INTO users (username,email,password,phone,address,role) VALUES (?,?,?,?,?,'customer')");
                 $stmt->execute([$username, $email, $password, $phone, $address]);
-                
+                log_audit($pdo, 'user_registered', 'user', $pdo->lastInsertId(), $email);
+
                 $msg = "Registration successful! You can now login.";
                 $registration_success = true;
                 

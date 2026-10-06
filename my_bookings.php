@@ -2,6 +2,7 @@
 session_start();
 require 'db.php'; // Your database connection file
 require_once 'feedback_helper.php';
+require_once 'management_helper.php';
 
 // 1. Security Check: Only logged-in customers can view this page.
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
@@ -12,6 +13,20 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
 // 2. Get User ID & Set Notification Clear Marker
 $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'] ?? 'Customer';
+
+// Customer approves/declines a part the mechanic added
+ensure_management_tables($pdo);
+$parts_flash = '';
+$parts_flash_type = 'info';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['part_decision'], $_POST['bp_id'])) {
+    $r = customer_decide_part($pdo, (int)$_POST['bp_id'], $user_id, $_POST['part_decision']);
+    header("Location: my_bookings.php?pmsg=" . urlencode($r['msg']) . "&ptype=" . ($r['ok'] ? 'success' : 'danger'));
+    exit;
+}
+if (isset($_GET['pmsg'])) {
+    $parts_flash = urldecode($_GET['pmsg']);
+    $parts_flash_type = ($_GET['ptype'] ?? 'info') === 'success' ? 'success' : 'danger';
+}
 
 // Feedback submission flash (set by rate_service.php)
 $toast_msg = '';
@@ -1251,6 +1266,49 @@ $active_page = basename($_SERVER['PHP_SELF']);
     .view-toggle .btn:hover:not(.active) {
         background: #f1f5f9;
     }
+
+    /* --- Parts approval --- */
+    .parts-approval {
+        border-top: 1px dashed #fde68a;
+        background: #fffbeb;
+        padding: 10px 16px;
+    }
+    .parts-approval-title {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #b45309;
+        margin-bottom: 6px;
+    }
+    .part-approve-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 0;
+        border-bottom: 1px solid #fef3c7;
+        font-size: 0.78rem;
+        flex-wrap: wrap;
+    }
+    .part-approve-row:last-child { border-bottom: none; }
+    .part-approve-row .pname { font-weight: 600; color: var(--text-dark); }
+    .part-approve-row .pmeta { color: var(--text-light); font-size: 0.72rem; }
+    .part-approve-row .btn-approve,
+    .part-approve-row .btn-decline {
+        border: none;
+        border-radius: 50px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 4px 12px;
+        cursor: pointer;
+    }
+    .part-approve-row .btn-approve { background: #10b981; color: #fff; }
+    .part-approve-row .btn-approve:hover { background: #059669; }
+    .part-approve-row .btn-decline { background: transparent; color: #dc2626; border: 1px solid #fecaca; }
+    .part-approve-row .btn-decline:hover { background: #fef2f2; }
+    .parts-approved-list { font-size: 0.74rem; color: var(--text-light); padding: 8px 16px; border-top: 1px dashed #e2e8f0; background: #f8fafc; }
+    .parts-approved-list .bi-check-circle-fill { color: var(--success); }
+
     .tab-pane.view-list .booking-row > [class*="col-"] {
         width: 100% !important;
         max-width: 100% !important;
@@ -1302,6 +1360,13 @@ $active_page = basename($_SERVER['PHP_SELF']);
     <div class="content-area">
 <!-- Content Section -->
 <div class="py-5">
+
+    <?php if ($parts_flash): ?>
+    <div class="alert alert-<?= $parts_flash_type ?> alert-dismissible fade show" role="alert">
+        <?= htmlspecialchars($parts_flash) ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <?php endif; ?>
 
     <ul class="nav nav-tabs nav-fill mb-4" id="bookingTabs" role="tablist">
         <li class="nav-item" role="presentation">
@@ -1646,6 +1711,38 @@ function generateBookingCards($bookings, $pdo) {
                     <?php endif; ?>
                 </div>
             </div>
+            <?php
+            // Parts added by the mechanic — customer approval for open bookings
+            $job_parts = get_booking_parts($pdo, $b['id']);
+            $pending_parts = array_values(array_filter($job_parts, fn($p) => $p['status'] === 'pending'));
+            $approved_parts = array_values(array_filter($job_parts, fn($p) => $p['status'] === 'approved'));
+            $parts_open = in_array($status, ['accepted', 'assigned', 'in_progress']);
+            ?>
+            <?php if (!empty($pending_parts)): ?>
+            <div class='parts-approval'>
+                <div class='parts-approval-title'><i class='bi bi-exclamation-circle me-1'></i>Parts added — your approval needed</div>
+                <?php foreach ($pending_parts as $pp): ?>
+                <div class='part-approve-row'>
+                    <span class='pname flex-grow-1'><?= htmlspecialchars($pp['part_name']) ?></span>
+                    <span class='pmeta'>×<?= (int)$pp['quantity'] ?> · ₱<?= number_format($pp['quantity'] * $pp['unit_price'], 2) ?></span>
+                    <?php if ($parts_open): ?>
+                    <form method='POST' class='d-inline-flex gap-1 m-0'>
+                        <input type='hidden' name='bp_id' value='<?= (int)$pp['id'] ?>'>
+                        <button type='submit' name='part_decision' value='approved' class='btn-approve'><i class='bi bi-check-lg me-1'></i>Approve</button>
+                        <button type='submit' name='part_decision' value='declined' class='btn-decline'><i class='bi bi-x-lg me-1'></i>Decline</button>
+                    </form>
+                    <?php endif; ?>
+                </div>
+                <?php endforeach; ?>
+                <div class='pmeta mt-1'>Approved parts are added to your final bill. Declined parts won't be charged.</div>
+            </div>
+            <?php endif; ?>
+            <?php if (!empty($approved_parts)): ?>
+            <div class='parts-approved-list'>
+                <i class='bi bi-check-circle-fill me-1'></i>Approved parts:
+                <?= implode(', ', array_map(fn($p) => htmlspecialchars($p['part_name']) . ' ×' . (int)$p['quantity'], $approved_parts)) ?>
+            </div>
+            <?php endif; ?>
             <?php if ($status === 'completed'): ?>
             <?php $feedback = get_booking_feedback($pdo, $b['id']); ?>
             <div class='booking-box-footer'>

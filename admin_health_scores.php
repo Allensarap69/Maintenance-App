@@ -389,6 +389,29 @@ $pageTitle = 'Motorcycle Health Scores';
         padding: 0 0.5rem 1rem 0.5rem;
     }
 
+    /* Keep stats cards + search pinned: only the customer list scrolls */
+    .hs-content {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    .hs-content > .row,
+    .hs-stats-row,
+    .customer-search-section {
+        flex-shrink: 0;
+    }
+    .customer-list {
+        flex: 1;
+        min-height: 240px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 0.25rem 0.5rem 1.5rem 0.25rem;
+    }
+    html[data-theme="dark"] .customer-list {
+        background: transparent !important;
+        border-color: transparent !important;
+    }
+
     .health-event-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;

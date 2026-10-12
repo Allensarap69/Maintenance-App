@@ -33,7 +33,7 @@ $sync_stmt->execute([$mechanic_id]);
 $open_emergency_count = (int) $sync_stmt->fetchColumn();
 
 if ($open_emergency_count > 0) {
-    $pdo->prepare("UPDATE mechanics SET status = 'Busy' WHERE id = ? AND status != 'Busy'")->execute([$mechanic_id]);
+    $pdo->prepare("UPDATE mechanics SET status = 'Busy' WHERE id = ? AND status NOT IN ('Busy','Off-Duty')")->execute([$mechanic_id]);
 } else {
     $booking_check = $pdo->prepare("
         SELECT COUNT(*) FROM bookings
@@ -50,6 +50,17 @@ if ($open_emergency_count > 0) {
         $pdo->prepare("UPDATE mechanics SET status = 'Available' WHERE id = ? AND status != 'Available'")->execute([$mechanic_id]);
     }
 }
+
+// Only an actively in-progress job locks the On/Off Duty toggle.
+// Assigned/accepted-but-not-started work must not trap the mechanic on "Busy".
+$active_stmt = $pdo->prepare("
+    SELECT
+        (SELECT COUNT(*) FROM emergency_service_requests WHERE assigned_mechanic_id = ? AND request_status = 'in_progress') +
+        (SELECT COUNT(*) FROM bookings WHERE mechanic_id = ? AND status = 'in_progress') +
+        (SELECT COUNT(*) FROM booking_mechanics bm JOIN bookings b ON b.id = bm.booking_id WHERE bm.mechanic_id = ? AND b.status = 'in_progress')
+");
+$active_stmt->execute([$mechanic_id, $mechanic_id, $mechanic_id]);
+$has_active_job = (int) $active_stmt->fetchColumn() > 0;
 
 // Handle job status actions
 $msg = '';
@@ -147,14 +158,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (!empty($_POST['set_availability'])) {
             $new_status = $_POST['availability_status'] ?? '';
             if (in_array($new_status, ['Available', 'Off-Duty'], true)) {
-                $avail_stmt = $pdo->prepare("UPDATE mechanics SET status = ? WHERE id = ? AND status != 'Busy'");
-                $avail_stmt->execute([$new_status, $mechanic_id]);
-                if ($avail_stmt->rowCount() > 0) {
+                if ($has_active_job) {
+                    $msg = "❌ Cannot change status while you are on an active job.";
+                    $msg_type = "error";
+                } else {
+                    $avail_stmt = $pdo->prepare("UPDATE mechanics SET status = ? WHERE id = ?");
+                    $avail_stmt->execute([$new_status, $mechanic_id]);
                     $msg = "✅ Status updated to {$new_status}.";
                     $msg_type = "success";
-                } else {
-                    $msg = "❌ Cannot change status while you are Busy.";
-                    $msg_type = "error";
                 }
                 // Refresh mechanic status
                 $mechanic_stmt->execute([$user_id]);
@@ -755,16 +766,16 @@ $activity_items = array_slice($activity_items, 0, 5);
             <div class="seg-toggle">
                 <form method="POST" action="dashboard_mechanic.php">
                     <input type="hidden" name="availability_status" value="Off-Duty">
-                    <button type="submit" name="set_availability" class="seg-btn <?= $isOffDuty ? 'active off' : '' ?>" <?= $isBusy ? 'disabled title="Finish current work first"' : '' ?>>Off Duty</button>
+                    <button type="submit" name="set_availability" class="seg-btn <?= $isOffDuty ? 'active off' : '' ?>" <?= $has_active_job ? 'disabled title="Finish your active job first"' : '' ?>>Off Duty</button>
                 </form>
                 <form method="POST" action="dashboard_mechanic.php">
                     <input type="hidden" name="availability_status" value="Available">
-                    <button type="submit" name="set_availability" class="seg-btn <?= !$isOffDuty ? 'active on' : '' ?>" <?= $isBusy ? 'disabled title="Finish current work first"' : '' ?>>On Duty</button>
+                    <button type="submit" name="set_availability" class="seg-btn <?= !$isOffDuty ? 'active on' : '' ?>" <?= $has_active_job ? 'disabled title="Finish your active job first"' : '' ?>>On Duty</button>
                 </form>
             </div>
             <div class="stat-sub">
                 <span class="live-dot <?= $isOffDuty ? 'off' : '' ?>"></span>
-                <?= $isBusy ? "You're on a job right now." : ($isOffDuty ? "You're off duty. Not receiving assignments." : "You're currently on duty. Ready for assigned jobs.") ?>
+                <?= $has_active_job ? "You're on a job right now." : ($isOffDuty ? "You're off duty. Not receiving assignments." : "You're currently on duty. Ready for assigned jobs.") ?>
             </div>
         </div>
         <div class="stat-card">
@@ -1014,7 +1025,8 @@ $activity_items = array_slice($activity_items, 0, 5);
     trendGrad.addColorStop(0, 'rgba(245,158,11,0.28)');
     trendGrad.addColorStop(1, 'rgba(245,158,11,0.02)');
 
-    new Chart(trendCtx, {
+    const isDarkMode = () => document.documentElement.getAttribute('data-theme') === 'dark';
+    const trendChart = new Chart(trendCtx, {
         type: 'line',
         data: {
             labels: <?= $trendLabelsJson ?>,
@@ -1027,7 +1039,7 @@ $activity_items = array_slice($activity_items, 0, 5);
                 tension: 0.4,
                 pointRadius: 4,
                 pointBackgroundColor: '#f59e0b',
-                pointBorderColor: '#fff',
+                pointBorderColor: isDarkMode() ? '#0a0f1e' : '#fff',
                 pointBorderWidth: 2,
                 borderWidth: 2.5
             }]
@@ -1036,12 +1048,22 @@ $activity_items = array_slice($activity_items, 0, 5);
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#F1F4F9' } },
-                x: { grid: { display: false } }
+                y: { beginAtZero: true, ticks: { precision: 0, color: isDarkMode() ? '#94a3b8' : '#666' }, grid: { color: isDarkMode() ? 'rgba(255,255,255,0.08)' : '#F1F4F9' } },
+                x: { ticks: { color: isDarkMode() ? '#94a3b8' : '#666' }, grid: { display: false } }
             },
             plugins: { legend: { display: false } }
         }
     });
+
+    // Recolor chart when the theme toggles
+    new MutationObserver(() => {
+        const dark = isDarkMode();
+        trendChart.data.datasets[0].pointBorderColor = dark ? '#0a0f1e' : '#fff';
+        trendChart.options.scales.y.ticks.color = dark ? '#94a3b8' : '#666';
+        trendChart.options.scales.y.grid.color = dark ? 'rgba(255,255,255,0.08)' : '#F1F4F9';
+        trendChart.options.scales.x.ticks.color = dark ? '#94a3b8' : '#666';
+        trendChart.update();
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 </script>
 
 <?php include 'mechanic_sidebar_footer.php'; ?>

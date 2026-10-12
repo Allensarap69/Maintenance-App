@@ -1883,7 +1883,7 @@ $alerts = array_slice($alerts, 0, 5);
         html[data-theme="dark"] .dc-card.dc-gold,
         html[data-theme="dark"] .dc-card.dc-amber,
         html[data-theme="dark"] .dc-card.dc-blue {
-            background: linear-gradient(135deg, #22335a 0%, #1a2b4f 100%) !important;
+            background: linear-gradient(135deg, #1a2340 0%, #141b30 100%) !important;
         }
         html[data-theme="dark"] .dc-card .dc-icon, html[data-theme="dark"] .dc-card .dc-arrow { color: #93c5fd !important; }
         html[data-theme="dark"] .dc-title { color: #cbd5e1 !important; }
@@ -1893,7 +1893,7 @@ $alerts = array_slice($alerts, 0, 5);
         html[data-theme="dark"] .veh-switch-head h2 { color: #e2e8f0 !important; }
         html[data-theme="dark"] .veh-switch-link { color: #94a3b8 !important; }
         html[data-theme="dark"] .veh-switch-link:hover { color: #FDE047 !important; }
-        html[data-theme="dark"] .veh-chip { background: #1a2b4f !important; border-color: rgba(255, 255, 255, 0.12) !important; }
+        html[data-theme="dark"] .veh-chip { background: #141b30 !important; border-color: rgba(255, 255, 255, 0.12) !important; }
         html[data-theme="dark"] .veh-chip:hover { border-color: rgba(59, 130, 246, 0.5) !important; }
         html[data-theme="dark"] .veh-chip.selected { border-color: #FACC15 !important; background: rgba(250, 204, 21, 0.08) !important; }
         html[data-theme="dark"] .veh-chip-img { background: transparent !important; color: #94a3b8 !important; }
@@ -1910,7 +1910,7 @@ $alerts = array_slice($alerts, 0, 5);
         html[data-theme="dark"] .ua-card, html[data-theme="dark"] .al-card,
         html[data-theme="dark"] .tip-card, html[data-theme="dark"] .qa-bar,
         html[data-theme="dark"] .no-motorcycles {
-            background: #1a2b4f !important;
+            background: #141b30 !important;
             border-color: rgba(255, 255, 255, 0.1) !important;
             color: #e2e8f0 !important;
         }
@@ -1931,7 +1931,7 @@ $alerts = array_slice($alerts, 0, 5);
         html[data-theme="dark"] .ua-head-ico, html[data-theme="dark"] .al-head-ico,
         html[data-theme="dark"] .ua-link, html[data-theme="dark"] .stl-link { color: #93c5fd !important; }
         html[data-theme="dark"] .ua-link:hover, html[data-theme="dark"] .stl-link:hover { color: #FDE047 !important; }
-        html[data-theme="dark"] .ua-body { background: #16233f !important; }
+        html[data-theme="dark"] .ua-body { background: #161e33 !important; }
         html[data-theme="dark"] .ua-service-ico { background: rgba(59, 130, 246, 0.15) !important; }
         html[data-theme="dark"] .vov-bike-img { background: transparent !important; }
         html[data-theme="dark"] .vov-bike-img img { mix-blend-mode: normal; }
@@ -1949,8 +1949,8 @@ $alerts = array_slice($alerts, 0, 5);
         html[data-theme="dark"] .vov-comp-caret, html[data-theme="dark"] .al-caret { color: #64748b !important; }
 
         /* Service timeline */
-        html[data-theme="dark"] .stl-head-ico { background: #22335a !important; color: #93c5fd !important; }
-        html[data-theme="dark"] .stl-item::before { background: #3b4d7d !important; }
+        html[data-theme="dark"] .stl-head-ico { background: #1a2340 !important; color: #93c5fd !important; }
+        html[data-theme="dark"] .stl-item::before { background: #2a3350 !important; }
         html[data-theme="dark"] .stl-item.completed::before { background: #10B981 !important; }
         html[data-theme="dark"] .stl-dot { box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2) !important; }
         html[data-theme="dark"] .stl-item.upcoming .stl-dot { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important; }
@@ -1962,7 +1962,7 @@ $alerts = array_slice($alerts, 0, 5);
 
         /* Alerts & tip cards */
         html[data-theme="dark"] .al-count { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
-        html[data-theme="dark"] .al-item { background: #22335a !important; border-color: rgba(255, 255, 255, 0.09) !important; }
+        html[data-theme="dark"] .al-item { background: #1a2340 !important; border-color: rgba(255, 255, 255, 0.09) !important; }
         html[data-theme="dark"] .al-ico.red { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
         html[data-theme="dark"] .al-ico.amber { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
         html[data-theme="dark"] .tip-ico { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
@@ -1970,8 +1970,8 @@ $alerts = array_slice($alerts, 0, 5);
         /* Health ring inner disc + track */
         html[data-theme="dark"] .vov-ring {
             background:
-                radial-gradient(closest-side, #1a2b4f 80%, transparent 81% 100%),
-                conic-gradient(var(--c, #10B981) calc(var(--p, 0) * 1%), #3b4d7d 0) !important;
+                radial-gradient(closest-side, #141b30 80%, transparent 81% 100%),
+                conic-gradient(var(--c, #10B981) calc(var(--p, 0) * 1%), #2a3350 0) !important;
         }
 
         /* Quick action bar */

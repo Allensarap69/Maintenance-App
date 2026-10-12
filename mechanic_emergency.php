@@ -41,7 +41,7 @@ $sync_stmt->execute([$mechanic_id]);
 $open_emergency_count = (int) $sync_stmt->fetchColumn();
 
 if ($open_emergency_count > 0) {
-    $pdo->prepare("UPDATE mechanics SET status = 'Busy' WHERE id = ? AND status != 'Busy'")->execute([$mechanic_id]);
+    $pdo->prepare("UPDATE mechanics SET status = 'Busy' WHERE id = ? AND status NOT IN ('Busy','Off-Duty')")->execute([$mechanic_id]);
 } else {
     $booking_check = $pdo->prepare("
         SELECT COUNT(*) FROM bookings
@@ -55,7 +55,7 @@ if ($open_emergency_count > 0) {
     $current_booking = $current->fetchColumn();
 
     if ($open_bookings === 0 && empty($current_booking)) {
-        $pdo->prepare("UPDATE mechanics SET status = 'Available' WHERE id = ? AND status != 'Available'")->execute([$mechanic_id]);
+        $pdo->prepare("UPDATE mechanics SET status = 'Available' WHERE id = ? AND status = 'Busy'")->execute([$mechanic_id]);
     }
 }
 
@@ -699,14 +699,117 @@ include 'mechanic_sidebar.php';
             return Math.round(seconds / 60) + ' min';
         }
 
+        function metersBetween(aLat, aLng, bLat, bLng) {
+            var R = 6371000, rad = Math.PI / 180;
+            var dLat = (bLat - aLat) * rad, dLng = (bLng - aLng) * rad;
+            var h = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(aLat * rad) * Math.cos(bLat * rad) *
+                    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+            return 2 * R * Math.asin(Math.sqrt(h));
+        }
+
         document.querySelectorAll('.emergency-map').forEach(function (mapEl) {
             var modal = mapEl.closest('.modal');
             if (!modal) return;
+
+            var custLat = null, custLng = null, customerMarker = null;
+            var tracker = { watchId: null, mechMarker: null, accCircle: null, routeLine: null, straightLine: null, lastRouted: null, lastFetch: 0, fitted: false };
+
+            function onPosition(pos) {
+                var map = mapEl._leaflet_map;
+                if (!map || custLat === null) return;
+                var mechLat = pos.coords.latitude;
+                var mechLng = pos.coords.longitude;
+                var accuracy = pos.coords.accuracy || 0;
+
+                if (!tracker.mechMarker) {
+                    var mechanicIcon = L.divIcon({
+                        className: 'mechanic-map-marker',
+                        html: '<div class="mechanic-marker-pin"><i class="bi bi-wrench"></i></div>',
+                        iconSize: [34, 34],
+                        iconAnchor: [17, 34],
+                        popupAnchor: [0, -36]
+                    });
+                    tracker.mechMarker = L.marker([mechLat, mechLng], { icon: mechanicIcon }).addTo(map);
+                    tracker.mechMarker.bindPopup('');
+                    tracker.accCircle = L.circle([mechLat, mechLng], {
+                        color: '#22c55e',
+                        fillColor: '#22c55e',
+                        fillOpacity: 0.08,
+                        radius: accuracy,
+                        weight: 1.5,
+                        dashArray: '4, 4'
+                    }).addTo(map);
+                } else {
+                    tracker.mechMarker.setLatLng([mechLat, mechLng]);
+                    tracker.accCircle.setLatLng([mechLat, mechLng]);
+                    tracker.accCircle.setRadius(accuracy);
+                }
+                tracker.mechMarker.setPopupContent('<div class="text-center"><strong class="d-block text-success">My Location</strong><span class="small text-muted">' + mechLat.toFixed(7) + ', ' + mechLng.toFixed(7) + '</span><br><span class="small ' + (accuracy <= 50 ? 'text-success' : 'text-warning') + '">±' + Math.round(accuracy) + ' m accuracy</span></div>');
+
+                // Dashed straight line tracks the mechanic instantly while the road route refreshes
+                if (!tracker.straightLine) {
+                    tracker.straightLine = L.polyline([[mechLat, mechLng], [custLat, custLng]], {
+                        color: '#3b82f6', weight: 3, opacity: 0.7, dashArray: '8, 8'
+                    }).addTo(map);
+                } else {
+                    tracker.straightLine.setLatLngs([[mechLat, mechLng], [custLat, custLng]]);
+                }
+
+                // Re-route at most every 15s and only after moving >30m (protects the OSRM server)
+                var now = Date.now();
+                var movedEnough = !tracker.lastRouted || metersBetween(mechLat, mechLng, tracker.lastRouted[0], tracker.lastRouted[1]) > 30;
+                if (movedEnough && now - tracker.lastFetch > 15000) {
+                    tracker.lastFetch = now;
+                    tracker.lastRouted = [mechLat, mechLng];
+                    fetch('https://router.project-osrm.org/route/v1/driving/' + mechLng + ',' + mechLat + ';' + custLng + ',' + custLat + '?overview=full&geometries=geojson')
+                        .then(function (res) { return res.json(); })
+                        .then(function (data) {
+                            if (data.routes && data.routes.length > 0) {
+                                var route = data.routes[0];
+                                var routeCoords = route.geometry.coordinates.map(function (c) { return [c[1], c[0]]; });
+                                if (tracker.routeLine) {
+                                    tracker.routeLine.setLatLngs(routeCoords);
+                                } else {
+                                    tracker.routeLine = L.polyline(routeCoords, {
+                                        color: '#2563eb', weight: 5, opacity: 0.85, lineCap: 'round', lineJoin: 'round'
+                                    }).addTo(map);
+                                }
+                                map.removeLayer(tracker.straightLine);
+                                customerMarker.setPopupContent('<div class="text-center"><strong class="d-block text-primary">Customer Location</strong><span class="small text-muted">' + custLat.toFixed(7) + ', ' + custLng.toFixed(7) + '</span><hr class="my-1"><span class="small text-success"><i class="bi bi-car-front me-1"></i>' + formatDistance(route.distance) + ' &bull; ' + formatDuration(route.duration) + '</span></div>');
+                                if (!tracker.fitted) {
+                                    map.fitBounds(tracker.routeLine.getBounds(), { padding: [50, 50], maxZoom: 16 });
+                                    tracker.fitted = true;
+                                }
+                            } else if (!tracker.fitted) {
+                                map.fitBounds(L.latLngBounds([[mechLat, mechLng], [custLat, custLng]]), { padding: [50, 50], maxZoom: 16 });
+                                tracker.fitted = true;
+                            }
+                        })
+                        .catch(function () {
+                            if (!tracker.fitted) {
+                                map.fitBounds(L.latLngBounds([[mechLat, mechLng], [custLat, custLng]]), { padding: [50, 50], maxZoom: 16 });
+                                tracker.fitted = true;
+                            }
+                        });
+                }
+            }
+
+            // Stop GPS watch when the modal closes (battery + privacy)
+            modal.addEventListener('hidden.bs.modal', function () {
+                if (tracker.watchId !== null) {
+                    navigator.geolocation.clearWatch(tracker.watchId);
+                    tracker.watchId = null;
+                }
+                tracker.fitted = false;
+            });
 
             modal.addEventListener('shown.bs.modal', function () {
                 var lat = parseFloat(mapEl.dataset.lat);
                 var lng = parseFloat(mapEl.dataset.lng);
                 if (isNaN(lat) || isNaN(lng)) return;
+                custLat = lat;
+                custLng = lng;
 
                 if (!mapEl._leaflet_map) {
                     mapEl._leaflet_map = L.map(mapEl.id).setView([lat, lng], 15);
@@ -723,7 +826,7 @@ include 'mechanic_sidebar.php';
                         popupAnchor: [0, -46]
                     });
 
-                    var customerMarker = L.marker([lat, lng], { icon: customerIcon, zIndexOffset: 100 }).addTo(mapEl._leaflet_map);
+                    customerMarker = L.marker([lat, lng], { icon: customerIcon, zIndexOffset: 100 }).addTo(mapEl._leaflet_map);
                     customerMarker.bindPopup('<div class="text-center"><strong class="d-block text-primary">Customer Location</strong><span class="small text-muted" id="customerCoords">' + lat.toFixed(7) + ', ' + lng.toFixed(7) + '</span></div>').openPopup();
 
                     L.circle([lat, lng], {
@@ -733,63 +836,17 @@ include 'mechanic_sidebar.php';
                         radius: 200,
                         weight: 2
                     }).addTo(mapEl._leaflet_map);
+                }
 
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(function (pos) {
-                            var mechLat = pos.coords.latitude;
-                            var mechLng = pos.coords.longitude;
-
-                            var mechanicIcon = L.divIcon({
-                                className: 'mechanic-map-marker',
-                                html: '<div class="mechanic-marker-pin"><i class="bi bi-wrench"></i></div>',
-                                iconSize: [34, 34],
-                                iconAnchor: [17, 34],
-                                popupAnchor: [0, -36]
-                            });
-
-                            var mechanicMarker = L.marker([mechLat, mechLng], { icon: mechanicIcon }).addTo(mapEl._leaflet_map);
-                            mechanicMarker.bindPopup('<div class="text-center"><strong class="d-block text-success">My Location</strong><span class="small text-muted">' + mechLat.toFixed(7) + ', ' + mechLng.toFixed(7) + '</span></div>');
-
-                            var straightLine = L.polyline([[mechLat, mechLng], [lat, lng]], {
-                                color: '#3b82f6',
-                                weight: 3,
-                                opacity: 0.7,
-                                dashArray: '8, 8'
-                            }).addTo(mapEl._leaflet_map);
-
-                            var bounds = L.latLngBounds([[mechLat, mechLng], [lat, lng]]);
-
-                            fetch('https://router.project-osrm.org/route/v1/driving/' + mechLng + ',' + mechLat + ';' + lng + ',' + lat + '?overview=full&geometries=geojson')
-                                .then(function (res) { return res.json(); })
-                                .then(function (data) {
-                                    if (data.routes && data.routes.length > 0) {
-                                        var route = data.routes[0];
-                                        var routeCoords = route.geometry.coordinates.map(function (c) { return [c[1], c[0]]; });
-
-                                        mapEl._leaflet_map.removeLayer(straightLine);
-                                        var roadLine = L.polyline(routeCoords, {
-                                            color: '#2563eb',
-                                            weight: 5,
-                                            opacity: 0.85,
-                                            lineCap: 'round',
-                                            lineJoin: 'round'
-                                        }).addTo(mapEl._leaflet_map);
-
-                                        customerMarker.setPopupContent('<div class="text-center"><strong class="d-block text-primary">Customer Location</strong><span class="small text-muted">' + lat.toFixed(7) + ', ' + lng.toFixed(7) + '</span><hr class="my-1"><span class="small text-success"><i class="bi bi-car-front me-1"></i>' + formatDistance(route.distance) + ' &bull; ' + formatDuration(route.duration) + '</span></div>');
-
-                                        bounds = roadLine.getBounds();
-                                        mapEl._leaflet_map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
-                                    } else {
-                                        mapEl._leaflet_map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
-                                    }
-                                })
-                                .catch(function () {
-                                    mapEl._leaflet_map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
-                                });
-                        }, function () {
-                            // Geolocation denied or unavailable
-                        }, { enableHighAccuracy: true, timeout: 10000 });
-                    }
+                // (Re)start live GPS tracking each time the modal opens
+                if (navigator.geolocation && tracker.watchId === null) {
+                    tracker.watchId = navigator.geolocation.watchPosition(onPosition, function () {
+                        // Geolocation denied or unavailable — customer pin still shows
+                    }, {
+                        enableHighAccuracy: true,
+                        timeout: 20000,
+                        maximumAge: 0
+                    });
                 }
 
                 setTimeout(function () {

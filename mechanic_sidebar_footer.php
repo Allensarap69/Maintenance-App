@@ -104,19 +104,19 @@
         .bg-animation, .floating-tools, .header-floating-icons { display: none; }
         .sidebar-brand span { color: var(--text-dark); }
 
-        .sidebar { background: #ffffff; }
-        .sidebar-header { background: #ffffff; }
-        .menu-title { background: #ffffff; color: rgba(30, 41, 59, 0.4); }
-        .menu-item { color: var(--text-dark); }
-        .sidebar-brand { color: var(--text-dark); }
+        html[data-theme="light"] .sidebar { background: #ffffff; }
+        html[data-theme="light"] .sidebar-header { background: #ffffff; }
+        html[data-theme="light"] .menu-title { background: #ffffff; color: rgba(30, 41, 59, 0.4); }
+        html[data-theme="light"] .menu-item { color: var(--text-dark); }
+        html[data-theme="light"] .sidebar-brand { color: var(--text-dark); }
         .sidebar::-webkit-scrollbar-thumb, .sidebar-menu::-webkit-scrollbar-thumb { background: rgba(30, 41, 59, 0.2); }
 
         .sidebar::-webkit-scrollbar, .sidebar-menu::-webkit-scrollbar { width: 0; height: 0; }
         .sidebar, .sidebar-menu { scrollbar-width: none; }
         .sidebar-brand i { background: var(--accent-gradient) !important; -webkit-background-clip: text !important; background-clip: text !important; color: transparent !important; }
-        .menu-item:hover, .menu-item.active { color: #FACC15; background: rgba(30,58,95,0.1); }
+        html[data-theme="light"] .menu-item:hover, html[data-theme="light"] .menu-item.active { color: #FACC15; background: rgba(30,58,95,0.1); }
         .menu-item::before { background: var(--accent-gradient) !important; }
-        .top-header { background: rgba(255,255,255,0.95) !important; border-bottom: 2px solid #FACC15 !important; box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important; }
+        html[data-theme="light"] .top-header { background: rgba(255,255,255,0.95) !important; border-bottom: 2px solid #FACC15 !important; box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important; }
         .top-header .page-title { color: var(--text-dark) !important; }
         .top-header .page-title i { color: #FACC15 !important; background: none !important; -webkit-background-clip: initial !important; background-clip: initial !important; }
         .top-header .text-muted { color: var(--text-dark) !important; }

@@ -214,21 +214,40 @@ require 'admin_sidebar_template.php';
         }
         .pinv-iconbtn { width:28px; height:28px; padding:0; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; }
         .pinv-iconbtn i { font-size:.75rem; }
-        .pinv-step { width:24px; height:24px; }
         .pinv-stockbar { height:4px; width:64px; background:#e2e8f0; border-radius:99px; overflow:hidden; margin-top:4px; }
         .pinv-stockbar-fill { height:100%; background:#10b981; }
         .pinv-stockbar-fill.is-low { background:#ef4444; }
         .pinv-margin { font-size:.68rem; }
+        .pinv-partcell { display:flex; align-items:center; gap:.55rem; min-width:0; }
+        .pinv-part-avatar { width:32px; height:32px; border-radius:9px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:.8rem; background:#eff6ff; color:#1d4ed8; border:1px solid #dbeafe; }
+        .pinv-part-name { font-weight:600; font-size:.83rem; line-height:1.2; color:#1e293b; }
+        .pinv-part-meta { font-size:.66rem; color:#94a3b8; white-space:nowrap; }
+        .pinv-cat { font-size:.64rem; font-weight:700; padding:.18rem .55rem; border-radius:999px; background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; white-space:nowrap; }
+        .pinv-reorder-hint { font-size:.62rem; color:#94a3b8; white-space:nowrap; }
+        .pinv-count-badge { font-size:.64rem; font-weight:700; background:rgba(59,130,246,.1); color:#1d4ed8; border-radius:999px; padding:.15rem .55rem; white-space:nowrap; }
+        .pinv-toolbar { display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin-bottom:.6rem; }
+        .pinv-search-wrap { position:relative; flex:1 1 220px; max-width:320px; margin:0; }
+        .pinv-search-wrap > i { position:absolute; left:.65rem; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:.75rem; pointer-events:none; }
+        .pinv-search-wrap .form-control { padding-left:1.75rem; border-radius:999px; background:#f8fafc; }
+        .pinv-search-wrap .form-control:focus { background:#fff; }
+        .pinv-toolbar-actions { display:flex; gap:.4rem; margin-left:auto; flex-wrap:wrap; }
+        .pinv-card-footer { border-top:1px solid #eef2f7; padding:.45rem 1rem; font-size:.7rem; color:#64748b; display:flex; gap:1.1rem; flex-wrap:wrap; align-items:center; }
+        .pinv-card-footer i { opacity:.7; }
+        html[data-theme="dark"] .pinv-part-avatar { background:rgba(59,130,246,.12); color:#93c5fd; border-color:rgba(59,130,246,.25); }
+        html[data-theme="dark"] .pinv-part-name { color:#e2e8f0; }
+        html[data-theme="dark"] .pinv-cat { background:rgba(255,255,255,.06); color:#cbd5e1; border-color:rgba(255,255,255,.12); }
+        html[data-theme="dark"] .pinv-count-badge { background:rgba(59,130,246,.18); color:#93c5fd; }
+        html[data-theme="dark"] .pinv-search-wrap .form-control { background:#161e33; }
+        html[data-theme="dark"] .pinv-search-wrap > i { color:#64748b; }
+        html[data-theme="dark"] .pinv-card-footer { border-color:rgba(255,255,255,.09); color:#94a3b8; }
         html[data-theme="dark"] .pinv-stockbar { background:rgba(255,255,255,.1); }
-        .pinv-table-scroll::-webkit-scrollbar { width:6px; }
-        .pinv-table-scroll::-webkit-scrollbar-thumb { background:rgba(100,116,139,.3); border-radius:3px; }
-        /* Usage list scrolls with the wheel but shows no scrollbar (both themes) */
-        .pinv-usage-scroll { scrollbar-width:none; -ms-overflow-style:none; }
-        .pinv-usage-scroll::-webkit-scrollbar { display:none; }
+        /* Scroll areas work with the wheel but show no scrollbar (both themes) */
+        .pinv-table-scroll, .pinv-usage-scroll { scrollbar-width:none; -ms-overflow-style:none; }
+        .pinv-table-scroll::-webkit-scrollbar, .pinv-usage-scroll::-webkit-scrollbar { display:none; }
         .pinv-form .form-label { font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#64748b; margin-bottom:.15rem; }
         .pinv-form .form-control-sm { padding:.22rem .5rem; font-size:.8rem; }
         html[data-theme="dark"] .pinv-form .form-label { color:#94a3b8; }
-        html[data-theme="dark"] .pinv-stat { background:#1a2b4f; border-color:rgba(255,255,255,.09); box-shadow:0 4px 20px rgba(0,0,0,.35); }
+        html[data-theme="dark"] .pinv-stat { background:#141b30; border-color:rgba(255,255,255,.09); box-shadow:0 4px 20px rgba(0,0,0,.35); }
         html[data-theme="dark"] .pinv-stat-value { color:#e2e8f0; }
         html[data-theme="dark"] .pi-blue { color:#93c5fd; }
         html[data-theme="dark"] .pi-green { color:#34d399; }
@@ -240,7 +259,7 @@ require 'admin_sidebar_template.php';
         html[data-theme="dark"] .pinv-head-amber { background:rgba(245,158,11,.12); color:#fbbf24; }
         html[data-theme="dark"] .pinv-head-blue { background:rgba(59,130,246,.12); color:#93c5fd; }
         html[data-theme="dark"] .pinv-lowalert { background:rgba(245,158,11,.1); border-color:rgba(245,158,11,.3); color:#fbbf24; }
-        html[data-theme="dark"] .pinv-table thead th { background:#1a2b4f; color:#94a3b8; border-bottom-color:rgba(255,255,255,.09) !important; }
+        html[data-theme="dark"] .pinv-table thead th { background:#141b30; color:#94a3b8; border-bottom-color:rgba(255,255,255,.09) !important; }
         html[data-theme="dark"] .pinv-table .table-warning,
         html[data-theme="dark"] .table-warning { --bs-table-bg:rgba(245,158,11,.13); --bs-table-color:#e2e8f0; --bs-table-hover-bg:rgba(245,158,11,.2); --bs-table-hover-color:#e2e8f0; --bs-table-border-color:rgba(255,255,255,.09); }
     </style>
@@ -421,19 +440,9 @@ require 'admin_sidebar_template.php';
 
         <div class="col-lg-8">
             <div class="card h-100" id="pinvInventoryCard">
-                <div class="card-header pinv-head pinv-head-slate justify-content-between flex-wrap gap-2">
+                <div class="card-header pinv-head pinv-head-slate justify-content-between">
                     <span><i class="bi bi-boxes me-1"></i>Parts Inventory</span>
-                    <div class="d-flex gap-2 align-items-center flex-wrap">
-                        <button type="button" id="pinvLowOnly" class="btn btn-sm btn-outline-warning rounded-pill px-3 text-nowrap">
-                            <i class="bi bi-exclamation-triangle me-1"></i>Low only
-                        </button>
-                        <form method="GET" class="d-flex gap-2">
-                            <input type="text" id="pinvSearch" name="search" class="form-control form-control-sm" placeholder="Search parts..."
-                                   value="<?= htmlspecialchars($search) ?>">
-                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3">Search</button>
-                        </form>
-                        <button type="button" id="pinvExport" class="btn btn-sm btn-outline-secondary pinv-iconbtn" title="Export CSV"><i class="bi bi-download"></i></button>
-                    </div>
+                    <span class="pinv-count-badge"><?= count($parts) ?> items</span>
                 </div>
                 <div class="card-body">
                     <?php if (empty($parts)): ?>
@@ -442,6 +451,21 @@ require 'admin_sidebar_template.php';
                             <p class="mb-0 small">No parts found. Add your first part using the form on the left.</p>
                         </div>
                     <?php else: ?>
+                    <div class="pinv-toolbar">
+                        <form method="GET" class="pinv-search-wrap">
+                            <i class="bi bi-search"></i>
+                            <input type="text" id="pinvSearch" name="search" class="form-control form-control-sm" placeholder="Search parts, SKU, category, supplier..."
+                                   value="<?= htmlspecialchars($search) ?>">
+                        </form>
+                        <div class="pinv-toolbar-actions">
+                            <button type="button" id="pinvLowOnly" class="btn btn-sm btn-outline-warning rounded-pill px-3 text-nowrap">
+                                <i class="bi bi-exclamation-triangle me-1"></i>Low only
+                            </button>
+                            <button type="button" id="pinvExport" class="btn btn-sm btn-outline-secondary rounded-pill px-3 text-nowrap" title="Export CSV">
+                                <i class="bi bi-download me-1"></i>Export
+                            </button>
+                        </div>
+                    </div>
                     <div class="pinv-table-scroll">
                         <table class="table table-sm table-hover align-middle mb-0 pinv-table" id="pinvTable">
                             <thead>
@@ -452,7 +476,7 @@ require 'admin_sidebar_template.php';
                                     <th>Price</th>
                                     <th>Stock</th>
                                     <th>Restock</th>
-                                    <th></th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -469,15 +493,20 @@ require 'admin_sidebar_template.php';
                                     data-cost="<?= $p['unit_cost'] ?>" data-price="<?= $p['selling_price'] ?>"
                                     data-stock="<?= (int)$p['stock_qty'] ?>" data-reorder="<?= (int)$p['reorder_level'] ?>">
                                     <td>
-                                        <strong><?= htmlspecialchars($p['name']) ?></strong><br>
-                                        <small class="text-muted"><?= htmlspecialchars($p['sku'] ?? '—') ?> · <?= htmlspecialchars($p['supplier'] ?? 'no supplier') ?></small>
+                                        <div class="pinv-partcell">
+                                            <span class="pinv-part-avatar"><i class="bi bi-gear-fill"></i></span>
+                                            <div>
+                                                <div class="pinv-part-name"><?= htmlspecialchars($p['name']) ?></div>
+                                                <div class="pinv-part-meta"><?= htmlspecialchars($p['sku'] ?? '—') ?> · <?= htmlspecialchars($p['supplier'] ?? 'no supplier') ?></div>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($p['category']) ?></span></td>
+                                    <td><span class="pinv-cat"><?= htmlspecialchars($p['category']) ?></span></td>
                                     <td>₱<?= number_format($p['unit_cost'], 2) ?></td>
                                     <td>
                                         ₱<?= number_format($p['selling_price'], 2) ?>
                                         <?php if ($margin !== null): ?>
-                                        <br><small class="pinv-margin <?= $margin < 0 ? 'text-danger fw-bold' : 'text-muted' ?>"><?= ($margin >= 0 ? '+' : '') . number_format($margin, 0) ?>%</small>
+                                        <br><small class="pinv-margin <?= $margin < 0 ? 'text-danger fw-bold' : 'text-success' ?>"><?= ($margin >= 0 ? '+' : '') . number_format($margin, 0) ?>%</small>
                                         <?php endif; ?>
                                     </td>
                                     <td>
@@ -485,16 +514,15 @@ require 'admin_sidebar_template.php';
                                         <?php if ($is_out): ?><small class="text-danger fw-bold">out</small>
                                         <?php elseif ($is_low): ?><small class="text-danger">low</small><?php endif; ?>
                                         <div class="pinv-stockbar" title="Stock vs 2× reorder level"><div class="pinv-stockbar-fill <?= $is_low ? 'is-low' : '' ?>" style="width:<?= $fill ?>%"></div></div>
+                                        <div class="pinv-reorder-hint">restock at <?= (int)$p['reorder_level'] ?></div>
                                     </td>
                                     <td>
                                         <form method="POST" class="d-flex gap-1 align-items-center">
                                             <input type="hidden" name="adjust_stock" value="1">
                                             <input type="hidden" name="part_id" value="<?= (int)$p['id'] ?>">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary pinv-iconbtn pinv-step" data-step="-1" title="−1"><i class="bi bi-dash"></i></button>
-                                            <input type="number" name="delta" class="form-control form-control-sm" style="width:64px"
+                                            <input type="number" name="delta" class="form-control form-control-sm" style="width:70px"
                                                    placeholder="<?= $suggest > 0 ? "+$suggest" : '+10' ?>"
                                                    title="Negative to deduct<?= $suggest > 0 ? " · suggested +$suggest" : '' ?>">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary pinv-iconbtn pinv-step" data-step="1" title="+1"><i class="bi bi-plus"></i></button>
                                             <button class="btn btn-sm btn-outline-primary pinv-iconbtn" title="Apply stock change"><i class="bi bi-check-lg"></i></button>
                                         </form>
                                     </td>
@@ -510,6 +538,11 @@ require 'admin_sidebar_template.php';
                         </table>
                     </div>
                     <?php endif; ?>
+                </div>
+                <div class="pinv-card-footer">
+                    <span><i class="bi bi-boxes me-1"></i><?= count($parts) ?> shown</span>
+                    <span><i class="bi bi-stack me-1"></i><?= number_format((float)$stats['total_units']) ?> units on hand</span>
+                    <span><i class="bi bi-cash-stack me-1"></i>₱<?= number_format((float)$stats['stock_value'], 2) ?> stock value</span>
                 </div>
             </div>
         </div>
@@ -543,14 +576,6 @@ require 'admin_sidebar_template.php';
     if (lowBtn) lowBtn.addEventListener('click', function () {
         lowBtn.classList.toggle('active');
         applyFilters();
-    });
-
-    // Restock steppers — bump the delta input, admin confirms with the check button
-    document.addEventListener('click', function (e) {
-        var b = e.target.closest('.pinv-step');
-        if (!b) return;
-        var inp = b.parentElement.querySelector('input[name="delta"]');
-        if (inp) inp.value = (parseInt(inp.value, 10) || 0) + parseInt(b.dataset.step, 10);
     });
 
     // Export the currently visible rows to CSV

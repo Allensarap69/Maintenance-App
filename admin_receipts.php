@@ -161,21 +161,21 @@ require 'admin_sidebar_template.php';
     html[data-theme="dark"] .rct-dl dt { color:#94a3b8; }
     .rct-empty { text-align:center; padding:2.5rem 1rem; color:#94a3b8; }
     .rct-empty i { font-size:2rem; display:block; margin-bottom:.5rem; }
-    html[data-theme="dark"] .rct-stat { background:#1a2b4f; border-color:rgba(255,255,255,.09); box-shadow:0 4px 20px rgba(0,0,0,.35); }
+    html[data-theme="dark"] .rct-stat { background:#141b30; border-color:rgba(255,255,255,.09); box-shadow:0 4px 20px rgba(0,0,0,.35); }
     html[data-theme="dark"] .rct-stat-value { color:#e2e8f0; }
     html[data-theme="dark"] .i-blue { color:#93c5fd; }
     html[data-theme="dark"] .i-green { color:#34d399; }
     html[data-theme="dark"] .i-red { color:#f87171; }
     html[data-theme="dark"] .i-amber { color:#fbbf24; }
     html[data-theme="dark"] .rct-head { background:rgba(255,255,255,.03); color:#e2e8f0; border-color:rgba(255,255,255,.09); }
-    html[data-theme="dark"] .rct-pill { background:#16233f; border-color:#3b4d7d; color:#cbd5e1; }
+    html[data-theme="dark"] .rct-pill { background:#161e33; border-color:#2a3350; color:#cbd5e1; }
     html[data-theme="dark"] .rct-pill:hover { border-color:#FACC15; color:#fff; }
     html[data-theme="dark"] .rct-pill.active { background:#FACC15; border-color:#FACC15; color:#111827; }
-    html[data-theme="dark"] .rct-table thead th { background:#1a2b4f; color:#94a3b8; border-bottom-color:rgba(255,255,255,.09) !important; }
-    html[data-theme="dark"] .rct-nothumb { background:#16233f; color:#64748b; }
+    html[data-theme="dark"] .rct-table thead th { background:#141b30; color:#94a3b8; border-bottom-color:rgba(255,255,255,.09) !important; }
+    html[data-theme="dark"] .rct-nothumb { background:#161e33; color:#64748b; }
     html[data-theme="dark"] .rct-thumb { border-color:rgba(255,255,255,.12); }
     html[data-theme="dark"] .rct-ref { color:#94a3b8; }
-    html[data-theme="dark"] .modal-content { background:#16233f; color:#e2e8f0; }
+    html[data-theme="dark"] .modal-content { background:#161e33; color:#e2e8f0; }
 
     /* ===== Theme polish ===== */
     /* Segmented tab control — sliding gold thumb */
@@ -197,19 +197,19 @@ require 'admin_sidebar_template.php';
     .rct-search:focus, .rct-select:focus { border-color:#FACC15; box-shadow:0 0 0 3px rgba(250,204,21,.15); }
     .rct-thumb:hover { box-shadow:0 4px 14px rgba(15,23,42,.2); }
 
-    html[data-theme="dark"] .rct-seg { background:#16233f; box-shadow:inset 0 0 0 1px #3b4d7d; }
+    html[data-theme="dark"] .rct-seg { background:#161e33; box-shadow:inset 0 0 0 1px #2a3350; }
     html[data-theme="dark"] .rct-seg-btn { color:#94a3b8; }
     html[data-theme="dark"] .rct-seg-btn:hover { color:#e2e8f0; }
     html[data-theme="dark"] .rct-seg-btn.active { color:#111827; }
     html[data-theme="dark"] .rct-table { --bs-table-hover-bg: rgba(255,255,255,.05); --bs-table-color: #e2e8f0; --bs-table-border-color: rgba(255,255,255,.07); }
     html[data-theme="dark"] .rct-method.m-gcash { color:#93c5fd; border-color:rgba(147,197,253,.4); }
     html[data-theme="dark"] .rct-method.m-cash { color:#34d399; border-color:rgba(52,211,153,.35); }
-    html[data-theme="dark"] .rct-method.m-other { color:#94a3b8; border-color:#3b4d7d; }
+    html[data-theme="dark"] .rct-method.m-other { color:#94a3b8; border-color:#2a3350; }
     html[data-theme="dark"] .rct-search,
-    html[data-theme="dark"] .rct-select { background:#16233f; border-color:#3b4d7d; color:#e2e8f0; }
+    html[data-theme="dark"] .rct-select { background:#161e33; border-color:#2a3350; color:#e2e8f0; }
     html[data-theme="dark"] .rct-search::placeholder { color:#64748b; }
     /* Badges that ship with light-only colors */
-    html[data-theme="dark"] .rct-page .badge.bg-light { background:#22335a !important; color:#cbd5e1 !important; border-color:#3b4d7d !important; }
+    html[data-theme="dark"] .rct-page .badge.bg-light { background:#1a2340 !important; color:#cbd5e1 !important; border-color:#2a3350 !important; }
     html[data-theme="dark"] .rct-page .bg-success-subtle { background:rgba(16,185,129,.15) !important; color:#34d399 !important; border-color:rgba(16,185,129,.3) !important; }
     html[data-theme="dark"] .rct-page .bg-info { background:rgba(59,130,246,.25) !important; color:#bfdbfe !important; }
     html[data-theme="dark"] .rct-page .bg-warning { background:rgba(250,204,21,.2) !important; color:#fde047 !important; }
@@ -220,7 +220,7 @@ require 'admin_sidebar_template.php';
     html[data-theme="dark"] .rct-act { color:#94a3b8; }
     html[data-theme="dark"] .rct-act.rct-view:hover { color:#fbbf24; }
     html[data-theme="dark"] .rct-act.rct-print:hover { color:#93c5fd; }
-    html[data-theme="dark"] .modal-content { border:1px solid #3b4d7d; }
+    html[data-theme="dark"] .modal-content { border:1px solid #2a3350; }
     html[data-theme="dark"] .modal-header { border-bottom-color:rgba(255,255,255,.09); }
     html[data-theme="dark"] .modal .btn-close { filter:invert(1) grayscale(100%); }
     @media (min-width: 992px) {

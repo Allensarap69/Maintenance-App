@@ -410,7 +410,7 @@ foreach ($packages as $pkg) {
         }
 
         html[data-theme="dark"] .step-header {
-            background: #22335a;
+            background: #1a2340;
             color: #e2e8f0;
             border-bottom-color: rgba(255, 255, 255, 0.09);
         }

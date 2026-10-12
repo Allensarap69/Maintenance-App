@@ -223,7 +223,7 @@ html[data-theme="dark"] .pager-info { color: #94a3b8; }
 }
 html[data-theme="dark"] .pager-btn,
 html[data-theme="dark"] .pager-page {
-    background: #16233f;
+    background: #161e33;
     border-color: rgba(255, 255, 255, .09);
     color: #e2e8f0;
 }

@@ -673,19 +673,19 @@ $pageTitle = 'Motorcycle Health Scores';
     html[data-theme="dark"] .hs-stat-card { border-color: rgba(255, 255, 255, 0.12); }
     html[data-theme="dark"] .hs-stat-label { color: #94a3b8; }
     html[data-theme="dark"] .customer-row { border-color: rgba(250, 204, 21, 0.4); }
-    html[data-theme="dark"] .customer-row:hover { background: #22335a !important; border-color: #3b82f6; }
+    html[data-theme="dark"] .customer-row:hover { background: #1a2340 !important; border-color: #3b82f6; }
     html[data-theme="dark"] .customer-name { color: #e2e8f0; }
     html[data-theme="dark"] .customer-count { color: #94a3b8; }
     html[data-theme="dark"] .customer-row.customer-row-alert { background: rgba(239, 68, 68, 0.08) !important; border-color: rgba(239, 68, 68, 0.5); }
     html[data-theme="dark"] .customer-row.customer-row-alert:hover { background: rgba(239, 68, 68, 0.12) !important; }
     html[data-theme="dark"] .customer-alert-badge { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.4); }
-    html[data-theme="dark"] .health-event-card.cond-fair { background: #1a2b4f; border-color: rgba(250, 204, 21, 0.4); }
+    html[data-theme="dark"] .health-event-card.cond-fair { background: #141b30; border-color: rgba(250, 204, 21, 0.4); }
     html[data-theme="dark"] .health-event-card.cond-poor { background: #1a1525; border-color: rgba(239, 68, 68, 0.5); }
     html[data-theme="dark"] .event-icon { background: rgba(250, 204, 21, 0.15); }
     html[data-theme="dark"] .event-icon.icon-attention { background: rgba(239, 68, 68, 0.15); }
     html[data-theme="dark"] .event-icon.icon-needs { background: rgba(250, 204, 21, 0.15); }
     html[data-theme="dark"] .event-title { color: #e2e8f0; }
-    html[data-theme="dark"] .event-info-tag { background: #16233f; border-color: rgba(255, 255, 255, 0.12); color: #94a3b8; }
+    html[data-theme="dark"] .event-info-tag { background: #161e33; border-color: rgba(255, 255, 255, 0.12); color: #94a3b8; }
     html[data-theme="dark"] .event-subtitle, html[data-theme="dark"] .event-subtitle i { color: #94a3b8; }
     html[data-theme="dark"] .status-needs { background: rgba(250, 204, 21, 0.15); color: #FDE047; }
     html[data-theme="dark"] .status-good { background: rgba(16, 185, 129, 0.15); color: #34d399; }
@@ -701,7 +701,7 @@ $pageTitle = 'Motorcycle Health Scores';
     html[data-theme="dark"] .detail-row { border-bottom-color: rgba(255, 255, 255, 0.09); }
     html[data-theme="dark"] .detail-label { color: #94a3b8; }
     html[data-theme="dark"] .detail-value { color: #e2e8f0; }
-    html[data-theme="dark"] .detail-gauge-marker { background: #1a2b4f; border-color: #475569; }
+    html[data-theme="dark"] .detail-gauge-marker { background: #141b30; border-color: #475569; }
     html[data-theme="dark"] .hs-moto-thumb { mix-blend-mode: normal; }
 
     /* Inline-style fixes (readonly inputs, recommendation boxes) */
@@ -714,7 +714,7 @@ $pageTitle = 'Motorcycle Health Scores';
     html[data-theme="dark"] .main-content [style*="background: #fee2e2"],
     html[data-theme="dark"] .main-content [style*="background:#fee2e2"] { background: rgba(239, 68, 68, 0.1) !important; }
     html[data-theme="dark"] .modal [style*="background: #ffffff"],
-    html[data-theme="dark"] .modal [style*="background:#ffffff"] { background: #16233f !important; }
+    html[data-theme="dark"] .modal [style*="background:#ffffff"] { background: #161e33 !important; }
 </style>
 
 <div class="container-fluid hs-content">

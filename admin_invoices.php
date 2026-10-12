@@ -234,7 +234,7 @@ require 'admin_sidebar_template.php';
         .inv-page .table-sm > :not(caption) > * > * { padding:.32rem .5rem; }
         .inv-page .form-label { font-size:.68rem; font-weight:600; color:#64748b; margin-bottom:.15rem; }
         html[data-theme="dark"] .inv-page .form-label { color:#94a3b8; }
-        html[data-theme="dark"] .inv-stat { background:#1a2b4f; border-color:rgba(255,255,255,.09); box-shadow:0 4px 20px rgba(0,0,0,.35); }
+        html[data-theme="dark"] .inv-stat { background:#141b30; border-color:rgba(255,255,255,.09); box-shadow:0 4px 20px rgba(0,0,0,.35); }
         html[data-theme="dark"] .inv-stat-label { color:#94a3b8; }
         html[data-theme="dark"] .inv-stat-value { color:#e2e8f0; }
         html[data-theme="dark"] .i-blue { background:rgba(59,130,246,.18); color:#93c5fd; }
@@ -246,11 +246,11 @@ require 'admin_sidebar_template.php';
         html[data-theme="dark"] .inv-head-green { background:rgba(16,185,129,.12); color:#34d399; }
         html[data-theme="dark"] .inv-head-amber { background:rgba(245,158,11,.12); color:#fbbf24; }
         html[data-theme="dark"] .inv-head-blue { background:rgba(59,130,246,.12); color:#93c5fd; }
-        html[data-theme="dark"] .inv-pill { background:#16233f; border-color:#3b4d7d; color:#cbd5e1; }
+        html[data-theme="dark"] .inv-pill { background:#161e33; border-color:#2a3350; color:#cbd5e1; }
         html[data-theme="dark"] .inv-pill:hover { border-color:#FACC15; color:#fff; }
         html[data-theme="dark"] .inv-pill.active { background:#FACC15; border-color:#FACC15; color:#111827; }
-        html[data-theme="dark"] .pay-card { background:#16233f; border-color:rgba(255,255,255,.09); }
-        html[data-theme="dark"] .inv-table thead th { background:#1a2b4f; color:#94a3b8; border-bottom-color:rgba(255,255,255,.09) !important; }
+        html[data-theme="dark"] .pay-card { background:#161e33; border-color:rgba(255,255,255,.09); }
+        html[data-theme="dark"] .inv-table thead th { background:#141b30; color:#94a3b8; border-bottom-color:rgba(255,255,255,.09) !important; }
         /* Dark mode: outline buttons via Bootstrap vars so every state stays readable */
         html[data-theme="dark"] .inv-page .btn-outline-primary {
             --bs-btn-color:#93c5fd; --bs-btn-border-color:rgba(147,197,253,.45);

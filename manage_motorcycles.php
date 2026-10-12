@@ -256,20 +256,8 @@ try {
         $where .= " AND (m.brand LIKE :search OR m.model LIKE :search OR m.plate_number LIKE :search OR u.username LIKE :search)";
     }
 
-    // Pagination: count matching rows first, then fetch this page only
-    require_once __DIR__ . '/pagination_helper.php';
-    $count_stmt = $pdo->prepare("SELECT COUNT(*)" . $where);
-    if ($current_status !== 'All') {
-        $count_stmt->bindValue(':status', $current_status);
-    }
-    if (!empty($search)) {
-        $count_stmt->bindValue(':search', "%$search%");
-    }
-    $count_stmt->execute();
-    $pg = paginate((int)$count_stmt->fetchColumn(), 10);
-
     $query = "SELECT m.*, u.username as customer_name, u.email as customer_email" . $where
-           . " ORDER BY m.brand ASC, m.model ASC LIMIT {$pg['per_page']} OFFSET {$pg['offset']}";
+           . " ORDER BY m.brand ASC, m.model ASC";
 
     $stmt = $pdo->prepare($query);
     
@@ -288,8 +276,6 @@ try {
 } catch (PDOException $e) {
     error_log("Error fetching motorcycles: " . $e->getMessage());
     $motorcycles = [];
-    require_once __DIR__ . '/pagination_helper.php';
-    $pg = paginate(0, 10);
 }
 
 $pageTitle = "Motorcycle Management";
@@ -906,9 +892,9 @@ require 'admin_sidebar_template.php';
     }
 
     /* Dark mode overrides */
-    html[data-theme="dark"] .moto-card { background: #1a2b4f !important; border-color: rgba(255, 255, 255, 0.12) !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .moto-card { background: #141b30 !important; border-color: rgba(255, 255, 255, 0.12) !important; color: #e2e8f0 !important; }
     html[data-theme="dark"] .moto-list-header {
-        background: #22335a !important;
+        background: #1a2340 !important;
         color: #93c5fd !important;
         border-bottom-color: rgba(255, 255, 255, 0.09) !important;
     }
@@ -923,12 +909,12 @@ require 'admin_sidebar_template.php';
     html[data-theme="dark"] .moto-status.archived { background: rgba(250, 204, 21, 0.15) !important; color: #FDE047 !important; }
 
     /* Model picker dropdown */
-    html[data-theme="dark"] .model-picker-toggle { background: #16233f !important; border-color: #3b4d7d !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .model-picker-toggle { background: #161e33 !important; border-color: #2a3350 !important; color: #e2e8f0 !important; }
     html[data-theme="dark"] .model-picker-toggle:hover,
     html[data-theme="dark"] .model-picker-toggle.open { border-color: #FACC15 !important; }
     html[data-theme="dark"] .model-picker-caret { color: #94a3b8 !important; }
-    html[data-theme="dark"] .model-picker-menu { background: #22335a !important; border-color: rgba(255, 255, 255, 0.1) !important; }
-    html[data-theme="dark"] .model-picker-option { background: #22335a !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .model-picker-menu { background: #1a2340 !important; border-color: rgba(255, 255, 255, 0.1) !important; }
+    html[data-theme="dark"] .model-picker-option { background: #1a2340 !important; color: #e2e8f0 !important; }
     html[data-theme="dark"] .model-picker-option:hover { background: #2a3d6b !important; }
     html[data-theme="dark"] .model-picker-option .model-picker-other-icon { color: #94a3b8 !important; }
     html[data-theme="dark"] .model-picker-thumb,
@@ -1063,7 +1049,6 @@ require 'admin_sidebar_template.php';
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
-    <?= render_pagination($pg) ?>
 </div>
 
 <!-- Add Motorcycle Modal -->

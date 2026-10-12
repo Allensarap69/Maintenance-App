@@ -274,8 +274,8 @@ require 'admin_sidebar_template.php';
     html[data-theme="dark"] .rep-kpi-ic { background:rgba(255,255,255,.06); background:color-mix(in srgb, currentColor 20%, transparent); }
     html[data-theme="dark"] .rep-rank { background:rgba(255,255,255,.1); color:#cbd5e1; }
     html[data-theme="dark"] .rep-rank-top { color:#fff; }
-    html[data-theme="dark"] .rep-list-scroll tbody tr.fw-bold td { background:color-mix(in srgb, var(--rep-acc,#3b82f6) 15%, #1a2b4f); }
-    html[data-theme="dark"] .rep-list-scroll thead th { background:#1a2b4f; color:#94a3b8; border-bottom-color:rgba(255,255,255,.09) !important; }
+    html[data-theme="dark"] .rep-list-scroll tbody tr.fw-bold td { background:color-mix(in srgb, var(--rep-acc,#3b82f6) 15%, #141b30); }
+    html[data-theme="dark"] .rep-list-scroll thead th { background:#141b30; color:#94a3b8; border-bottom-color:rgba(255,255,255,.09) !important; }
     html[data-theme="dark"] .rep-list-scroll tbody tr:hover { background:rgba(255,255,255,.04); }
     html[data-theme="dark"] .rep-list-scroll tbody tr.fw-bold { background:rgba(255,255,255,.05); }
     html[data-theme="dark"] .rep-bar { background:rgba(255,255,255,.1); }

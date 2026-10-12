@@ -410,27 +410,27 @@ try {
     html[data-theme="dark"] .emg-title i, html[data-theme="dark"] .qa-title i { color: #fbbf24 !important; }
     html[data-theme="dark"] .av-head i { color: #60a5fa !important; }
 
-    html[data-theme="dark"] .btn-view { background: #22335a !important; border-color: #3b4d7d !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .btn-view { background: #1a2340 !important; border-color: #2a3350 !important; color: #e2e8f0 !important; }
     html[data-theme="dark"] .btn-view:hover { border-color: #3b82f6 !important; color: #60a5fa !important; }
 
-    html[data-theme="dark"] .card-x.qa-card { background: #1a2b4f !important; border-color: rgba(250, 204, 21, 0.2) !important; }
-    html[data-theme="dark"] .qa-item { background: #16233f !important; border-color: rgba(255, 255, 255, 0.09) !important; color: #e2e8f0 !important; }
-    html[data-theme="dark"] .qa-item:hover { background: #16233f !important; border-color: #3b82f6 !important; color: #ffffff !important; }
+    html[data-theme="dark"] .card-x.qa-card { background: #141b30 !important; border-color: rgba(250, 204, 21, 0.2) !important; }
+    html[data-theme="dark"] .qa-item { background: #161e33 !important; border-color: rgba(255, 255, 255, 0.09) !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .qa-item:hover { background: #161e33 !important; border-color: #3b82f6 !important; color: #ffffff !important; }
     html[data-theme="dark"] .qa-item i.lead { color: #94a3b8 !important; }
     html[data-theme="dark"] .qa-item i.tail { color: #475569 !important; }
 
     html[data-theme="dark"] .av-bar { background: #2a3d6b !important; }
-    html[data-theme="dark"] .trend-select { background: #16233f !important; border-color: #3b4d7d !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .trend-select { background: #161e33 !important; border-color: #2a3350 !important; color: #e2e8f0 !important; }
 
-    html[data-theme="dark"] .modal-content.glass-modal { background: #1a2b4f !important; border-color: rgba(255, 255, 255, 0.1) !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .modal-content.glass-modal { background: #141b30 !important; border-color: rgba(255, 255, 255, 0.1) !important; color: #e2e8f0 !important; }
     html[data-theme="dark"] .glass-modal-header { border-bottom-color: rgba(255, 255, 255, 0.09) !important; }
     html[data-theme="dark"] .glass-modal .modal-title { color: #e2e8f0 !important; }
     html[data-theme="dark"] .glass-modal .btn-close { filter: invert(1) !important; opacity: 0.8; }
     html[data-theme="dark"] .dash-form-label { color: #94a3b8 !important; }
-    html[data-theme="dark"] .dash-form-control { background: #16233f !important; border-color: #3b4d7d !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .dash-form-control { background: #161e33 !important; border-color: #2a3350 !important; color: #e2e8f0 !important; }
     html[data-theme="dark"] .dash-form-control::placeholder { color: #64748b; }
     html[data-theme="dark"] .dash-form-control:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25) !important; }
-    html[data-theme="dark"] .dash-form-check { background: #16233f !important; border-color: #3b4d7d !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .dash-form-check { background: #161e33 !important; border-color: #2a3350 !important; color: #e2e8f0 !important; }
     html[data-theme="dark"] .dash-btn.ghost { background: #2a3d6b !important; color: #cbd5e1 !important; }
     html[data-theme="dark"] .dash-btn.ghost:hover { background: #2b3a5c !important; color: #ffffff !important; }
 
@@ -445,20 +445,7 @@ try {
 </style>
 <div class="dashboard-page">
 
-    <!-- Page Header -->
-    <div class="dash-header">
-        <div class="dash-title-wrap">
-            <div class="dash-logo-badge"><i data-lucide="wrench"></i></div>
-            <div>
-                <h1 class="dash-page-title">Dashboard</h1>
-                <div class="dash-page-subtitle">Overview of your motorcycle service operations</div>
-            </div>
-        </div>
-        <div class="dash-header-meta">
-            <span><i data-lucide="calendar"></i> <?= date('D, M j, Y') ?></span>
-            <span><i data-lucide="clock"></i> <?= date('g:i A') ?></span>
-        </div>
-    </div>
+   
 
     <?php if ($msg): ?>
         <div class="dash-alert <?= $msg_type == 'success' ? 'success' : 'error' ?> alert alert-dismissible fade show" role="alert">
@@ -831,7 +818,7 @@ $pkgTotal = (int)($totalPackageServices ?? 0);
         return {
             tick: dark ? '#94a3b8' : '#6B7280',
             grid: dark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
-            donutBorder: dark ? '#1a2b4f' : '#ffffff',
+            donutBorder: dark ? '#141b30' : '#ffffff',
             centerMain: dark ? '#e2e8f0' : '#0f172a',
             centerSub: dark ? '#94a3b8' : '#6B7280'
         };

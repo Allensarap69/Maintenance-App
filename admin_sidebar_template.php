@@ -531,9 +531,6 @@ require __DIR__ . '/partials/head.php';
                 <i class="bi bi-speedometer2"></i>
                 <i class="bi bi-calendar-check"></i>
             </div>
-            <button class="btn-toggle-sidebar" onclick="toggleSidebar()">
-                <i class="bi bi-list"></i>
-            </button>
             <h1 class="page-title">
                 <i class="bi bi-speedometer2"></i>
                 <?= isset($pageTitle) ? $pageTitle : 'Admin' ?>

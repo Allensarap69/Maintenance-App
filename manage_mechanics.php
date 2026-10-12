@@ -304,7 +304,7 @@ try {
         }
         $active_check->execute([$mr['id'], $mr['id'], $mr['id']]);
         $has_active = ((int)$active_check->fetchColumn() > 0) || !empty($mr['current_booking_id']);
-        if ($has_active && $mr['status'] !== 'Busy') {
+        if ($has_active && $mr['status'] !== 'Busy' && $mr['status'] !== 'Off-Duty') {
             $set_status->execute(['Busy', $mr['id']]);
         } elseif (!$has_active && $mr['status'] === 'Busy') {
             $set_status->execute(['Available', $mr['id']]);
@@ -751,6 +751,7 @@ $pageTitle = 'Manage Mechanics';
     }
     .mechanic-status.Available { background: #dcfce7; color: #15803d; }
     .mechanic-status.Busy { background: #fff7ed; color: #c2410c; }
+    .mechanic-status.Off-Duty { background: #e2e8f0; color: #475569; }
     .mechanic-status.Unavailable { background: #fee2e2; color: #991b1b; }
     .action-group { display: inline-flex; align-items: center; gap: 0.6rem; }
     .action-btn {
@@ -846,6 +847,7 @@ $pageTitle = 'Manage Mechanics';
     html[data-theme="dark"] .mechanic-specialties { background: rgba(14, 165, 233, 0.15) !important; color: #7dd3fc !important; }
     html[data-theme="dark"] .mechanic-status.Available { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
     html[data-theme="dark"] .mechanic-status.Busy { background: rgba(249, 115, 22, 0.15) !important; color: #fdba74 !important; }
+    html[data-theme="dark"] .mechanic-status.Off-Duty { background: rgba(148, 163, 184, 0.15) !important; color: #94a3b8 !important; }
     html[data-theme="dark"] .mechanic-status.Unavailable { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
 </style>
 
@@ -1390,14 +1392,6 @@ $pageTitle = 'Manage Mechanics';
             }
         }
     });
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    if (window.attachPager) {
-        attachPager({ items: '.mechanic-row', container: '.mechanic-list', perPage: 12 });
-    }
-});
 </script>
 
 <?php require 'admin_sidebar_footer.php'; ?>

@@ -243,7 +243,7 @@ try {
         }
         $active_check->execute([$mr['id'], $mr['id'], $mr['id']]);
         $has_active = ((int)$active_check->fetchColumn() > 0) || !empty($mr['current_booking_id']);
-        if ($has_active && $mr['status'] !== 'Busy') {
+        if ($has_active && $mr['status'] !== 'Busy' && $mr['status'] !== 'Off-Duty') {
             $set_status->execute(['Busy', $mr['id']]);
         } elseif (!$has_active && $mr['status'] === 'Busy') {
             $set_status->execute(['Available', $mr['id']]);
@@ -626,7 +626,7 @@ $pageTitle = 'Mechanic Assignment';
     }
     #mechanicStatsModal .workload-rows::-webkit-scrollbar { width: 6px; }
     #mechanicStatsModal .workload-rows::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); border-radius: 3px; }
-    html[data-theme="dark"] #mechanicStatsModal .workload-rows::-webkit-scrollbar-thumb { background: #3b4d7d; }
+    html[data-theme="dark"] #mechanicStatsModal .workload-rows::-webkit-scrollbar-thumb { background: #2a3350; }
 </style>
 
 <div class="container-fluid">

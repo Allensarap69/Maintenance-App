@@ -366,11 +366,11 @@ $pageTitle = 'Warranty Management';
     .claim-modal-header .btn-close { filter: none; }
 
     /* Dark mode overrides */
-    html[data-theme="dark"] .warranty-card-header { background: #1a2b4f !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .warranty-card-header { background: #141b30 !important; color: #e2e8f0 !important; }
     html[data-theme="dark"] .warranty-card-header h4 { color: #e2e8f0 !important; }
-    html[data-theme="dark"] .claim-modal-header { background: #1a2b4f !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .claim-modal-header { background: #141b30 !important; color: #e2e8f0 !important; }
     html[data-theme="dark"] .claim-modal-header .modal-title { color: #e2e8f0 !important; }
-    html[data-theme="dark"] .table thead th { background-color: #22335a !important; color: #e2e8f0 !important; }
+    html[data-theme="dark"] .table thead th { background-color: #1a2340 !important; color: #e2e8f0 !important; }
     html[data-theme="dark"] #warranties-tab .table thead th { color: #FDE047 !important; }
     html[data-theme="dark"] .table tbody tr:hover { background-color: rgba(255, 255, 255, 0.05) !important; }
     html[data-theme="dark"] .warranty-form,
@@ -392,9 +392,41 @@ $pageTitle = 'Warranty Management';
     html[data-theme="dark"] .status-approved { background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
     html[data-theme="dark"] .status-rejected { background-color: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
     html[data-theme="dark"] .status-completed { background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; }
+
+    /* Fit the page in the viewport — interiors scroll, the page itself does not */
+    .warranty-form {
+        max-height: calc(100vh - 170px);
+        overflow-y: auto;
+    }
+    .warranty-page .table-responsive {
+        max-height: calc(100vh - 320px);
+        overflow-y: auto;
+    }
+    .warranty-page .table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+    /* Interiors scroll with the wheel but show no scrollbar */
+    .warranty-form,
+    .warranty-page .table-responsive { scrollbar-width: none; -ms-overflow-style: none; }
+    .warranty-form::-webkit-scrollbar,
+    .warranty-page .table-responsive::-webkit-scrollbar { display: none; }
+
+    /* Collapsible "additional details" section in the register form */
+    .warranty-extras-toggle {
+        display: flex; align-items: center; width: 100%;
+        border: 1px dashed #e2e8f0; background: #f8fafc; color: #64748b;
+        font-size: .74rem; font-weight: 600; border-radius: 8px; padding: .4rem .7rem;
+    }
+    .warranty-extras-toggle:hover { color: #1d4ed8; border-color: #bfdbfe; background: #eff6ff; }
+    .warranty-extras-toggle .bi-chevron-down { transition: transform .2s; font-size: .65rem; }
+    .warranty-extras-toggle[aria-expanded="true"] .bi-chevron-down { transform: rotate(180deg); }
+    html[data-theme="dark"] .warranty-extras-toggle { background: #161e33; border-color: #2a3350; color: #94a3b8; }
+    html[data-theme="dark"] .warranty-extras-toggle:hover { color: #FDE047; border-color: #FACC15; background: rgba(250, 204, 21, .08); }
 </style>
 
-<div class="container-fluid">
+<div class="container-fluid warranty-page">
     <div class="row g-4">
         <!-- Register New Warranty -->
         <div class="col-lg-4">
@@ -402,8 +434,8 @@ $pageTitle = 'Warranty Management';
                 <h4 class="mb-0"><i class="bi bi-shield-check me-2"></i> Register Warranty</h4>
             </div>
             <form method="POST" class="warranty-form">
-                        <div class="mb-3">
-                            <label class="form-label">Customer </label>
+                        <div class="mb-2">
+                            <label class="form-label">Customer</label>
                             <select name="customer_id" id="customerSelect" class="form-select" required>
                                 <option value="">Select Customer</option>
                                 <?php foreach ($customers as $customer): ?>
@@ -411,8 +443,8 @@ $pageTitle = 'Warranty Management';
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Motorcycle </label>
+                        <div class="mb-2">
+                            <label class="form-label">Motorcycle</label>
                             <select name="motorcycle_id" id="motorcycleSelect" class="form-select" required>
                                 <option value="">Select Motorcycle</option>
                                 <?php foreach ($motorcycles as $motorcycle): ?>
@@ -422,35 +454,41 @@ $pageTitle = 'Warranty Management';
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Warranty Type</label>
-                            <select name="warranty_type" class="form-select">
-                                <option value="standard">Standard</option>
-                                <option value="extended">Extended</option>
-                                <option value="premium">Premium</option>
-                            </select>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Start Date x</label>
+                        <div class="row g-2 mb-2">
+                            <div class="col-4">
+                                <label class="form-label">Warranty Type</label>
+                                <select name="warranty_type" class="form-select">
+                                    <option value="standard">Standard</option>
+                                    <option value="extended">Extended</option>
+                                    <option value="premium">Premium</option>
+                                </select>
+                            </div>
+                            <div class="col-5">
+                                <label class="form-label">Start Date</label>
                                 <input type="date" name="warranty_start" class="form-control" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Duration (Months)</label>
+                            <div class="col-3">
+                                <label class="form-label">Months</label>
                                 <input type="number" name="warranty_duration_months" class="form-control" value="12" min="1" max="120">
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Coverage Details</label>
-                            <textarea name="coverage_details" class="form-control" rows="2" placeholder="What's covered under this warranty..."></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Terms & Conditions</label>
-                            <textarea name="terms_conditions" class="form-control" rows="2" placeholder="Warranty terms and conditions..."></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Notes</label>
-                            <textarea name="notes" class="form-control" rows="2" placeholder="Additional notes..."></textarea>
+                        <button type="button" class="warranty-extras-toggle mb-2" data-bs-toggle="collapse" data-bs-target="#warrantyExtras" aria-expanded="false">
+                            <i class="bi bi-sliders me-1"></i>Coverage, terms &amp; notes
+                            <i class="bi bi-chevron-down ms-auto"></i>
+                        </button>
+                        <div class="collapse mb-2" id="warrantyExtras">
+                            <div class="mb-2">
+                                <label class="form-label">Coverage Details</label>
+                                <textarea name="coverage_details" class="form-control" rows="2" placeholder="What's covered under this warranty..."></textarea>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Terms &amp; Conditions</label>
+                                <textarea name="terms_conditions" class="form-control" rows="2" placeholder="Warranty terms and conditions..."></textarea>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Notes</label>
+                                <textarea name="notes" class="form-control" rows="2" placeholder="Additional notes..."></textarea>
+                            </div>
                         </div>
                         <button type="submit" name="register_warranty" class="btn btn-primary w-100">
                             <i class="bi bi-plus-circle me-2"></i>Register Warranty

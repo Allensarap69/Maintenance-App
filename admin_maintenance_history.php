@@ -690,18 +690,18 @@ $pageTitle = 'Maintenance History Management';
 
     /* Dark mode overrides */
     html[data-theme="dark"] .mh-content .table-responsive {
-        background: #1a2b4f;
+        background: #141b30;
         border-color: rgba(255, 255, 255, 0.09);
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
     }
     html[data-theme="dark"] .mh-content .table { color: #e2e8f0 !important; }
     html[data-theme="dark"] .mh-content .table thead th {
-        background-color: #22335a !important;
+        background-color: #1a2340 !important;
         color: #93c5fd !important;
         border-bottom-color: rgba(255, 255, 255, 0.12) !important;
     }
     html[data-theme="dark"] .mh-content .table tbody tr {
-        background: #1a2b4f !important;
+        background: #141b30 !important;
         border-bottom-color: rgba(255, 255, 255, 0.08) !important;
     }
     html[data-theme="dark"] .mh-content,

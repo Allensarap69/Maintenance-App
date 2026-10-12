@@ -629,19 +629,19 @@ $pageTitle = 'Emergency Service Requests Management';
     html[data-theme="dark"] .emergency-page { color: #e2e8f0; }
 
     html[data-theme="dark"] .emergency-panel {
-        background: #1a2b4f !important;
+        background: #141b30 !important;
         border-color: rgba(255, 255, 255, 0.09);
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     }
     html[data-theme="dark"] .emergency-panel .panel-header {
-        background: #1a2b4f;
+        background: #141b30;
         color: #e2e8f0;
         border-bottom-color: rgba(255, 255, 255, 0.09);
     }
     html[data-theme="dark"] .panel-title { color: #e2e8f0; }
 
     html[data-theme="dark"] .stat-card { box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4); }
-    html[data-theme="dark"] .stat-card:hover { background: #22335a; border-color: #475569; }
+    html[data-theme="dark"] .stat-card:hover { background: #1a2340; border-color: #475569; }
     html[data-theme="dark"] .stat-card.active { background: rgba(250, 204, 21, 0.08); border-color: #FACC15; }
     html[data-theme="dark"] .stat-icon.all { background: #2a3d6b; color: #94a3b8; }
     html[data-theme="dark"] .stat-icon.pending { background: rgba(250, 204, 21, 0.15); color: #FDE047; }
@@ -652,7 +652,7 @@ $pageTitle = 'Emergency Service Requests Management';
     html[data-theme="dark"] .stat-value { color: #e2e8f0; }
 
     html[data-theme="dark"] .filter-pills .nav-link {
-        background: #1a2b4f;
+        background: #141b30;
         border-color: rgba(255, 255, 255, 0.09);
         color: #cbd5e1;
     }
@@ -661,19 +661,19 @@ $pageTitle = 'Emergency Service Requests Management';
     html[data-theme="dark"] .filter-pills .nav-link.active .pill-count { background: rgba(0, 0, 0, 0.15); }
 
     html[data-theme="dark"] .emergency-card {
-        background: #16233f !important;
+        background: #161e33 !important;
         border-color: rgba(255, 255, 255, 0.09);
     }
     html[data-theme="dark"] .emergency-card:hover { border-color: #3b82f6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); }
-    html[data-theme="dark"] .emergency-card .ecard-header { background: #1a2b4f; border-bottom-color: rgba(255, 255, 255, 0.08); }
-    html[data-theme="dark"] .emergency-card .ecard-footer { background: #1a2b4f; border-top-color: rgba(255, 255, 255, 0.06); }
+    html[data-theme="dark"] .emergency-card .ecard-header { background: #141b30; border-bottom-color: rgba(255, 255, 255, 0.08); }
+    html[data-theme="dark"] .emergency-card .ecard-footer { background: #141b30; border-top-color: rgba(255, 255, 255, 0.06); }
     html[data-theme="dark"] .emergency-card .ecard-title,
     html[data-theme="dark"] .emergency-card .ecard-value,
     html[data-theme="dark"] .emergency-card .ecard-meta strong { color: #e2e8f0; }
     html[data-theme="dark"] .emergency-card .ecard-meta { color: #94a3b8; }
-    html[data-theme="dark"] .emergency-card .details-inner { background: #1a2b4f; border-color: rgba(255, 255, 255, 0.09); }
+    html[data-theme="dark"] .emergency-card .details-inner { background: #141b30; border-color: rgba(255, 255, 255, 0.09); }
     html[data-theme="dark"] .emergency-card .action-bar { border-top-color: rgba(255, 255, 255, 0.09); }
-    html[data-theme="dark"] .emergency-list::-webkit-scrollbar-thumb { background: #3b4d7d; }
+    html[data-theme="dark"] .emergency-list::-webkit-scrollbar-thumb { background: #2a3350; }
 
     html[data-theme="dark"] .priority-urgent { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
     html[data-theme="dark"] .priority-high { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
@@ -687,7 +687,7 @@ $pageTitle = 'Emergency Service Requests Management';
     html[data-theme="dark"] .status-pill.in_progress { background: rgba(139, 92, 246, 0.15); color: #c4b5fd; }
     html[data-theme="dark"] .status-pill.declined { background: rgba(239, 68, 68, 0.15); color: #f87171; }
 
-    html[data-theme="dark"] .assign-modal { background: #1a2b4f; color: #e2e8f0; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); }
+    html[data-theme="dark"] .assign-modal { background: #141b30; color: #e2e8f0; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); }
     html[data-theme="dark"] .assign-modal h5 { color: #e2e8f0; }
     html[data-theme="dark"] .assign-modal .form-label { color: #94a3b8; }
 
@@ -699,7 +699,7 @@ $pageTitle = 'Emergency Service Requests Management';
     /* Leaflet controls */
     html[data-theme="dark"] .leaflet-bar a,
     html[data-theme="dark"] .leaflet-control-layers {
-        background: #22335a;
+        background: #1a2340;
         color: #e2e8f0;
         border-color: rgba(255, 255, 255, 0.1);
     }

@@ -303,27 +303,27 @@ $pageTitle = 'Availability Setup';
 
     /* Dark mode overrides */
     html[data-theme="dark"] .date-header {
-        background-color: #22335a !important;
+        background-color: #1a2340 !important;
         color: #93c5fd !important;
         border-bottom-color: rgba(255, 255, 255, 0.09) !important;
     }
     html[data-theme="dark"] .time-segment {
-        background: #1a2b4f !important;
+        background: #141b30 !important;
         border-bottom-color: rgba(255, 255, 255, 0.09) !important;
         color: #e2e8f0 !important;
     }
-    html[data-theme="dark"] .time-segment:hover { background: #22335a !important; }
+    html[data-theme="dark"] .time-segment:hover { background: #1a2340 !important; }
     html[data-theme="dark"] .month-filter-container {
-        background: #1a2b4f !important;
+        background: #141b30 !important;
         border-bottom-color: rgba(255, 255, 255, 0.09) !important;
     }
     html[data-theme="dark"] .month-btn {
-        background: #22335a !important;
+        background: #1a2340 !important;
         color: #94a3b8 !important;
-        border-color: #3b4d7d !important;
+        border-color: #2a3350 !important;
     }
     html[data-theme="dark"] .month-btn:hover { background: #2a3d6b !important; }
-    html[data-theme="dark"] .month-btn.active { background: #2a3d6b !important; color: #FDE047 !important; border-color: #3b4d7d !important; }
+    html[data-theme="dark"] .month-btn.active { background: #2a3d6b !important; color: #FDE047 !important; border-color: #2a3350 !important; }
     html[data-theme="dark"] .main-content .card-setup h5,
     html[data-theme="dark"] .card-setup input[name="date_type"]:checked + .form-check-label { color: #e2e8f0 !important; }
     html[data-theme="dark"] .av-card-header { color: #e2e8f0 !important; }

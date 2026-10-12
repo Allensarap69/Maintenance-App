@@ -277,7 +277,7 @@ $pageTitle = 'Rate Your Service';
 
         /* --- Dark mode --- */
         html[data-theme="dark"] .feedback-card {
-            background: #1a2b4f;
+            background: #141b30;
             border: 1px solid rgba(255, 255, 255, 0.09);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
         }
@@ -289,7 +289,7 @@ $pageTitle = 'Rate Your Service';
         html[data-theme="dark"] .rating-label small,
         html[data-theme="dark"] .star-value-text,
         html[data-theme="dark"] .btn-back-link { color: #94a3b8; }
-        html[data-theme="dark"] .star-input .star-btn { color: #3b4d7d; }
+        html[data-theme="dark"] .star-input .star-btn { color: #2a3350; }
         html[data-theme="dark"] .star-input .star-btn.active { color: #EAB308; }
         html[data-theme="dark"] .submitted-comment {
             background: rgba(255, 255, 255, 0.05);

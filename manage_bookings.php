@@ -927,8 +927,8 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
     html[data-theme="dark"] .mb-search,
     html[data-theme="dark"] .mb-filter-bar select,
     html[data-theme="dark"] .mb-filter-bar input[type="date"] {
-        background: #16233f;
-        border-color: #3b4d7d;
+        background: #161e33;
+        border-color: #2a3350;
         color: #e2e8f0;
     }
     html[data-theme="dark"] .mb-search input { color: #e2e8f0; }
@@ -955,14 +955,14 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
     html[data-theme="dark"] .mb-action-btn.primary { color: #60a5fa; }
 
     html[data-theme="dark"] .modal-header.glass-modal-header {
-        background: #22335a !important;
+        background: #1a2340 !important;
         color: #e2e8f0;
         border-bottom-color: rgba(255, 255, 255, 0.09) !important;
     }
     html[data-theme="dark"] .modal-header.glass-modal-header .modal-title,
     html[data-theme="dark"] .modal-header.glass-modal-header h5 { color: #e2e8f0; }
     html[data-theme="dark"] .glass-modal .btn-close { filter: invert(1); opacity: 0.8; }
-    html[data-theme="dark"] .modal-detail-card { background: #16233f; border-color: rgba(255, 255, 255, 0.09); }
+    html[data-theme="dark"] .modal-detail-card { background: #161e33; border-color: rgba(255, 255, 255, 0.09); }
 </style>
 
 <div class="manage-bookings-page">
@@ -1203,14 +1203,6 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
         </div>
     </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    if (window.attachPager) {
-        attachPager({ items: '.mb-booking-card', container: '#bookingGrid', perPage: 12 });
-    }
-});
-</script>
 
 <?php require 'admin_sidebar_footer.php'; ?>
 

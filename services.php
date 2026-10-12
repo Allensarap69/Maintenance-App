@@ -283,7 +283,21 @@ $pageTitle = 'Manage Services';
     }
     .service-form-card form {
         padding: 15px;
+        /* Fit the page in the viewport — the form scrolls internally */
+        max-height: calc(100vh - 195px);
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
+    .service-form-card form::-webkit-scrollbar { display: none; }
+    /* Skills checklist scrolls inside its box so the form stays compact */
+    .service-skills-list {
+        max-height: 150px;
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .service-skills-list::-webkit-scrollbar { display: none; }
     .main-content .service-form-card .form-label {
         font-weight: 600;
         color: #1e3a5f;
@@ -466,7 +480,7 @@ $pageTitle = 'Manage Services';
                     <div class="mb-4 border p-3 rounded">
                         <label class="form-label fw-bold mb-2">Required Mechanic Skills:</label>
                         <small class="text-muted d-block mb-2">Select all specialties needed to perform this service.</small>
-                        <div class="row row-cols-1 g-2">
+                        <div class="row row-cols-1 g-2 service-skills-list">
                             <?php if (empty($all_specialties)): ?>
                                 <p class="text-danger">No specialties found. Please configure the `specialties` table.</p>
                             <?php else: ?>

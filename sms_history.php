@@ -52,8 +52,8 @@ $pageTitle = 'SMS History';
 
 <style>
     table th {
-        background-color: #004d80;
-        color: white;
+        background-color: #ffffff;
+        color: #1e293b !important;
         text-align: center;
         font-size: 0.9rem;
     }
@@ -86,6 +86,33 @@ $pageTitle = 'SMS History';
     }
     .btn-view:hover {
         text-decoration: underline;
+    }
+    /* Table fits the viewport — scrolls inside the box, header stays visible */
+    .table-responsive {
+        max-height: calc(100vh - 300px);
+        overflow-y: auto;
+    }
+    .table-responsive thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background-color: #ffffff;
+        box-shadow: inset 0 -1px 0 #E2E8F0;
+    }
+
+    /* Dark mode */
+    html[data-theme="dark"] table th,
+    html[data-theme="dark"] .table-responsive thead th {
+        background-color: #1a2340;
+        color: #e2e8f0 !important;
+        box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.09);
+    }
+    html[data-theme="dark"] .btn-view { color: #60a5fa; }
+    html[data-theme="dark"] .status-sent { color: #34d399; }
+    html[data-theme="dark"] .status-failed { color: #f87171; }
+    html[data-theme="dark"] .badge.bg-info {
+        background-color: rgba(59, 130, 246, 0.18) !important;
+        color: #93c5fd !important;
     }
 </style>
 

@@ -289,6 +289,35 @@ require __DIR__ . '/partials/head.php';
                 });
             });
 
+            // Dark mode toggle
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            if (darkModeToggle) {
+                const dmIcon = darkModeToggle.querySelector('i');
+                const syncDarkIcon = function () {
+                    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                    dmIcon.classList.toggle('bi-moon-fill', !isDark);
+                    dmIcon.classList.toggle('bi-sun-fill', isDark);
+                };
+                syncDarkIcon();
+                darkModeToggle.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    const root = document.documentElement;
+                    const isDark = root.getAttribute('data-theme') !== 'dark';
+                    const applyTheme = function () {
+                        root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+                        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                        localStorage.setItem('themeManual', '1');
+                        syncDarkIcon();
+                    };
+                    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                    if (!reduceMotion && document.startViewTransition) {
+                        document.startViewTransition(applyTheme);
+                    } else {
+                        applyTheme();
+                    }
+                });
+            }
+
             // Mechanic notification bell
             const notifWrapper = document.getElementById('mechNotifWrapper');
             const notifBell = document.getElementById('mechNotifBell');
@@ -405,6 +434,10 @@ require __DIR__ . '/partials/head.php';
                         <?php endif; ?>
                     </div>
                 </div>
+            </div>
+            <!-- Dark Mode Toggle -->
+            <div class="dark-mode-toggle" id="darkModeToggle" title="Toggle dark mode">
+                <i class="bi bi-moon-fill"></i>
             </div>
             <div class="header-user-wrap" id="mechUserWrap">
                 <div class="user-avatar">

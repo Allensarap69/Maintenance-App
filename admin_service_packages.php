@@ -427,6 +427,15 @@ $pageTitle = 'Service Package Management';
     html[data-theme="dark"] .package-form .form-select,
     html[data-theme="dark"] .package-form .form-check-label { color: #e2e8f0 !important; }
     html[data-theme="dark"] .included-service-item { border-color: rgba(255, 255, 255, 0.09) !important; }
+
+    /* Packages grid scrolls inside the viewport — the page itself does not */
+    .packages-grid {
+        max-height: calc(100vh - 175px);
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .packages-grid::-webkit-scrollbar { display: none; }
 </style>
 
 <div>
@@ -457,7 +466,7 @@ $pageTitle = 'Service Package Management';
             <?php endif; ?>
 
             <!-- Service Packages Grid -->
-            <div class="row">
+            <div class="row packages-grid">
                 <?php if (empty($service_packages)): ?>
                     <div class="col-12">
                         <div class="card card-glass">

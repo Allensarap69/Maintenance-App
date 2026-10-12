@@ -210,11 +210,11 @@ $pageTitle = 'Customer Feedback';
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
     }
     html[data-theme="dark"] .feedback-stat-card:hover {
-        background: #22335a;
+        background: #1a2340;
         border-color: rgba(250, 204, 21, 0.25);
     }
     html[data-theme="dark"] .feedback-table thead th {
-        background: #22335a;
+        background: #1a2340;
         color: #e2e8f0;
         border-bottom-color: rgba(255, 255, 255, 0.12);
     }

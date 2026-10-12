@@ -2,7 +2,6 @@
 session_start();
 require 'db.php';
 require 'management_helper.php';
-require 'pagination_helper.php';
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: index.php");
@@ -30,9 +29,9 @@ $where_sql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
 $count = $pdo->prepare("SELECT COUNT(*) FROM audit_log $where_sql");
 $count->execute($params);
-$pg = paginate((int)$count->fetchColumn(), 25);
+$total = (int)$count->fetchColumn();
 
-$stmt = $pdo->prepare("SELECT * FROM audit_log $where_sql ORDER BY id DESC LIMIT {$pg['per_page']} OFFSET {$pg['offset']}");
+$stmt = $pdo->prepare("SELECT * FROM audit_log $where_sql ORDER BY id DESC");
 $stmt->execute($params);
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -51,10 +50,40 @@ $pageTitle = 'Audit Log';
 require 'admin_sidebar_template.php';
 ?>
 
+<style>
+    /* Light mode: white filter bar matching the module cards */
+    .audit-log-card .card-header {
+        background: #ffffff;
+        color: #111827;
+        border-bottom: 1px solid #E2E8F0;
+    }
+    /* Table fits the viewport — scrolls inside the box, header stays visible */
+    .audit-log-card .table-responsive {
+        max-height: calc(100vh - 305px);
+        overflow-y: auto;
+    }
+    .audit-log-card .table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: #ffffff;
+        box-shadow: inset 0 -1px 0 #E2E8F0;
+    }
+    html[data-theme="dark"] .audit-log-card .card-header {
+        background: rgba(255, 255, 255, 0.03);
+        color: #e2e8f0;
+        border-bottom-color: rgba(255, 255, 255, 0.09);
+    }
+    html[data-theme="dark"] .audit-log-card .table thead th {
+        background: #141b30;
+        box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.09);
+    }
+</style>
+
 <div class="container-fluid py-4">
-    <div class="card">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <h5 class="mb-0">Audit Log <span class="badge bg-secondary"><?= $pg['total'] ?></span></h5>
+    <div class="card audit-log-card">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="mb-0">Audit Log <span class="badge bg-secondary"><?= $total ?></span></h5>
             <form method="GET" class="d-flex gap-2 flex-wrap">
                 <select name="action" class="form-select form-select-sm" style="width:auto">
                     <option value="">All actions</option>
@@ -71,7 +100,7 @@ require 'admin_sidebar_template.php';
                 <input type="text" name="user" class="form-control form-control-sm" style="width:130px" placeholder="User" value="<?= htmlspecialchars($f_user) ?>">
                 <input type="date" name="from" class="form-control form-control-sm" style="width:auto" value="<?= htmlspecialchars($f_from) ?>">
                 <input type="date" name="to" class="form-control form-control-sm" style="width:auto" value="<?= htmlspecialchars($f_to) ?>">
-                <button class="btn btn-sm btn-outline-light">Filter</button>
+                <button class="btn btn-sm btn-warning text-dark fw-semibold">Filter</button>
                 <a href="admin_audit_log.php" class="btn btn-sm btn-outline-secondary">Reset</a>
             </form>
         </div>
@@ -105,7 +134,6 @@ require 'admin_sidebar_template.php';
                     </tbody>
                 </table>
             </div>
-            <?= render_pagination($pg) ?>
             <?php endif; ?>
         </div>
     </div>

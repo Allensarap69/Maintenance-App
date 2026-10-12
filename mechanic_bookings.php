@@ -32,7 +32,7 @@ $sync_stmt->execute([$mechanic_id]);
 $open_emergency_count = (int) $sync_stmt->fetchColumn();
 
 if ($open_emergency_count > 0) {
-    $pdo->prepare("UPDATE mechanics SET status = 'Busy' WHERE id = ? AND status != 'Busy'")->execute([$mechanic_id]);
+    $pdo->prepare("UPDATE mechanics SET status = 'Busy' WHERE id = ? AND status NOT IN ('Busy','Off-Duty')")->execute([$mechanic_id]);
 } else {
     $booking_check = $pdo->prepare("
         SELECT COUNT(*) FROM bookings
@@ -46,7 +46,7 @@ if ($open_emergency_count > 0) {
     $current_booking = $current->fetchColumn();
 
     if ($open_bookings === 0 && empty($current_booking)) {
-        $pdo->prepare("UPDATE mechanics SET status = 'Available' WHERE id = ? AND status != 'Available'")->execute([$mechanic_id]);
+        $pdo->prepare("UPDATE mechanics SET status = 'Available' WHERE id = ? AND status = 'Busy'")->execute([$mechanic_id]);
     }
 }
 
@@ -400,6 +400,18 @@ include 'mechanic_sidebar.php';
     .emergency-table th,
     .emergency-table td {
         background-color: transparent !important;
+    }
+    @media (max-width: 767.98px) {
+        .stat-card { overflow-wrap: normal; word-break: normal; }
+        .stat-card .card-body { padding: .7rem .75rem !important; gap: .6rem !important; }
+        .stat-card .rounded-circle { width: 38px !important; height: 38px !important; }
+        .stat-card .rounded-circle i { font-size: .9rem !important; }
+        .stat-card .stat-num { font-size: 1.3rem !important; }
+        .stat-card small { font-size: .68rem !important; line-height: 1.25 !important; }
+        .stat-card .card-body > div:last-child { min-width: 0; }
+        .content-area h2 { font-size: 1.35rem; }
+        .job-actions { padding: .35rem .5rem; }
+        .job-actions .btn { padding: .28rem .7rem; font-size: .72rem; }
     }
     .emergency-table tbody tr:hover {
         background-color: transparent !important;

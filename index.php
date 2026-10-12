@@ -304,7 +304,7 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
                         <button class="btn btn-cta-outline" data-bs-toggle="modal" data-bs-target="#registerModal">
                             Create Account<i data-lucide="chevrons-right"></i>
                         </button>
-                        <a href="download_app.php" class="btn btn-cta-outline" download>
+                        <a href="download_app.php" class="btn btn-cta-outline">
                             Download App<i data-lucide="download"></i>
                         </a>
                     </div>
@@ -757,7 +757,7 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
                 <a href="#service-list">Services</a>
                 <a href="#how-it-works">How It Works</a>
                 <a href="#contact">Contact</a>
-                <a href="download_app.php" download>Get the App</a>
+                <a href="download_app.php">Get the App</a>
             </nav>
             <div class="social-links">
                 <a href="#" aria-label="Facebook"><i data-lucide="facebook"></i></a>

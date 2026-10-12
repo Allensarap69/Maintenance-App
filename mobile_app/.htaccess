@@ -1,0 +1,2 @@
+# App source lives in the webroot only for convenience — never serve it.
+Require all denied

@@ -1,0 +1,2 @@
+Drop the app's .apk file in this folder. download_app.php serves it automatically
+(app-release.apk is preferred; otherwise the first .apk found is used).

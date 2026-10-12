@@ -898,10 +898,6 @@ foreach ($packages as $pkg) {
         /* ============================================
            PAGE TRANSITION ANIMATIONS
            ============================================ */
-        .main-content {
-            animation: fadeInUp 0.6s ease-out;
-        }
-
         @keyframes fadeInUp {
             from {
                 opacity: 0;

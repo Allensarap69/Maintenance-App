@@ -862,8 +862,19 @@
         }
 
         .notification-dropdown {
-            width: calc(100vw - 24px);
-            right: -12px;
+            position: fixed;
+            top: 66px;
+            left: auto;
+            right: 8px;
+            width: min(320px, calc(100vw - 16px));
+            max-height: calc(100vh - 84px);
+            transform-origin: top right;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notification-dropdown .notification-list {
+            max-height: calc(100vh - 150px);
         }
 
         .top-bar-title {

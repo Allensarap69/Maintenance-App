@@ -33,145 +33,14 @@ $unreadHealthCount = 0;
 $customerNotificationItems = [];
 $unreadBookingItems = [];
 
-if (!function_exists('notifTimeAgo')) {
-    function notifTimeAgo($dt) {
-        if (empty($dt)) return '';
-        $ts = strtotime($dt);
-        if (!$ts) return '';
-        $now = time();
-        if ($ts > $now) return date('M d, Y', $ts);
-        $diff = $now - $ts;
-        if ($diff < 60) return 'Just now';
-        if ($diff < 3600) return floor($diff / 60) . 'm ago';
-        if ($diff < 86400) return floor($diff / 3600) . 'h ago';
-        if ($diff < 604800) return floor($diff / 86400) . 'd ago';
-        return date('M d, Y', $ts);
-    }
-}
 if (isset($_SESSION['user_id'])) {
     try {
         require_once 'db.php';
-        $pdo->exec("CREATE TABLE IF NOT EXISTS customer_notifications (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            customer_id INT NOT NULL,
-            motorcycle_id INT NOT NULL,
-            health_score INT NOT NULL,
-            recommendation TEXT,
-            is_read TINYINT(1) DEFAULT 0,
-            is_applied TINYINT(1) DEFAULT 0,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            INDEX idx_customer (customer_id),
-            INDEX idx_motorcycle (motorcycle_id)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-
-        // Total upcoming bookings for sidebar badge
-        if ($totalUpcoming === 0) {
-            $stmt = $pdo->prepare("
-                SELECT COUNT(*) FROM bookings
-                WHERE user_id = ? AND status IN ('pending','deposit_submitted','accepted')
-            ");
-            $stmt->execute([$_SESSION['user_id']]);
-            $totalUpcoming = (int) $stmt->fetchColumn();
-        }
-
-        // Health score unapplied notifications for sidebar badge
-        $stmt = $pdo->prepare("
-            SELECT COUNT(DISTINCT n.motorcycle_id)
-            FROM customer_notifications n
-            JOIN motorcycles m ON n.motorcycle_id = m.id
-            WHERE n.customer_id = ? AND n.is_applied = 0
-        ");
-        $stmt->execute([$_SESSION['user_id']]);
-        $healthScoreNotificationCount = (int) $stmt->fetchColumn();
-
-        // --- Unread notification count for top bell ---
-
-        // Health score notifications unread
-        $unreadHealthCount = 0;
-        $unreadHealthItems = [];
-        $stmt = $pdo->prepare("
-            SELECT n.id, n.motorcycle_id, n.health_score, n.recommendation, n.created_at,
-                   m.brand, m.model, m.plate_number
-            FROM customer_notifications n
-            JOIN motorcycles m ON n.motorcycle_id = m.id
-            WHERE n.customer_id = ? AND n.is_read = 0
-            ORDER BY n.created_at DESC
-            LIMIT 5
-        ");
-        $stmt->execute([$_SESSION['user_id']]);
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $unreadHealthItems[] = [
-                'type' => 'health',
-                'title' => 'Health Score Alert',
-                'message' => ($row['brand'] . ' ' . $row['model'] . ' (' . $row['plate_number'] . ') - health ' . $row['health_score']),
-                'link' => 'customer_health_score.php',
-                'time_label' => notifTimeAgo($row['created_at'])
-            ];
-        }
-        $unreadHealthCount = count($unreadHealthItems);
-
-        // Unseen upcoming bookings for bell
-        $seenBookingIds = $_SESSION['seen_booking_ids'] ?? [];
-        $unreadBookingItems = [];
-        if (!empty($seenBookingIds)) {
-            $placeholders = implode(',', array_fill(0, count($seenBookingIds), '?'));
-            $stmt = $pdo->prepare("
-                SELECT id, status, schedule_date, schedule_start_time, vehicle_id
-                FROM bookings
-                WHERE user_id = ? AND status IN ('pending','deposit_submitted','accepted') AND id NOT IN ($placeholders)
-                ORDER BY schedule_date ASC, schedule_start_time ASC
-                LIMIT 5
-            ");
-            $stmt->execute(array_merge([$_SESSION['user_id']], $seenBookingIds));
-        } else {
-            $stmt = $pdo->prepare("
-                SELECT id, status, schedule_date, schedule_start_time, vehicle_id
-                FROM bookings
-                WHERE user_id = ? AND status IN ('pending','deposit_submitted','accepted')
-                ORDER BY schedule_date ASC, schedule_start_time ASC
-                LIMIT 5
-            ");
-            $stmt->execute([$_SESSION['user_id']]);
-        }
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $unreadBookingItems[] = [
-                'type' => 'booking',
-                'title' => 'Booking #' . $row['id'],
-                'message' => ucfirst(str_replace('_', ' ', $row['status'])) . ' on ' . date('M d, Y', strtotime($row['schedule_date'])),
-                'link' => 'my_bookings.php',
-                'time_label' => date('M d, Y g:i A', strtotime($row['schedule_date'] . ' ' . $row['schedule_start_time']))
-            ];
-        }
-
-        // Parts awaiting the customer's approval (computed live — clears once decided)
-        $unreadPartItems = [];
-        try {
-            $stmt = $pdo->prepare("
-                SELECT bp.booking_id, COUNT(*) AS cnt, SUM(bp.quantity * bp.unit_price) AS total
-                FROM booking_parts bp
-                JOIN bookings b ON b.id = bp.booking_id
-                WHERE b.user_id = ? AND bp.status = 'pending'
-                  AND b.status IN ('pending','deposit_submitted','accepted','assigned','in_progress')
-                GROUP BY bp.booking_id
-                ORDER BY bp.booking_id DESC
-                LIMIT 5
-            ");
-            $stmt->execute([$_SESSION['user_id']]);
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $unreadPartItems[] = [
-                    'type' => 'part',
-                    'title' => 'Parts approval needed',
-                    'message' => 'Booking #' . $row['booking_id'] . ': ' . (int)$row['cnt'] . ' part(s) added — ₱' . number_format((float)$row['total'], 2) . ' awaiting your approval',
-                    'link' => 'my_bookings.php',
-                    'time_label' => ''
-                ];
-            }
-        } catch (PDOException $e) {
-            error_log('Sidebar parts notification error: ' . $e->getMessage());
-        }
-
-        $customerNotificationItems = array_merge($unreadPartItems, $unreadHealthItems, $unreadBookingItems);
+        require_once __DIR__ . '/customer_notifications_helper.php';
+        $custNotif = fetch_customer_notifications($pdo, (int) $_SESSION['user_id']);
+        $customerNotificationItems = $custNotif['items'];
+        $unreadBookingItems = $custNotif['booking_items'];
+        $unreadHealthCount = $custNotif['unread_health'];
     } catch (PDOException $e) {
         error_log("Sidebar notification query error: " . $e->getMessage());
     }
@@ -350,37 +219,42 @@ $totalNotificationCount = count($customerNotificationItems);
                 part: 'bi-gear-fill'
             };
 
-            let dropdownHTML = '<div class="notification-dropdown-header">' +
-                '<div class="nd-title">Notifications' +
-                (notifData.count > 0 ? '<span class="nd-count">' + notifData.count + ' new</span>' : '') +
-                '</div>' +
-                '<a href="my_bookings.php" class="nd-link">View All</a>' +
-                '</div><div class="notification-list">';
-
-            if (notifData.items && notifData.items.length > 0) {
-                notifData.items.forEach(item => {
-                    const iconClass = iconMap[item.type] || 'bi-bell';
-                    dropdownHTML += '<a href="' + esc(item.link) + '" class="notification-item ' + esc(item.type) + '">' +
-                        '<div class="notification-icon"><i class="bi ' + iconClass + '"></i></div>' +
-                        '<div class="notification-item-text">' +
-                            '<div class="notification-item-title">' + esc(item.title) + '</div>' +
-                            '<div class="notification-item-message">' + esc(item.message) + '</div>' +
-                            (item.time_label ? '<div class="notification-item-time"><i class="bi bi-clock"></i>' + esc(item.time_label) + '</div>' : '') +
-                        '</div>' +
-                        '<span class="notification-dot"></span>' +
-                    '</a>';
-                });
-            } else {
-                dropdownHTML += '<div class="notification-empty">' +
+            const notifEmptyHTML =
+                '<div class="notification-empty">' +
                     '<i class="bi bi-bell-slash"></i>' +
                     '<div class="ne-title">All caught up</div>' +
                     '<div class="ne-sub">No new notifications right now</div>' +
+                '</div>';
+
+            const notifItemHTML = function (item) {
+                const iconClass = iconMap[item.type] || 'bi-bell';
+                return '<a href="' + esc(item.link) + '" class="notification-item ' + esc(item.type) + '"' +
+                    (item.key ? ' data-key="' + esc(item.key) + '"' : '') + '>' +
+                    '<div class="notification-icon"><i class="bi ' + iconClass + '"></i></div>' +
+                    '<div class="notification-item-text">' +
+                        '<div class="notification-item-title">' + esc(item.title) + '</div>' +
+                        '<div class="notification-item-message">' + esc(item.message) + '</div>' +
+                        (item.time_label ? '<div class="notification-item-time"><i class="bi bi-clock"></i>' + esc(item.time_label) + '</div>' : '') +
+                    '</div>' +
+                    '<span class="notification-dot"></span>' +
+                '</a>';
+            };
+
+            const renderNotifHeader = function (count) {
+                return '<div class="notification-dropdown-header">' +
+                    '<div class="nd-title">Notifications' +
+                    (count > 0 ? '<span class="nd-count">' + count + ' new</span>' : '') +
+                    '</div>' +
+                    '<a href="my_bookings.php" class="nd-link">View All</a>' +
                     '</div>';
-            }
+            };
 
-            dropdownHTML += '</div>';
+            const renderNotifList = function (items) {
+                return (items && items.length) ? items.map(notifItemHTML).join('') : notifEmptyHTML;
+            };
 
-            dropdown.innerHTML = dropdownHTML;
+            dropdown.innerHTML = renderNotifHeader(notifData.count) +
+                '<div class="notification-list">' + renderNotifList(notifData.items) + '</div>';
             notifWrapper.appendChild(bell);
             notifWrapper.appendChild(dropdown);
 
@@ -452,6 +326,110 @@ $totalNotificationCount = count($customerNotificationItems);
                 if (!notifWrapper.contains(e.target)) {
                     dropdown.classList.remove('show');
                 }
+            });
+
+            // --- Live notification polling (no page refresh needed) ---
+            const customerNotifKnown = {};
+            (notifData.items || []).forEach(function (it) {
+                if (it.key) customerNotifKnown[it.key] = true;
+            });
+
+            const setCustomerNotifCount = function (count) {
+                let badge = bell.querySelector('.badge');
+                if (count > 0) {
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.className = 'badge';
+                        bell.appendChild(badge);
+                    }
+                    badge.textContent = count;
+                    badge.style.display = '';
+                } else if (badge) {
+                    badge.remove();
+                }
+
+                const ndTitle = dropdown.querySelector('.nd-title');
+                let ndCount = dropdown.querySelector('.nd-count');
+                if (count > 0) {
+                    if (!ndCount && ndTitle) {
+                        ndCount = document.createElement('span');
+                        ndCount.className = 'nd-count';
+                        ndTitle.appendChild(ndCount);
+                    }
+                    if (ndCount) ndCount.textContent = count + ' new';
+                } else if (ndCount) {
+                    ndCount.remove();
+                }
+            };
+
+            const setNavBadge = function (href, count) {
+                const link = document.querySelector('.sidebar-nav-item[href="' + href + '"]');
+                if (!link) return;
+                let badge = link.querySelector('.badge');
+                if (count > 0) {
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.className = 'badge';
+                        link.appendChild(badge);
+                    }
+                    badge.textContent = count;
+                } else if (badge) {
+                    badge.remove();
+                }
+            };
+
+            const pollCustomerNotifications = function () {
+                if (document.hidden) return;
+                fetch('api/get_customer_notifications.php', {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    credentials: 'same-origin'
+                })
+                .then(function (res) { return res.ok ? res.json() : null; })
+                .then(function (data) {
+                    if (!data || !data.success) return;
+                    const items = data.items || [];
+                    const list = dropdown.querySelector('.notification-list');
+                    const isOpen = dropdown.classList.contains('show');
+                    const newItems = items.filter(function (it) {
+                        return it.key && !customerNotifKnown[it.key];
+                    });
+
+                    if (!isOpen && list) {
+                        list.innerHTML = renderNotifList(items);
+                    } else if (newItems.length && list) {
+                        const empty = list.querySelector('.notification-empty');
+                        if (empty) empty.remove();
+                        newItems.slice().reverse().forEach(function (it) {
+                            list.insertAdjacentHTML('afterbegin', notifItemHTML(it));
+                        });
+                    }
+
+                    items.forEach(function (it) {
+                        if (it.key) customerNotifKnown[it.key] = true;
+                    });
+
+                    newItems.forEach(function (it) {
+                        if (typeof window.showToast === 'function') {
+                            window.showToast(
+                                it.title + (it.message ? ' \u2014 ' + it.message : ''),
+                                (it.type === 'part' || it.type === 'emergency') ? 'warning' : 'info',
+                                6000
+                            );
+                        }
+                    });
+
+                    notifData.items = items;
+                    notifData.count = parseInt(data.count, 10) || 0;
+                    setCustomerNotifCount(notifData.count);
+                    setNavBadge('my_bookings.php', parseInt(data.unread_bookings, 10) || 0);
+                    setNavBadge('customer_health_score.php', parseInt(data.unread_health, 10) || 0);
+                })
+                .catch(function () { /* network hiccup — try again next tick */ });
+            };
+
+            setInterval(pollCustomerNotifications, 15000);
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden) pollCustomerNotifications();
             });
         }
 

@@ -10,160 +10,18 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 
 require_once __DIR__ . '/status_helper.php';
 require_once __DIR__ . '/pagination_helper.php';
+require_once __DIR__ . '/admin_notifications_helper.php';
 
 $adminName = $_SESSION['username'] ?? 'Admin';
 $currentPage = basename($_SERVER['PHP_SELF'], '.php');
 require 'notification_helper.php';
 
-// Get pending count for badge
-$pendingCount = 0;
-try {
-    $pendingCount = $pdo->query("
-        SELECT COUNT(id) FROM bookings 
-        WHERE status IN ('pending', 'unassigned', 'deposit_submitted')
-    ")->fetchColumn();
-} catch (PDOException $e) {
-    $pendingCount = 0;
-}
-
-// Get new/pending emergency request count for badge
-$emergencyCount = 0;
-try {
-    $emergencyCount = $pdo->query("
-        SELECT COUNT(id) FROM emergency_service_requests 
-        WHERE request_status IN ('pending', 'new')
-    ")->fetchColumn();
-} catch (PDOException $e) {
-    $emergencyCount = 0;
-}
-
-// --- Admin notification items for the header bell ---
-$adminNotificationItems = [];
-$adminSeenBookings  = $_SESSION['admin_seen_booking_ids'] ?? [];
-$adminSeenEmergency = $_SESSION['admin_seen_emergency_ids'] ?? [];
-$adminSeenWarranty  = $_SESSION['admin_seen_warranty_ids'] ?? [];
-$adminSeenHealth    = $_SESSION['admin_seen_health_ids'] ?? [];
-
-if (!function_exists('notifTimeAgo')) {
-    function notifTimeAgo($dt) {
-        if (empty($dt)) return '';
-        $ts = strtotime($dt);
-        if (!$ts) return '';
-        $now = time();
-        if ($ts > $now) return date('M d, Y', $ts);
-        $diff = $now - $ts;
-        if ($diff < 60) return 'Just now';
-        if ($diff < 3600) return floor($diff / 60) . 'm ago';
-        if ($diff < 86400) return floor($diff / 3600) . 'h ago';
-        if ($diff < 604800) return floor($diff / 86400) . 'd ago';
-        return date('M d, Y', $ts);
-    }
-}
-
-// Pending / new bookings needing admin action
-try {
-    $sql = "
-        SELECT b.id, b.status, b.schedule_date, b.schedule_start_time, u.name AS customer_name
-        FROM bookings b
-        JOIN users u ON b.user_id = u.id
-        WHERE b.status IN ('pending', 'unassigned', 'deposit_submitted')
-    ";
-    if (!empty($adminSeenBookings)) {
-        $sql .= " AND b.id NOT IN (" . implode(',', array_map('intval', $adminSeenBookings)) . ")";
-    }
-    $sql .= " ORDER BY b.schedule_date ASC, b.schedule_start_time ASC LIMIT 5";
-    foreach ($pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $label = $row['status'] === 'deposit_submitted' ? 'Deposit submitted'
-               : ($row['status'] === 'unassigned' ? 'Unassigned booking' : 'New booking');
-        $adminNotificationItems[] = [
-            'type'       => 'booking',
-            'title'      => $label . ' #' . $row['id'],
-            'message'    => ($row['customer_name'] ?: 'Customer') . ' - ' . date('M d, Y', strtotime($row['schedule_date'])),
-            'link'       => 'manage_bookings.php',
-            'time_label' => date('M d, Y g:i A', strtotime($row['schedule_date'] . ' ' . $row['schedule_start_time']))
-        ];
-    }
-} catch (PDOException $e) {
-    error_log("Admin notif bookings error: " . $e->getMessage());
-}
-
-// Pending / new emergency requests
-try {
-    $sql = "
-        SELECT esr.id, esr.request_status, esr.created_at, u.name AS customer_name
-        FROM emergency_service_requests esr
-        JOIN users u ON esr.customer_id = u.id
-        WHERE esr.request_status IN ('pending', 'new')
-    ";
-    if (!empty($adminSeenEmergency)) {
-        $sql .= " AND esr.id NOT IN (" . implode(',', array_map('intval', $adminSeenEmergency)) . ")";
-    }
-    $sql .= " ORDER BY esr.created_at DESC LIMIT 5";
-    foreach ($pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $adminNotificationItems[] = [
-            'type'       => 'emergency',
-            'title'      => 'Emergency Request #' . $row['id'],
-            'message'    => ($row['customer_name'] ?: 'Customer') . ' needs assistance',
-            'link'       => 'admin_emergency_requests.php',
-            'time_label' => notifTimeAgo($row['created_at'])
-        ];
-    }
-} catch (PDOException $e) {
-    error_log("Admin notif emergency error: " . $e->getMessage());
-}
-
-// Pending warranty claims
-try {
-    $sql = "
-        SELECT wc.id, wc.claim_date, u.name AS customer_name
-        FROM warranty_claims wc
-        JOIN warranties w ON wc.warranty_id = w.id
-        LEFT JOIN users u ON w.customer_id = u.id
-        WHERE wc.claim_status = 'pending'
-    ";
-    if (!empty($adminSeenWarranty)) {
-        $sql .= " AND wc.id NOT IN (" . implode(',', array_map('intval', $adminSeenWarranty)) . ")";
-    }
-    $sql .= " ORDER BY wc.claim_date DESC LIMIT 5";
-    foreach ($pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $adminNotificationItems[] = [
-            'type'       => 'warranty',
-            'title'      => 'Warranty Claim #' . $row['id'],
-            'message'    => ($row['customer_name'] ?: 'Customer') . ' - ' . date('M d, Y', strtotime($row['claim_date'])),
-            'link'       => 'admin_warranty.php',
-            'time_label' => notifTimeAgo($row['claim_date'])
-        ];
-    }
-} catch (PDOException $e) {
-    error_log("Admin notif warranty error: " . $e->getMessage());
-}
-
-// Motorcycles with critical health scores
-try {
-    $sql = "
-        SELECT m.id, m.health_score, m.brand, m.model, m.plate_number, u.name AS customer_name
-        FROM motorcycles m
-        LEFT JOIN users u ON m.user_id = u.id
-        WHERE m.health_score < 60
-    ";
-    if (!empty($adminSeenHealth)) {
-        $sql .= " AND m.id NOT IN (" . implode(',', array_map('intval', $adminSeenHealth)) . ")";
-    }
-    $sql .= " ORDER BY m.health_score ASC LIMIT 5";
-    foreach ($pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $adminNotificationItems[] = [
-            'type'       => 'health',
-            'title'      => 'Low Health Score',
-            'message'    => $row['brand'] . ' ' . $row['model'] . ' (' . $row['plate_number'] . ') - health ' . $row['health_score'],
-            'link'       => 'admin_health_scores.php',
-            'time_label' => ''
-        ];
-    }
-} catch (PDOException $e) {
-    error_log("Admin notif health error: " . $e->getMessage());
-}
-
-$adminNotificationCount = count($adminNotificationItems);
+// Sidebar badges + header bell items (shared with api/get_admin_notifications.php)
+$adminNotif = fetch_admin_notifications($pdo);
+$pendingCount = $adminNotif['pending_bookings'];
+$emergencyCount = $adminNotif['pending_emergencies'];
+$adminNotificationItems = $adminNotif['items'];
+$adminNotificationCount = $adminNotif['count'];
 $adminNotifIcons = [
     'booking'   => 'bi-journal-text',
     'emergency' => 'bi-exclamation-triangle-fill',
@@ -467,6 +325,138 @@ require __DIR__ . '/partials/head.php';
                         notifDropdown.classList.remove('show');
                     }
                 });
+
+                // --- Live notification polling (no page refresh needed) ---
+                var adminNotifIcons = <?= json_encode($adminNotifIcons) ?>;
+                var adminNotifList = notifDropdown.querySelector('.notification-list');
+                var adminNotifKnown = {};
+                var adminNotifEmptyHTML =
+                    '<div class="notification-empty"><i class="bi bi-bell-slash"></i>' +
+                    '<div class="ne-title">All caught up</div>' +
+                    '<div class="ne-sub">No new notifications right now</div></div>';
+
+                notifDropdown.querySelectorAll('.notification-item[data-key]').forEach(function (el) {
+                    adminNotifKnown[el.getAttribute('data-key')] = true;
+                });
+
+                var escNotif = function (s) {
+                    return String(s == null ? '' : s)
+                        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+                };
+
+                var notifItemHTML = function (item) {
+                    var icon = adminNotifIcons[item.type] || 'bi-bell';
+                    return '<a href="' + escNotif(item.link) + '" class="notification-item ' + escNotif(item.type) + '"' +
+                        (item.key ? ' data-key="' + escNotif(item.key) + '"' : '') + '>' +
+                        '<div class="notification-icon"><i class="bi ' + icon + '"></i></div>' +
+                        '<div class="notification-item-text">' +
+                            '<div class="notification-item-title">' + escNotif(item.title) + '</div>' +
+                            '<div class="notification-item-message">' + escNotif(item.message) + '</div>' +
+                            (item.time_label ? '<div class="notification-item-time"><i class="bi bi-clock"></i>' + escNotif(item.time_label) + '</div>' : '') +
+                        '</div>' +
+                        '<span class="notification-dot"></span>' +
+                    '</a>';
+                };
+
+                var setAdminNotifCount = function (count) {
+                    var badge = document.getElementById('adminNotifBadge');
+                    if (count > 0) {
+                        if (!badge) {
+                            badge = document.createElement('span');
+                            badge.className = 'badge';
+                            badge.id = 'adminNotifBadge';
+                            notifBell.appendChild(badge);
+                        }
+                        badge.textContent = count;
+                        badge.style.display = '';
+                    } else if (badge) {
+                        badge.remove();
+                    }
+
+                    var ndTitle = notifDropdown.querySelector('.nd-title');
+                    var ndCount = notifDropdown.querySelector('.nd-count');
+                    if (count > 0) {
+                        if (!ndCount && ndTitle) {
+                            ndCount = document.createElement('span');
+                            ndCount.className = 'nd-count';
+                            ndTitle.appendChild(ndCount);
+                        }
+                        if (ndCount) ndCount.textContent = count + ' new';
+                    } else if (ndCount) {
+                        ndCount.remove();
+                    }
+                };
+
+                var setMenuBadge = function (submenuId, count) {
+                    var btn = document.querySelector('.menu-parent[data-submenu="' + submenuId + '"]');
+                    if (!btn) return;
+                    var badge = btn.querySelector('.menu-badge');
+                    if (count > 0) {
+                        if (!badge) {
+                            badge = document.createElement('span');
+                            badge.className = 'menu-badge';
+                            btn.insertBefore(badge, btn.querySelector('.menu-caret'));
+                        }
+                        badge.textContent = count;
+                    } else if (badge) {
+                        badge.remove();
+                    }
+                };
+
+                var pollAdminNotifications = function () {
+                    if (document.hidden) return;
+                    fetch('api/get_admin_notifications.php', {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                        credentials: 'same-origin'
+                    })
+                    .then(function (res) { return res.ok ? res.json() : null; })
+                    .then(function (data) {
+                        if (!data || !data.success || !adminNotifList) return;
+                        var items = data.items || [];
+                        var isOpen = notifDropdown.classList.contains('show');
+                        var newItems = items.filter(function (it) {
+                            return it.key && !adminNotifKnown[it.key];
+                        });
+
+                        if (!isOpen) {
+                            adminNotifList.innerHTML = items.length
+                                ? items.map(notifItemHTML).join('')
+                                : adminNotifEmptyHTML;
+                        } else if (newItems.length) {
+                            var empty = adminNotifList.querySelector('.notification-empty');
+                            if (empty) empty.remove();
+                            newItems.slice().reverse().forEach(function (it) {
+                                adminNotifList.insertAdjacentHTML('afterbegin', notifItemHTML(it));
+                            });
+                        }
+
+                        items.forEach(function (it) {
+                            if (it.key) adminNotifKnown[it.key] = true;
+                        });
+
+                        newItems.forEach(function (it) {
+                            if (typeof window.showToast === 'function') {
+                                window.showToast(
+                                    it.title + (it.message ? ' \u2014 ' + it.message : ''),
+                                    it.type === 'emergency' ? 'warning' : 'info',
+                                    6000
+                                );
+                            }
+                        });
+
+                        setAdminNotifCount(parseInt(data.count, 10) || 0);
+                        setMenuBadge('submenuBookings', parseInt(data.pending_bookings, 10) || 0);
+                        setMenuBadge('submenuEmergency', parseInt(data.pending_emergencies, 10) || 0);
+                    })
+                    .catch(function () { /* network hiccup — try again next tick */ });
+                };
+
+                setInterval(pollAdminNotifications, 15000);
+                document.addEventListener('visibilitychange', function () {
+                    if (!document.hidden) pollAdminNotifications();
+                });
             }
 
             // Dark mode toggle
@@ -556,7 +546,7 @@ require __DIR__ . '/partials/head.php';
                     <div class="notification-list">
                         <?php if (!empty($adminNotificationItems)): ?>
                             <?php foreach ($adminNotificationItems as $item): ?>
-                                <a href="<?= htmlspecialchars($item['link']) ?>" class="notification-item <?= htmlspecialchars($item['type']) ?>">
+                                <a href="<?= htmlspecialchars($item['link']) ?>" class="notification-item <?= htmlspecialchars($item['type']) ?>"<?= !empty($item['key']) ? ' data-key="' . htmlspecialchars($item['key']) . '"' : '' ?>>
                                     <div class="notification-icon"><i class="bi <?= $adminNotifIcons[$item['type']] ?? 'bi-bell' ?>"></i></div>
                                     <div class="notification-item-text">
                                         <div class="notification-item-title"><?= htmlspecialchars($item['title']) ?></div>

@@ -90,12 +90,21 @@ function fetch_customer_notifications($pdo, $customerId) {
     ");
     $stmt->execute([$customerId]);
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $src = ($row['source'] ?? 'health') === 'maintenance' ? 'maintenance' : 'health';
+        $src = $row['source'] ?? 'health';
+        if (!in_array($src, ['maintenance', 'coaching'], true)) $src = 'health';
+        $title = $src === 'maintenance' ? 'Maintenance Reminder'
+               : ($src === 'coaching' ? 'Coaching Note' : 'Health Score Alert');
+        $message = $row['brand'] . ' ' . $row['model'] . ' (' . $row['plate_number'] . ')';
+        if ($src === 'coaching') {
+            $message .= ' - ' . trim(preg_replace('/^Coaching note:\s*/i', '', (string) ($row['recommendation'] ?? '')));
+        } else {
+            $message .= ' - health ' . $row['health_score'];
+        }
         $unreadHealthItems[] = [
             'key' => $src . '-' . (int) $row['id'],
             'type' => $src,
-            'title' => $src === 'maintenance' ? 'Maintenance Reminder' : 'Health Score Alert',
-            'message' => ($row['brand'] . ' ' . $row['model'] . ' (' . $row['plate_number'] . ') - health ' . $row['health_score']),
+            'title' => $title,
+            'message' => $message,
             'motorcycle' => trim($row['brand'] . ' ' . $row['model'] . ' (' . $row['plate_number'] . ')'),
             'health_score' => (int) $row['health_score'],
             'recommendation' => $row['recommendation'] ?? '',
@@ -169,7 +178,7 @@ function fetch_customer_notifications($pdo, $customerId) {
     $items = array_merge($unreadPartItems, $unreadHealthItems, $unreadBookingItems);
 
     $unreadHealthCount = count(array_filter($unreadHealthItems, function ($it) {
-        return $it['type'] === 'health';
+        return $it['type'] === 'health' || $it['type'] === 'coaching';
     }));
 
     return [

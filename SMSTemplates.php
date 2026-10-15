@@ -79,6 +79,11 @@ class SMSTemplates {
         ]);
     }
 
+    public static function coachingNote($brand, $model, $note) {
+        $template = "Mindanao Eversure: Service note for your {brand} {model}: {note}";
+        return self::replace($template, ['brand' => $brand, 'model' => $model, 'note' => $note]);
+    }
+
     public static function warrantyExpiration($brand, $model, $date) {
         $template = "Mindanao Eversure: Reminder: The warranty for your {brand} {model} will expire on {date}. Please contact Mindanao Eversure Corporation for applicable warranty concerns before the expiration date.";
         return self::replace($template, [

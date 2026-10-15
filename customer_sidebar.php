@@ -217,6 +217,7 @@ $totalNotificationCount = count($customerNotificationItems);
                 emergency: 'bi-exclamation-triangle-fill',
                 warranty: 'bi-shield-check',
                 health: 'bi-heart-pulse',
+                coaching: 'bi-clipboard-check',
                 maintenance: 'bi-tools',
                 part: 'bi-gear-fill'
             };

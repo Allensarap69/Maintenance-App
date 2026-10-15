@@ -2447,7 +2447,7 @@ endif;
     // Admin-sent notifications: health alerts + maintenance reminders
     function healthItems(items) {
         return (items || []).filter(function (it) {
-            return it && (it.type === 'health' || it.type === 'maintenance') && it.key && !popped[it.key];
+            return it && (it.type === 'health' || it.type === 'maintenance' || it.type === 'coaching') && it.key && !popped[it.key];
         });
     }
 

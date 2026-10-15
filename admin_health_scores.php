@@ -142,6 +142,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['notify_customer'])) {
     exit;
 }
 
+// Migrate older tables: coaching notes are tagged source='coaching'
+try {
+    $notifCols = $pdo->query("DESCRIBE customer_notifications")->fetchAll(PDO::FETCH_COLUMN);
+    if (!in_array('source', $notifCols, true)) {
+        $pdo->exec("ALTER TABLE customer_notifications ADD COLUMN source VARCHAR(20) NOT NULL DEFAULT 'health' AFTER recommendation");
+    }
+} catch (PDOException $e) {
+    error_log('customer_notifications source migration: ' . $e->getMessage());
+}
+
+// Handle admin "Coaching Notes" action - saves the note and notifies the customer
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['coaching_note'])) {
+    $customer_id = (int) ($_POST['customer_id'] ?? 0);
+    $motorcycle_id = (int) ($_POST['motorcycle_id'] ?? 0);
+    $health_score = (int) ($_POST['health_score'] ?? 0);
+    $notes = trim($_POST['notes'] ?? '');
+
+    if ($customer_id && $motorcycle_id && $notes !== '') {
+        try {
+            $stmt = $pdo->prepare("INSERT INTO customer_notifications (customer_id, motorcycle_id, health_score, recommendation, source) VALUES (?, ?, ?, ?, 'coaching')");
+            $stmt->execute([$customer_id, $motorcycle_id, $health_score, 'Coaching note: ' . $notes]);
+            $notificationId = (int) $pdo->lastInsertId();
+
+            // Send SMS to the customer's registered phone number
+            $stmt = $pdo->prepare("SELECT phone FROM users WHERE id = ?");
+            $stmt->execute([$customer_id]);
+            $customerPhone = $stmt->fetchColumn();
+
+            $stmt = $pdo->prepare("SELECT brand, model FROM motorcycles WHERE id = ?");
+            $stmt->execute([$motorcycle_id]);
+            $moto = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            $flashType = 'success';
+            $smsNote = '';
+            if (!empty($customerPhone)) {
+                try {
+                    $sms = new SMSHelper();
+                    $smsText = SMSTemplates::coachingNote(
+                        $moto['brand'] ?? 'motorcycle',
+                        $moto['model'] ?? '',
+                        $notes
+                    );
+                    $smsResult = $sms->sendSMS($customerPhone, $smsText, 'COACHING_NOTE', [
+                        'user_id' => $customer_id,
+                        'customer_id' => $customer_id,
+                        'motorcycle_id' => $motorcycle_id,
+                        'notification_key' => 'COACHING_' . $notificationId,
+                        'reference_id' => $notificationId
+                    ]);
+                    if ($smsResult['success']) {
+                        $smsNote = ' SMS sent to ' . $customerPhone . '.';
+                    } else {
+                        $smsNote = ' SMS failed: ' . $smsResult['message'];
+                        $flashType = 'warning';
+                    }
+                } catch (Exception $e) {
+                    error_log('Coaching note SMS error: ' . $e->getMessage());
+                    $smsNote = ' SMS could not be sent.';
+                    $flashType = 'warning';
+                }
+            } else {
+                $smsNote = ' No phone number on file - SMS not sent.';
+                $flashType = 'warning';
+            }
+
+            $_SESSION['flash_msg'] = 'Coaching note sent to customer.' . $smsNote;
+            $_SESSION['flash_type'] = $flashType;
+        } catch (PDOException $e) {
+            $_SESSION['flash_msg'] = "Failed to send coaching note";
+            $_SESSION['flash_type'] = "danger";
+            error_log("Coaching note error: " . $e->getMessage());
+        }
+    } else {
+        $_SESSION['flash_msg'] = "A coaching note is required";
+        $_SESSION['flash_type'] = "warning";
+    }
+
+    // Post/Redirect/Get: prevent duplicate notes when the page is reloaded
+    header("Location: admin_health_scores.php");
+    exit;
+}
+
 // --- Fetch Available Services ---
 $services = [];
 try {
@@ -939,17 +1021,24 @@ $pageTitle = 'Motorcycle Health Scores';
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                         </div>
                                         <div class="modal-body">
-                                            <form onsubmit="event.preventDefault(); Swal.fire({icon:'success',title:'Saved',text:'Coaching notes saved.',timer:1500,showConfirmButton:false}); bootstrap.Modal.getInstance(document.getElementById('<?= $notesId ?>')).hide();">
+                                            <form method="POST">
+                                                <input type="hidden" name="coaching_note" value="1">
+                                                <input type="hidden" name="customer_id" value="<?= (int) ($motorcycle['user_id'] ?? 0) ?>">
+                                                <input type="hidden" name="motorcycle_id" value="<?= (int) $motorcycle['id'] ?>">
+                                                <input type="hidden" name="health_score" value="<?= (int) $health_score ?>">
                                                 <div class="mb-3">
                                                     <label class="form-label" style="color: #6b7280; font-size: 0.85rem;">Customer</label>
                                                     <input type="text" class="form-control" style="background: #ffffff; border-color: #e2e8f0; color: #111827;" value="<?= htmlspecialchars($customerName) ?>" readonly>
                                                 </div>
                                                 <div class="mb-3">
                                                     <label class="form-label" style="color: #6b7280; font-size: 0.85rem;">Notes</label>
-                                                    <textarea class="form-control" rows="4" style="background: #ffffff; border-color: #e2e8f0; color: #111827;" placeholder="Enter service or coaching notes..."></textarea>
+                                                    <textarea class="form-control" name="notes" rows="4" required style="background: #ffffff; border-color: #e2e8f0; color: #111827;" placeholder="Enter service or coaching notes..."></textarea>
+                                                </div>
+                                                <div class="alert alert-info" style="font-size: 0.8rem;">
+                                                    <i class="fas fa-info-circle me-1"></i> The customer will receive this note in their notifications and via SMS.
                                                 </div>
                                                 <div class="text-end">
-                                                    <button type="submit" class="btn" style="background: #FACC15; color: #0f172a; font-weight: 600;">Save Notes</button>
+                                                    <button type="submit" class="btn" style="background: #FACC15; color: #0f172a; font-weight: 600;"><i class="fas fa-paper-plane me-1"></i> Send to Customer</button>
                                                 </div>
                                             </form>
                                         </div>

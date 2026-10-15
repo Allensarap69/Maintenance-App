@@ -2444,9 +2444,10 @@ endif;
     var modalEl = null;
     var modal = null;
 
+    // Admin-sent notifications: health alerts + maintenance reminders
     function healthItems(items) {
         return (items || []).filter(function (it) {
-            return it && it.type === 'health' && it.key && !popped[it.key];
+            return it && (it.type === 'health' || it.type === 'maintenance') && it.key && !popped[it.key];
         });
     }
 
@@ -2473,6 +2474,7 @@ endif;
                 rec = rec.substring(0, idx);
             }
             return '<div style="border: 1px solid #e2e8f0; border-left: 4px solid ' + scoreColor(it.health_score) + '; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; background: #f8fafc;">' +
+                '<div style="font-size:.68rem; letter-spacing:.06em; font-weight:700; text-transform:uppercase; color:' + scoreColor(it.health_score) + '; margin-bottom:4px;">' + esc(it.title) + '</div>' +
                 '<div class="d-flex justify-content-between align-items-center mb-1">' +
                     '<strong style="color:#0f172a;">' + esc(it.motorcycle || 'Motorcycle') + '</strong>' +
                     '<span style="font-size:.78rem; font-weight:700; color:' + scoreColor(it.health_score) + ';">Health: ' + esc(it.health_score) + '/100</span>' +

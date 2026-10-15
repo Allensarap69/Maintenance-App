@@ -49,6 +49,7 @@ function fetch_customer_notifications($pdo, $customerId) {
         motorcycle_id INT NOT NULL,
         health_score INT NOT NULL,
         recommendation TEXT,
+        source VARCHAR(20) NOT NULL DEFAULT 'health',
         is_read TINYINT(1) DEFAULT 0,
         is_applied TINYINT(1) DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -57,10 +58,29 @@ function fetch_customer_notifications($pdo, $customerId) {
         INDEX idx_motorcycle (motorcycle_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
-    // Health score notifications unread
+    // Migrate older tables: 'source' distinguishes admin health alerts from
+    // maintenance reminders (maintenance_management.php "Remind Customer").
+    // Result is cached in the session so rapid polling doesn't run DESCRIBE
+    // on every request.
+    $hasSourceCol = !empty($_SESSION['notif_source_col_ok']);
+    if (!$hasSourceCol) {
+        try {
+            $notifCols = $pdo->query("DESCRIBE customer_notifications")->fetchAll(PDO::FETCH_COLUMN);
+            if (!in_array('source', $notifCols, true)) {
+                $pdo->exec("ALTER TABLE customer_notifications ADD COLUMN source VARCHAR(20) NOT NULL DEFAULT 'health' AFTER recommendation");
+            }
+            $hasSourceCol = true;
+            $_SESSION['notif_source_col_ok'] = true;
+        } catch (PDOException $e) {
+            error_log('customer_notifications source migration: ' . $e->getMessage());
+        }
+    }
+    $srcExpr = $hasSourceCol ? 'n.source' : "'health' AS source";
+
+    // Health score + maintenance reminder notifications unread
     $unreadHealthItems = [];
     $stmt = $pdo->prepare("
-        SELECT n.id, n.motorcycle_id, n.health_score, n.recommendation, n.created_at,
+        SELECT n.id, n.motorcycle_id, n.health_score, n.recommendation, $srcExpr, n.created_at,
                m.brand, m.model, m.plate_number
         FROM customer_notifications n
         JOIN motorcycles m ON n.motorcycle_id = m.id
@@ -70,10 +90,11 @@ function fetch_customer_notifications($pdo, $customerId) {
     ");
     $stmt->execute([$customerId]);
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $src = ($row['source'] ?? 'health') === 'maintenance' ? 'maintenance' : 'health';
         $unreadHealthItems[] = [
-            'key' => 'health-' . (int) $row['id'],
-            'type' => 'health',
-            'title' => 'Health Score Alert',
+            'key' => $src . '-' . (int) $row['id'],
+            'type' => $src,
+            'title' => $src === 'maintenance' ? 'Maintenance Reminder' : 'Health Score Alert',
             'message' => ($row['brand'] . ' ' . $row['model'] . ' (' . $row['plate_number'] . ') - health ' . $row['health_score']),
             'motorcycle' => trim($row['brand'] . ' ' . $row['model'] . ' (' . $row['plate_number'] . ')'),
             'health_score' => (int) $row['health_score'],
@@ -147,11 +168,15 @@ function fetch_customer_notifications($pdo, $customerId) {
 
     $items = array_merge($unreadPartItems, $unreadHealthItems, $unreadBookingItems);
 
+    $unreadHealthCount = count(array_filter($unreadHealthItems, function ($it) {
+        return $it['type'] === 'health';
+    }));
+
     return [
         'items'          => $items,
         'count'          => count($items),
         'booking_items'  => $unreadBookingItems,
-        'unread_health'  => count($unreadHealthItems),
+        'unread_health'  => $unreadHealthCount,
         'unread_bookings' => count($unreadBookingItems),
     ];
 }

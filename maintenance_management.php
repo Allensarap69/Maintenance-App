@@ -25,6 +25,7 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS customer_notifications (
     motorcycle_id INT NOT NULL,
     health_score INT NOT NULL,
     recommendation TEXT,
+    source VARCHAR(20) NOT NULL DEFAULT 'health',
     is_read TINYINT(1) DEFAULT 0,
     is_applied TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -32,6 +33,16 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS customer_notifications (
     INDEX idx_customer (customer_id),
     INDEX idx_motorcycle (motorcycle_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+// Migrate older tables: reminders are tagged source='maintenance'
+try {
+    $notifCols = $pdo->query("DESCRIBE customer_notifications")->fetchAll(PDO::FETCH_COLUMN);
+    if (!in_array('source', $notifCols, true)) {
+        $pdo->exec("ALTER TABLE customer_notifications ADD COLUMN source VARCHAR(20) NOT NULL DEFAULT 'health' AFTER recommendation");
+    }
+} catch (PDOException $e) {
+    error_log('customer_notifications source migration: ' . $e->getMessage());
+}
 
 // --- Remind Customer (maintenance reminder notification + SMS) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remind_customer'])) {
@@ -55,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remind_customer'])) {
             $motoStmt->execute([$motorcycle_id]);
             $moto = $motoStmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-            $stmt = $pdo->prepare("INSERT INTO customer_notifications (customer_id, motorcycle_id, health_score, recommendation) VALUES (?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO customer_notifications (customer_id, motorcycle_id, health_score, recommendation, source) VALUES (?, ?, ?, ?, 'maintenance')");
             $stmt->execute([$customer_id, $motorcycle_id, (int) ($moto['health_score'] ?? 0), $recommendation]);
             $notificationId = (int) $pdo->lastInsertId();
 

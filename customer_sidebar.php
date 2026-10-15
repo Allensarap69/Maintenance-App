@@ -217,6 +217,7 @@ $totalNotificationCount = count($customerNotificationItems);
                 emergency: 'bi-exclamation-triangle-fill',
                 warranty: 'bi-shield-check',
                 health: 'bi-heart-pulse',
+                maintenance: 'bi-tools',
                 part: 'bi-gear-fill'
             };
 
@@ -388,12 +389,14 @@ $totalNotificationCount = count($customerNotificationItems);
                              window.Capacitor.Plugins.LocalNotifications;
                     if (!LN || !LN.schedule) return;
                     var doSchedule = function () {
+                        // No `schedule` field: the plugin calls notify() immediately.
+                        // (schedule.at needs SCHEDULE_EXACT_ALARM, which the app
+                        // does not declare — it would fail silently on Android 12+.)
                         LN.schedule({
                             notifications: [{
                                 id: Math.floor(Math.random() * 2000000000),
                                 title: title,
-                                body: body,
-                                schedule: { at: new Date(Date.now() + 200) }
+                                body: body
                             }]
                         }).catch(function () {});
                     };
@@ -406,8 +409,27 @@ $totalNotificationCount = count($customerNotificationItems);
                 } catch (e) {}
             };
 
+            // Ask for Android notification permission up front so the first
+            // real notification isn't lost behind the permission prompt.
+            try {
+                var __LN = window.Capacitor && window.Capacitor.Plugins &&
+                           window.Capacitor.Plugins.LocalNotifications;
+                if (__LN && __LN.checkPermissions && __LN.requestPermissions) {
+                    __LN.checkPermissions().then(function (p) {
+                        nativeNotifPerm = (p && p.display) || null;
+                        if (nativeNotifPerm === 'prompt' || nativeNotifPerm === 'prompt-with-rationale') {
+                            __LN.requestPermissions().then(function (p2) {
+                                nativeNotifPerm = (p2 && p2.display) || nativeNotifPerm;
+                            }).catch(function () {});
+                        }
+                    }).catch(function () {});
+                }
+            } catch (e) {}
+
+            var notifInFlight = false;
             const pollCustomerNotifications = function () {
-                if (document.hidden) return;
+                if (document.hidden || notifInFlight) return;
+                notifInFlight = true;
                 fetch('api/get_customer_notifications.php', {
                     headers: { 'X-Requested-With': 'XMLHttpRequest' },
                     credentials: 'same-origin'
@@ -440,7 +462,7 @@ $totalNotificationCount = count($customerNotificationItems);
                         if (typeof window.showToast === 'function') {
                             window.showToast(
                                 it.title + (it.message ? ' \u2014 ' + it.message : ''),
-                                (it.type === 'part' || it.type === 'emergency') ? 'warning' : 'info',
+                                (it.type === 'part' || it.type === 'emergency' || it.type === 'maintenance') ? 'warning' : 'info',
                                 6000
                             );
                         }
@@ -465,10 +487,11 @@ $totalNotificationCount = count($customerNotificationItems);
                     setNavBadge('my_bookings.php', parseInt(data.unread_bookings, 10) || 0);
                     setNavBadge('customer_health_score.php', parseInt(data.unread_health, 10) || 0);
                 })
-                .catch(function () { /* network hiccup — try again next tick */ });
+                .catch(function () { /* network hiccup — try again next tick */ })
+                .finally(function () { notifInFlight = false; });
             };
 
-            setInterval(pollCustomerNotifications, 15000);
+            setInterval(pollCustomerNotifications, 3000);
             document.addEventListener('visibilitychange', function () {
                 if (!document.hidden) pollCustomerNotifications();
             });

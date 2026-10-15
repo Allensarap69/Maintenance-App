@@ -70,6 +70,7 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS customer_notifications (
     motorcycle_id INT NOT NULL,
     health_score INT NOT NULL,
     recommendation TEXT,
+    source VARCHAR(20) NOT NULL DEFAULT 'health',
     is_read TINYINT(1) DEFAULT 0,
     is_applied TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

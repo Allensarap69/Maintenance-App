@@ -3,7 +3,7 @@
   "appName": "Mindanao Eversure",
   "webDir": "www",
   "server": {
-    "url": "https://maintenance-app.onrender.com",
+    "url": "https://maintenance-app-q64i.onrender.com",
     "cleartext": true
   },
   "android": {

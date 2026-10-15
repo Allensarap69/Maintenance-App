@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 // The app tries each URL in order until one loads.
-// 192.168.1.16 is this PC's LAN address — for real phones on the same Wi-Fi
+// 192.168.1.67 is this PC's LAN address — for real phones on the same Wi-Fi
 // (requires inbound TCP:80 allowed through Windows Firewall).
 // 10.0.2.2 reaches the host machine from inside an Android emulator.
 // Replace with the production URL (e.g. https://your-app.onrender.com) once deployed.
 const List<String> kBaseUrls = [
-  'http://192.168.1.16/Advance_Database-System/',
+  'http://192.168.1.67/Advance_Database-System/',
   'http://10.0.2.2/Advance_Database-System/',
 ];
 

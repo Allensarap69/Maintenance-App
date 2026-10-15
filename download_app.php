@@ -5,11 +5,19 @@
  * If a file named app-release.apk exists it is preferred; otherwise the first .apk found is used.
  */
 
-$dir = __DIR__ . DIRECTORY_SEPARATOR . 'downloads';
+$apk_dir = __DIR__ . DIRECTORY_SEPARATOR . 'apk';
+$legacy_dir = __DIR__ . DIRECTORY_SEPARATOR . 'downloads';
 
-$apk = $dir . DIRECTORY_SEPARATOR . 'app-release.apk';
+$apk = $apk_dir . DIRECTORY_SEPARATOR . 'MindanaoEversure.apk';
 if (!is_file($apk)) {
-    $matches = glob($dir . DIRECTORY_SEPARATOR . '*.apk') ?: [];
+    $matches = glob($apk_dir . DIRECTORY_SEPARATOR . '*.apk') ?: [];
+    $apk = $matches[0] ?? null;
+}
+if (!$apk || !is_file($apk)) {
+    $apk = $legacy_dir . DIRECTORY_SEPARATOR . 'app-release.apk';
+}
+if (!is_file($apk)) {
+    $matches = glob($legacy_dir . DIRECTORY_SEPARATOR . '*.apk') ?: [];
     $apk = $matches[0] ?? null;
 }
 

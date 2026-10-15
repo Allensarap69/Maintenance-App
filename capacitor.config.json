@@ -1,0 +1,12 @@
+{
+  "appId": "com.eversure.app",
+  "appName": "Mindanao Eversure",
+  "webDir": "www",
+  "server": {
+    "url": "https://maintenance-app.onrender.com",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

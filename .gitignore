@@ -16,3 +16,10 @@ _*
 Thumbs.db
 .DS_Store
 nul
+
+# Capacitor / Node
+node_modules/
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties

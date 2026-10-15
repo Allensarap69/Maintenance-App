@@ -2406,6 +2406,142 @@ $alerts = array_slice($alerts, 0, 5);
 endif; 
 ?>
 
+<!-- Admin Notification Popup (unread admin notifications pop up on the home screen) -->
+<div class="modal fade" id="adminNotifModal" tabindex="-1" aria-labelledby="adminNotifModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden;">
+            <div class="modal-header" style="background: var(--primary-gradient); color: white; padding: 25px;">
+                <h5 class="modal-title fw-bold" id="adminNotifModalLabel">
+                    <i class="bi bi-megaphone-fill me-2"></i> Admin Notification
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="mb-3" style="color: #475569; font-size: 0.95rem;">
+                    The admin sent you a service notification for your motorcycle:
+                </p>
+                <div id="adminNotifList" style="max-height: 320px; overflow-y: auto;"></div>
+            </div>
+            <div class="modal-footer justify-content-center pb-4" style="border: none;">
+                <a href="customer_health_score.php" id="adminNotifViewLink" class="btn btn-lg" style="background: var(--primary-gradient); color: white; border-radius: 50px; padding: 12px 32px; font-weight: 600;">
+                    <i class="bi bi-heart-pulse me-2"></i> View Health Score
+                </a>
+                <button type="button" class="btn btn-lg btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 50px; padding: 12px 32px; font-weight: 600;">
+                    Dismiss
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Admin notification popup on the customer home screen.
+// Pops on page load for unread admin notifications, and again live whenever
+// the sidebar poller detects a new one while the customer is on this page.
+(function () {
+    var popped = {};
+    var shownItems = [];
+    var modalEl = null;
+    var modal = null;
+
+    function healthItems(items) {
+        return (items || []).filter(function (it) {
+            return it && it.type === 'health' && it.key && !popped[it.key];
+        });
+    }
+
+    function esc(s) {
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function scoreColor(score) {
+        score = parseInt(score, 10) || 0;
+        return score < 50 ? '#ef4444' : (score < 75 ? '#f59e0b' : '#10b981');
+    }
+
+    function renderList() {
+        var list = document.getElementById('adminNotifList');
+        if (!list) return;
+        list.innerHTML = shownItems.map(function (it) {
+            var rec = String(it.recommendation || '');
+            var notes = '';
+            var idx = rec.indexOf(' | Notes: ');
+            if (idx !== -1) {
+                notes = rec.substring(idx + 10);
+                rec = rec.substring(0, idx);
+            }
+            return '<div style="border: 1px solid #e2e8f0; border-left: 4px solid ' + scoreColor(it.health_score) + '; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; background: #f8fafc;">' +
+                '<div class="d-flex justify-content-between align-items-center mb-1">' +
+                    '<strong style="color:#0f172a;">' + esc(it.motorcycle || 'Motorcycle') + '</strong>' +
+                    '<span style="font-size:.78rem; font-weight:700; color:' + scoreColor(it.health_score) + ';">Health: ' + esc(it.health_score) + '/100</span>' +
+                '</div>' +
+                (rec ? '<div style="font-size:.85rem; color:#334155;">' + esc(rec) + '</div>' : '') +
+                (notes ? '<div style="font-size:.8rem; color:#64748b; margin-top:2px;"><em>Notes: ' + esc(notes) + '</em></div>' : '') +
+                (it.time_label ? '<div style="font-size:.72rem; color:#94a3b8; margin-top:4px;"><i class="bi bi-clock"></i> ' + esc(it.time_label) + '</div>' : '') +
+            '</div>';
+        }).join('');
+    }
+
+    function showAdminPopup(items) {
+        items.forEach(function (it) {
+            popped[it.key] = true;
+            shownItems.push(it);
+        });
+        modalEl = modalEl || document.getElementById('adminNotifModal');
+        if (!modalEl || typeof bootstrap === 'undefined') return;
+        renderList();
+        modal = modal || new bootstrap.Modal(modalEl);
+        modal.show();
+    }
+
+    function markAdminNotifsRead() {
+        fetch('api/mark_notifications_read.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin',
+            body: 'scope=health',
+            keepalive: true
+        }).catch(function () {});
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        modalEl = document.getElementById('adminNotifModal');
+        if (!modalEl) return;
+
+        modalEl.addEventListener('hidden.bs.modal', function () {
+            shownItems = [];
+            markAdminNotifsRead();
+        });
+
+        var viewLink = document.getElementById('adminNotifViewLink');
+        if (viewLink) {
+            viewLink.addEventListener('click', markAdminNotifsRead);
+        }
+
+        var initial = healthItems(window.customerNotificationsData && window.customerNotificationsData.items);
+        if (initial.length) {
+            var confModal = document.getElementById('confirmationModal');
+            if (confModal) {
+                // Let the booking confirmation modal finish first, then pop this one
+                confModal.addEventListener('hidden.bs.modal', function () {
+                    showAdminPopup(initial);
+                });
+            } else {
+                setTimeout(function () { showAdminPopup(initial); }, 600);
+            }
+        }
+    });
+
+    // Live: the sidebar poller dispatches this when new notifications arrive
+    document.addEventListener('customerNotificationsUpdated', function (e) {
+        var fresh = healthItems(e.detail && e.detail.newItems);
+        if (fresh.length) showAdminPopup(fresh);
+    });
+})();
+</script>
+
 <!-- Customer utility scripts -->
 <script>
 (function() {

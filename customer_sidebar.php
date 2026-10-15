@@ -379,6 +379,33 @@ $totalNotificationCount = count($customerNotificationItems);
                 }
             };
 
+            // Raise an Android notification via @capacitor/local-notifications when
+            // running inside the app WebView. Silently no-ops in normal browsers.
+            var nativeNotifPerm = null;
+            var fireNativeNotif = function (title, body) {
+                try {
+                    var LN = window.Capacitor && window.Capacitor.Plugins &&
+                             window.Capacitor.Plugins.LocalNotifications;
+                    if (!LN || !LN.schedule) return;
+                    var doSchedule = function () {
+                        LN.schedule({
+                            notifications: [{
+                                id: Math.floor(Math.random() * 2000000000),
+                                title: title,
+                                body: body,
+                                schedule: { at: new Date(Date.now() + 200) }
+                            }]
+                        }).catch(function () {});
+                    };
+                    if (nativeNotifPerm === 'granted') { doSchedule(); return; }
+                    if (nativeNotifPerm === 'denied') return;
+                    LN.requestPermissions().then(function (p) {
+                        nativeNotifPerm = (p && p.display) || 'denied';
+                        if (nativeNotifPerm === 'granted') doSchedule();
+                    }).catch(function () {});
+                } catch (e) {}
+            };
+
             const pollCustomerNotifications = function () {
                 if (document.hidden) return;
                 fetch('api/get_customer_notifications.php', {
@@ -418,6 +445,19 @@ $totalNotificationCount = count($customerNotificationItems);
                             );
                         }
                     });
+
+                    // Let pages react to fresh notifications (e.g. dashboard popup)
+                    if (newItems.length) {
+                        document.dispatchEvent(new CustomEvent('customerNotificationsUpdated', {
+                            detail: { newItems: newItems, items: items }
+                        }));
+
+                        // Inside the Capacitor app, also raise a phone-tray
+                        // notification for each fresh item (no-op in browsers).
+                        newItems.forEach(function (it) {
+                            fireNativeNotif(it.title || 'Notification', it.message || '');
+                        });
+                    }
 
                     notifData.items = items;
                     notifData.count = parseInt(data.count, 10) || 0;

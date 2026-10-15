@@ -75,6 +75,9 @@ function fetch_customer_notifications($pdo, $customerId) {
             'type' => 'health',
             'title' => 'Health Score Alert',
             'message' => ($row['brand'] . ' ' . $row['model'] . ' (' . $row['plate_number'] . ') - health ' . $row['health_score']),
+            'motorcycle' => trim($row['brand'] . ' ' . $row['model'] . ' (' . $row['plate_number'] . ')'),
+            'health_score' => (int) $row['health_score'],
+            'recommendation' => $row['recommendation'] ?? '',
             'link' => 'customer_health_score.php',
             'time_label' => notifTimeAgo($row['created_at'])
         ];

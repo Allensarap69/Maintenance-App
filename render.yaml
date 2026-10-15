@@ -18,10 +18,12 @@ services:
       - key: DB_SSL
         sync: false
       - key: SMS_ENABLED
-        value: "false"
+        value: "true"
       - key: SMS_API_KEY
         sync: false
       - key: SMS_SENDER_NAME
         value: MOTOFIX
+      - key: IPROG_SMS_PROVIDER
+        value: "2"
       - key: SMS_DEBUG
         value: "false"

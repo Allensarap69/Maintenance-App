@@ -19,23 +19,28 @@ try {
     require_once __DIR__ . '/../db.php';
 
     $customerId = (int) $_SESSION['user_id'];
+    $scope = $_POST['scope'] ?? 'all';
 
     // Mark all health score notifications as read
     $stmt = $pdo->prepare("UPDATE customer_notifications SET is_read = 1 WHERE customer_id = ? AND is_read = 0");
     $stmt->execute([$customerId]);
 
-    // Remember current upcoming booking IDs as seen
-    $stmt = $pdo->prepare("
-        SELECT id FROM bookings
-        WHERE user_id = ? AND status IN ('pending','deposit_submitted','accepted')
-    ");
-    $stmt->execute([$customerId]);
-    $seenBookingIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    // scope=health (dashboard popup dismiss) only clears admin notifications;
+    // booking "seen" markers stay untouched until the bell is opened.
+    if ($scope !== 'health') {
+        // Remember current upcoming booking IDs as seen
+        $stmt = $pdo->prepare("
+            SELECT id FROM bookings
+            WHERE user_id = ? AND status IN ('pending','deposit_submitted','accepted')
+        ");
+        $stmt->execute([$customerId]);
+        $seenBookingIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    if (!isset($_SESSION['seen_booking_ids']) || !is_array($_SESSION['seen_booking_ids'])) {
-        $_SESSION['seen_booking_ids'] = [];
+        if (!isset($_SESSION['seen_booking_ids']) || !is_array($_SESSION['seen_booking_ids'])) {
+            $_SESSION['seen_booking_ids'] = [];
+        }
+        $_SESSION['seen_booking_ids'] = array_unique(array_merge($_SESSION['seen_booking_ids'], $seenBookingIds));
     }
-    $_SESSION['seen_booking_ids'] = array_unique(array_merge($_SESSION['seen_booking_ids'], $seenBookingIds));
 
     echo json_encode(['success' => true]);
 } catch (PDOException $e) {

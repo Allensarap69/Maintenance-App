@@ -3,7 +3,7 @@ session_start();
 require 'db.php'; // Ensure this file correctly sets up your $pdo connection
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: login.php");
+    header("Location: index.php");
     exit;
 }
 

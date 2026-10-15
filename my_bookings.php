@@ -6,7 +6,7 @@ require_once 'management_helper.php';
 
 // 1. Security Check: Only logged-in customers can view this page.
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
-    header("Location: login.php");
+    header("Location: index.php");
     exit;
 }
 

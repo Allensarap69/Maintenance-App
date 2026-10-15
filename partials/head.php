@@ -34,6 +34,7 @@
     <link rel="stylesheet" href="fonts.css">
     <link rel="stylesheet" href="assets/css/app.css">
     <link rel="stylesheet" href="assets/css/ui.css">
+    <link rel="stylesheet" href="assets/css/mobile.css?v=<?= @filemtime(__DIR__ . '/../assets/css/mobile.css') ?>">
     <script src="assets/js/pager.js?v=<?= @filemtime(__DIR__ . '/../assets/js/pager.js') ?>" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">

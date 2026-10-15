@@ -8,7 +8,7 @@ require 'db.php'; // Include your database connection
 
 // FIX: Allow both 'customer' and 'admin' roles to access this page.
 if (!isset($_SESSION['role']) || ($_SESSION['role'] !== 'customer' && $_SESSION['role'] !== 'admin')) {
-    header("Location: login.php");
+    header("Location: index.php");
     exit;
 }
 
@@ -150,6 +150,7 @@ if (!$is_admin) {
 <html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $is_admin ? 'Admin: Set Availability' : 'Confirm Mutual Availability' ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
@@ -186,6 +187,7 @@ if (!$is_admin) {
         .time-slot input[type="radio"] { display: none; }
     </style>
     <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="assets/css/mobile.css">
 </head>
 <body>
 

@@ -25,6 +25,7 @@ if (!defined('ACPC_UI_ASSETS')) {
     define('ACPC_UI_ASSETS', true);
     echo '<link rel="stylesheet" href="assets/css/app.css">' . "\n";
     echo '<link rel="stylesheet" href="assets/css/ui.css">' . "\n";
+    echo '<link rel="stylesheet" href="assets/css/mobile.css?v=' . @filemtime(__DIR__ . '/assets/css/mobile.css') . '">' . "\n";
     echo '<script src="assets/js/pager.js?v=' . @filemtime(__DIR__ . '/assets/js/pager.js') . '" defer></script>' . "\n";
 }
 

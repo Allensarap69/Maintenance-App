@@ -9,7 +9,7 @@ require_once 'sms_config.php';
 require_once 'SMSTemplates.php';
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: login.php");
+    header("Location: index.php");
     exit;
 }
 

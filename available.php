@@ -3,7 +3,7 @@ session_start();
 require 'db.php';
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'customer') {
-    header("Location: login.php");
+    header("Location: index.php");
     exit;
 }
 
@@ -92,6 +92,7 @@ $required_duration_human_readable = convertMinutesToHoursMins($required_duration
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="assets/css/mobile.css">
     <style>
         /* ============================================
            MODERN CUSTOMER PORTAL - INDEX.PHP STYLE

@@ -5,7 +5,7 @@ require __DIR__ . '/../sms_config.php';
 require __DIR__ . '/../sms_helper.php';
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: login.php");
+    header("Location: ../index.php");
     exit;
 }
 

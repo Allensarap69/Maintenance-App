@@ -219,6 +219,7 @@ $login_button_text = 'Login';
     <link rel="stylesheet" href="fonts.css">
     <link rel="stylesheet" href="assets/css/app.css">
     <link rel="stylesheet" href="assets/css/ui.css">
+    <link rel="stylesheet" href="assets/css/mobile.css">
     <noscript><style>[data-reveal]{opacity:1!important;transform:none!important}.bar-fill{width:var(--w)!important}</style></noscript>
     <link rel="stylesheet" href="assets/css/landing.css">
 </head>
@@ -304,9 +305,6 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
                         <button class="btn btn-cta-outline" data-bs-toggle="modal" data-bs-target="#registerModal">
                             Create Account<i data-lucide="chevrons-right"></i>
                         </button>
-                        <a href="download_app.php" class="btn btn-cta-outline">
-                            Download App<i data-lucide="download"></i>
-                        </a>
                     </div>
                 </div>
             </div>
@@ -757,7 +755,6 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
                 <a href="#service-list">Services</a>
                 <a href="#how-it-works">How It Works</a>
                 <a href="#contact">Contact</a>
-                <a href="download_app.php">Get the App</a>
             </nav>
             <div class="social-links">
                 <a href="#" aria-label="Facebook"><i data-lucide="facebook"></i></a>

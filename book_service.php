@@ -3,7 +3,7 @@ session_start();
 require 'db.php'; // Ensure db.php is correctly set up for PDO connection
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'customer') {
-    header("Location: login.php");
+    header("Location: index.php");
     exit;
 }
 
@@ -88,6 +88,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         header("Location: select_mechanic.php");
         exit;
     }
+}
+
+// Error sent back from a later step (mechanic/time/payment) — renders in the
+// same red alert used for in-page validation errors.
+if (isset($_GET['error_msg'])) {
+    $msg = urldecode($_GET['error_msg']);
 }
 
 // Clear saved selections after a final "Confirm Booking" is successful (redirect with a success message).

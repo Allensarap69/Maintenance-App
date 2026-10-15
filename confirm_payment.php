@@ -13,7 +13,7 @@ if (isset($_GET['error_msg'])) {
 
 // --- Security Check ---
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'customer') {
-    header("Location: login.php");
+    header("Location: index.php");
     exit;
 }
 
@@ -56,7 +56,7 @@ if (!empty($service_ids)) {
 
     } catch (PDOException $e) {
         error_log("Price calculation error: " . $e->getMessage());
-        header("Location: select_service.php?error_msg=" . urlencode("⚠️ Failed to confirm service price. Please try selecting services again."));
+        header("Location: book_service.php?error_msg=" . urlencode("⚠️ Failed to confirm service price. Please try selecting services again."));
         exit;
     }
 }
@@ -129,7 +129,7 @@ if (empty($mechanic_info_display) && $mechanic_id) {
 
 // --- Final checks ---
 if ($total_price <= 0 || !$mechanic_id) { 
-    header("Location: select_service.php?error_msg=" . urlencode("Critical booking data is invalid. Please restart the service selection."));
+    header("Location: book_service.php?error_msg=" . urlencode("Critical booking data is invalid. Please restart the service selection."));
     exit;
 }
 
@@ -178,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
 
     // Re-check essential data before database transaction
     if ($total_price <= 0 || !$mechanic_id) {
-        header("Location: select_service.php?error_msg=" . urlencode("❌ Missing essential booking details during final submission. Please restart the process."));
+        header("Location: book_service.php?error_msg=" . urlencode("❌ Missing essential booking details during final submission. Please restart the process."));
         exit;
     }
 

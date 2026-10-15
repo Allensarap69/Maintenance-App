@@ -12,7 +12,7 @@ $username = $_SESSION['username'] ?? 'Customer';
 
 // Check 1: User Role Authentication
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'customer') {
-    header("Location: login.php");
+    header("Location: index.php");
     exit;
 }
 
@@ -23,7 +23,7 @@ if (!isset($_SESSION['final_booking_details']['service_ids'])
     || !isset($_SESSION['final_booking_details']['start_time']) 
     || !isset($_SESSION['final_booking_details']['end_time'])) {
     
-    header("Location: book_service.php?msg=" . urlencode("❌ Please re-select your service, vehicle, and time slot. Essential details are missing."));
+    header("Location: book_service.php?error_msg=" . urlencode("❌ Please re-select your service, vehicle, and time slot. Essential details are missing."));
     exit;
 }
 

@@ -4,7 +4,7 @@ require 'db.php'; // Your database connection file
 
 // 1. Validate ID and User
 if (!isset($_GET['request_id']) || !isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['customer', 'admin'])) {
-    header("Location: login.php");
+    header("Location: index.php");
     exit;
 }
 

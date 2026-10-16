@@ -582,7 +582,8 @@ $button_specialties = [
             }
             .mechanic-list-container {
                  height: auto;
-                 overflow-y: visible;
+                 overflow-y: auto;
+                 -webkit-overflow-scrolling: touch;
                  padding-right: 0;
                  max-height: 400px;
             }
@@ -850,9 +851,14 @@ $button_specialties = [
                 </div>
             </div>
 
-            <a href="available.php" class="btn btn-sm btn-accent mt-5" style="padding: 4px 10px; font-size: 0.75rem;">
-                <i class="bi bi-arrow-left me-1"></i> Back
-            </a>
+            <div class="d-flex justify-content-between align-items-center mt-5">
+                <a href="available.php" class="btn btn-sm btn-accent" style="padding: 4px 10px; font-size: 0.75rem;">
+                    <i class="bi bi-arrow-left me-1"></i> Back
+                </a>
+                <button type="submit" form="mechanic-selection-form" class="btn btn-sm btn-accent d-lg-none" onclick="return validateSelection()" style="padding: 4px 10px; font-size: 0.75rem;">
+                    <i class="bi bi-clock-fill me-1"></i> Confirm
+                </button>
+            </div>
         </div>
 
         <div class="col-lg-8 mechanic-list-col h-100 d-flex flex-column">
@@ -926,7 +932,7 @@ $button_specialties = [
                     <?php endif; ?>
                 </form>
             </div>
-            <div class="mechanic-footer p-3 border-top text-end">
+            <div class="mechanic-footer p-3 border-top text-end d-none d-lg-block">
                 <button type="submit" form="mechanic-selection-form" class="btn btn-sm btn-accent" onclick="return validateSelection()" style="padding: 4px 10px; font-size: 0.75rem;">
                     <i class="bi bi-clock-fill me-1"></i> Confirm
                 </button>

@@ -1402,6 +1402,12 @@ $pageTitle = 'Maintenance History';
             }
         }
 
+        @media (max-width: 767.98px) {
+            .filter-group .filter-control {
+                flex-wrap: nowrap !important;
+            }
+        }
+
         @media (max-width: 992px) {
             .service-record-card {
                 flex-wrap: wrap;
@@ -1577,7 +1583,7 @@ $pageTitle = 'Maintenance History';
             </div>
             <div class="col-6 col-xl-3">
                 <div class="stat-card">
-                    <div class="stat-icon stat-icon-info"><i class="bi bi-motorcycle"></i></div>
+                    <div class="stat-icon stat-icon-info"><i class="bi bi-scooter"></i></div>
                     <div>
                         <div class="stat-value">
                             <?= !empty($maintenance_history) ? count($motorcycles) : 0 ?>
@@ -1619,7 +1625,7 @@ $pageTitle = 'Maintenance History';
                 </div>
                 <div class="d-flex align-items-center gap-2 filter-group">
                     <div class="filter-control">
-                        <i class="bi bi-motorcycle filter-icon"></i>
+                        <i class="bi bi-scooter filter-icon"></i>
                         <select class="form-select" onchange="window.location.href='?motorcycle_id='+this.value+'&date_filter=<?= urlencode($date_filter) ?>'">
                             <option value="">All Motorcycles</option>
                             <?php foreach ($motorcycles as $moto): ?>
@@ -1680,7 +1686,7 @@ $pageTitle = 'Maintenance History';
                             </div>
                             <div class="sr-media-name"><?= htmlspecialchars($record['motorcycle_info']) ?></div>
                             <?php if ($moto_plate): ?>
-                            <span class="sr-plate"><i class="bi bi-motorcycle"></i><?= htmlspecialchars($moto_plate) ?></span>
+                            <span class="sr-plate"><i class="bi bi-scooter"></i><?= htmlspecialchars($moto_plate) ?></span>
                             <?php endif; ?>
                         </div>
 

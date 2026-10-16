@@ -386,7 +386,16 @@
         transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease;
     }
 
-    .top-bar-user:hover {
+    .top-bar-user-profile {
+        display: flex;
+        align-items: center;
+        gap: inherit;
+        padding: 6px 10px;
+        border-radius: 12px;
+        transition: background 0.3s ease;
+    }
+
+    .top-bar-user-profile:hover {
         background: rgba(0, 0, 0, 0.05);
     }
 
@@ -982,7 +991,7 @@
     /* Top bar - same navy as sidebar for a unified frame */
     html[data-theme="dark"] .top-bar { background: #0a0f1e !important; box-shadow: none !important; }
     html[data-theme="dark"] .top-bar-title { color: #e2e8f0 !important; }
-    html[data-theme="dark"] .top-bar-user:hover { background: rgba(255, 255, 255, 0.06) !important; }
+    html[data-theme="dark"] .top-bar-user-profile:hover { background: rgba(255, 255, 255, 0.06) !important; }
     html[data-theme="dark"] .top-bar-user-name { color: #e2e8f0 !important; }
     html[data-theme="dark"] .top-bar-user-role { color: #94a3b8 !important; }
     html[data-theme="dark"] .top-bar-dropdown-btn { color: #94a3b8 !important; }

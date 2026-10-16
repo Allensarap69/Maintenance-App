@@ -193,6 +193,23 @@ $totalNotificationCount = count($customerNotificationItems);
         const notifData = window.customerNotificationsData || { count: 0, items: [] };
 
         if (topBar && topBarUser) {
+            // Group avatar/name/chevron so the hover pill only covers the
+            // profile button and not the bell or dark-mode toggle.
+            const userAvatar = topBarUser.querySelector('.top-bar-user-avatar');
+            const userInfo = topBarUser.querySelector('.top-bar-user-info');
+            const dropdownBtn = topBarUser.querySelector('.top-bar-dropdown-btn');
+            const userDropdown = topBarUser.querySelector('.top-bar-user-dropdown');
+            const profileGroup = document.createElement('div');
+            profileGroup.className = 'top-bar-user-profile';
+            [userAvatar, userInfo, dropdownBtn].forEach(function (el) {
+                if (el) profileGroup.appendChild(el);
+            });
+            if (userDropdown) {
+                topBarUser.insertBefore(profileGroup, userDropdown);
+            } else {
+                topBarUser.appendChild(profileGroup);
+            }
+
             const notifWrapper = document.createElement('div');
             notifWrapper.className = 'top-bar-notifications';
 
@@ -261,14 +278,7 @@ $totalNotificationCount = count($customerNotificationItems);
             notifWrapper.appendChild(bell);
             notifWrapper.appendChild(dropdown);
 
-            const userAvatar = topBarUser.querySelector('.top-bar-user-avatar');
-            if (userAvatar) {
-                topBarUser.insertBefore(notifWrapper, userAvatar);
-            } else if (topBarUser.firstChild) {
-                topBarUser.insertBefore(notifWrapper, topBarUser.firstChild);
-            } else {
-                topBarUser.appendChild(notifWrapper);
-            }
+            topBarUser.insertBefore(notifWrapper, profileGroup);
 
             // Dark mode toggle (beside the notification bell)
             const themeToggle = document.createElement('button');

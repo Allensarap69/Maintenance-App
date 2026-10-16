@@ -3,6 +3,8 @@ services:
     name: maintenance-app
     runtime: docker
     plan: free
+    branch: main
+    autoDeployTrigger: commit
     healthCheckPath: /index.php
     envVars:
       - key: DB_HOST

@@ -43,20 +43,30 @@ if (!function_exists('notifTimeAgo')) {
 function fetch_customer_notifications($pdo, $customerId) {
     $customerId = (int) $customerId;
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS customer_notifications (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        customer_id INT NOT NULL,
-        motorcycle_id INT NOT NULL,
-        health_score INT NOT NULL,
-        recommendation TEXT,
-        source VARCHAR(20) NOT NULL DEFAULT 'health',
-        is_read TINYINT(1) DEFAULT 0,
-        is_applied TINYINT(1) DEFAULT 0,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        INDEX idx_customer (customer_id),
-        INDEX idx_motorcycle (motorcycle_id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    // DDL on every request costs a remote-DB round trip + metadata lock, and
+    // this helper is called on every page load and every poll — run it once
+    // per session instead.
+    if (empty($_SESSION['notif_table_ok'])) {
+        try {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS customer_notifications (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                customer_id INT NOT NULL,
+                motorcycle_id INT NOT NULL,
+                health_score INT NOT NULL,
+                recommendation TEXT,
+                source VARCHAR(20) NOT NULL DEFAULT 'health',
+                is_read TINYINT(1) DEFAULT 0,
+                is_applied TINYINT(1) DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX idx_customer (customer_id),
+                INDEX idx_motorcycle (motorcycle_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+            $_SESSION['notif_table_ok'] = true;
+        } catch (PDOException $e) {
+            error_log('customer_notifications table init: ' . $e->getMessage());
+        }
+    }
 
     // Migrate older tables: 'source' distinguishes admin health alerts from
     // maintenance reminders (maintenance_management.php "Remind Customer").

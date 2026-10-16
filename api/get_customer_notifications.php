@@ -12,7 +12,15 @@ if (session_status() === PHP_SESSION_NONE) {
 header('Content-Type: application/json');
 header('Cache-Control: no-store, no-cache, must-revalidate');
 
-if (!isset($_SESSION['user_id']) || (($_SESSION['role'] ?? 'customer') !== 'customer')) {
+$customerId = (int)($_SESSION['user_id'] ?? 0);
+$customerRole = $_SESSION['role'] ?? 'customer';
+
+// Release the session lock BEFORE hitting the database. PHP locks the
+// session file for the whole request, so a slow poll (remote DB round
+// trips) would otherwise block every real page navigation for this user.
+session_write_close();
+
+if (!$customerId || $customerRole !== 'customer') {
     echo json_encode(['success' => false, 'message' => 'Not authenticated']);
     exit;
 }
@@ -21,7 +29,7 @@ try {
     require_once __DIR__ . '/../db.php';
     require_once __DIR__ . '/../customer_notifications_helper.php';
 
-    $data = fetch_customer_notifications($pdo, (int) $_SESSION['user_id']);
+    $data = fetch_customer_notifications($pdo, $customerId);
     unset($data['booking_items']);
     $data['success'] = true;
 

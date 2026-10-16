@@ -72,7 +72,7 @@ $totalNotificationCount = count($customerNotificationItems);
 <!-- Sidebar Overlay for Mobile -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<!-- Top page-loading line (shows while navigating between modules) -->
+<!-- Top page-loading line + spinner overlay (shows while navigating between modules) -->
 <style>
     #pageLoadingBar {
         position: fixed;
@@ -88,13 +88,67 @@ $totalNotificationCount = count($customerNotificationItems);
         transition: width .3s ease, opacity .3s ease;
     }
     #pageLoadingBar.active { opacity: 1; }
+
+    #pageLoader {
+        position: fixed;
+        inset: 0;
+        z-index: 999998;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 14px;
+        background: rgba(248, 250, 252, 0.72);
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity .18s ease, visibility .18s ease;
+        pointer-events: none;
+    }
+    [data-theme="dark"] #pageLoader { background: rgba(15, 23, 42, 0.72); }
+    #pageLoader.active {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+    .page-loader-spinner {
+        width: 46px;
+        height: 46px;
+        border: 4px solid rgba(250, 204, 21, 0.25);
+        border-top-color: #FACC15;
+        border-radius: 50%;
+        animation: pageLoaderSpin .8s linear infinite;
+    }
+    .page-loader-text {
+        font-family: 'Poppins', sans-serif;
+        font-size: .78rem;
+        font-weight: 500;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: #64748b;
+    }
+    [data-theme="dark"] .page-loader-text { color: #94a3b8; }
+    @keyframes pageLoaderSpin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) {
+        .page-loader-spinner { animation-duration: 1.6s; }
+    }
 </style>
 <div id="pageLoadingBar"></div>
+<div id="pageLoader" role="status" aria-label="Loading">
+    <div class="page-loader-spinner"></div>
+    <div class="page-loader-text">Loading</div>
+</div>
 <script>
 (function () {
     var bar = document.getElementById('pageLoadingBar');
+    var loader = document.getElementById('pageLoader');
     if (!bar) return;
-    var timer = null, failsafe = null, hideTimer = null, pct = 0;
+    var timer = null, failsafe = null, hideTimer = null, cancelCheck = null, pct = 0;
+    var unloading = false;
+
+    function showLoader() { if (loader) loader.classList.add('active'); }
+    function hideLoader() { if (loader) loader.classList.remove('active'); }
 
     function showAt(v) {
         clearTimeout(hideTimer);
@@ -116,6 +170,7 @@ $totalNotificationCount = count($customerNotificationItems);
         clearInterval(timer);
         clearTimeout(failsafe);
         bar.classList.remove('active');
+        hideLoader();
         hideTimer = setTimeout(function () { bar.style.width = '0%'; }, 300);
     }
 
@@ -125,13 +180,22 @@ $totalNotificationCount = count($customerNotificationItems);
         clearTimeout(failsafe);
         bar.classList.add('active');
         bar.style.width = '100%';
+        hideLoader();
         hideTimer = setTimeout(hide, 300);
     }
 
-    // Outgoing page: start the bar when an internal link/form navigates
+    // Outgoing page: show bar + spinner when an internal link/form navigates
     function start() {
         showAt(30);
         creep(90);
+        showLoader();
+        clearTimeout(cancelCheck);
+        clearTimeout(failsafe);
+        // If no beforeunload follows, the navigation was cancelled client-side
+        // (e.g. onclick="return confirm(...)" declined) — reset the indicators.
+        cancelCheck = setTimeout(function () {
+            if (!unloading) hide();
+        }, 500);
         failsafe = setTimeout(hide, 8000); // no navigation happened — reset
     }
 
@@ -150,15 +214,20 @@ $totalNotificationCount = count($customerNotificationItems);
         start();
     }, true);
 
-    window.addEventListener('beforeunload', start);
+    window.addEventListener('beforeunload', function () {
+        unloading = true;
+        start();
+    });
 
-    // Incoming page: progress follows the real load stages
+    // Incoming page: spinner covers the parse; progress follows real load stages
     if (document.readyState === 'loading') {
         showAt(15);
         creep(70); // still parsing HTML/resources
+        showLoader();
         document.addEventListener('DOMContentLoaded', function () {
             showAt(85); // DOM ready — content is now displaying
             creep(95);
+            hideLoader();
         });
     } else if (document.readyState === 'interactive') {
         showAt(85);
@@ -172,16 +241,19 @@ $totalNotificationCount = count($customerNotificationItems);
     } else {
         window.addEventListener('load', finish);
     }
-    failsafe = setTimeout(hide, 12000); // never leave the bar stuck
+    failsafe = setTimeout(hide, 12000); // never leave the indicators stuck
 
     // Reset if the page is restored from bfcache (back/forward buttons)
     window.addEventListener('pageshow', function (e) {
         if (e.persisted) {
+            unloading = false;
             clearInterval(timer);
             clearTimeout(failsafe);
             clearTimeout(hideTimer);
+            clearTimeout(cancelCheck);
             bar.classList.remove('active');
             bar.style.width = '0%';
+            hideLoader();
         }
     });
 })();
@@ -617,7 +689,7 @@ $totalNotificationCount = count($customerNotificationItems);
                 .finally(function () { notifInFlight = false; });
             };
 
-            setInterval(pollCustomerNotifications, 3000);
+            setInterval(pollCustomerNotifications, 15000);
             document.addEventListener('visibilitychange', function () {
                 if (!document.hidden) pollCustomerNotifications();
             });
@@ -648,9 +720,11 @@ $totalNotificationCount = count($customerNotificationItems);
     });
 </script>
 
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@1.57.0/dist/umd/lucide.min.js" defer></script>
 <script>
-    if (typeof lucide !== 'undefined') lucide.createIcons();
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
 </script>
 
 <?php include __DIR__ . '/floating_toast.php'; ?>

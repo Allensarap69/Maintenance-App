@@ -72,6 +72,121 @@ $totalNotificationCount = count($customerNotificationItems);
 <!-- Sidebar Overlay for Mobile -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+<!-- Top page-loading line (shows while navigating between modules) -->
+<style>
+    #pageLoadingBar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 2px;
+        width: 0%;
+        background: #FACC15;
+        box-shadow: 0 0 6px rgba(250, 204, 21, 0.8);
+        z-index: 999999;
+        opacity: 0;
+        pointer-events: none;
+        transition: width .3s ease, opacity .3s ease;
+    }
+    #pageLoadingBar.active { opacity: 1; }
+</style>
+<div id="pageLoadingBar"></div>
+<script>
+(function () {
+    var bar = document.getElementById('pageLoadingBar');
+    if (!bar) return;
+    var timer = null, failsafe = null, hideTimer = null, pct = 0;
+
+    function showAt(v) {
+        clearTimeout(hideTimer);
+        bar.classList.add('active');
+        pct = v;
+        bar.style.width = pct + '%';
+    }
+
+    function creep(cap) {
+        clearInterval(timer);
+        timer = setInterval(function () {
+            pct += Math.random() * 15;
+            if (pct >= cap) { pct = cap; clearInterval(timer); }
+            bar.style.width = pct + '%';
+        }, 150);
+    }
+
+    function hide() {
+        clearInterval(timer);
+        clearTimeout(failsafe);
+        bar.classList.remove('active');
+        hideTimer = setTimeout(function () { bar.style.width = '0%'; }, 300);
+    }
+
+    // Bar reaches 100% only when the page (and its content) is fully loaded
+    function finish() {
+        clearInterval(timer);
+        clearTimeout(failsafe);
+        bar.classList.add('active');
+        bar.style.width = '100%';
+        hideTimer = setTimeout(hide, 300);
+    }
+
+    // Outgoing page: start the bar when an internal link/form navigates
+    function start() {
+        showAt(30);
+        creep(90);
+        failsafe = setTimeout(hide, 8000); // no navigation happened — reset
+    }
+
+    document.addEventListener('click', function (e) {
+        var a = e.target.closest('a[href]');
+        if (!a) return;
+        var href = a.getAttribute('href');
+        if (!href || href.charAt(0) === '#' || a.target === '_blank' ||
+            /^(javascript:|tel:|mailto:)/i.test(href) || a.hasAttribute('download')) return;
+        if (a.hostname && a.hostname !== location.hostname) return;
+        start();
+    }, true);
+
+    document.addEventListener('submit', function (e) {
+        if (e.target && e.target.target === '_blank') return;
+        start();
+    }, true);
+
+    window.addEventListener('beforeunload', start);
+
+    // Incoming page: progress follows the real load stages
+    if (document.readyState === 'loading') {
+        showAt(15);
+        creep(70); // still parsing HTML/resources
+        document.addEventListener('DOMContentLoaded', function () {
+            showAt(85); // DOM ready — content is now displaying
+            creep(95);
+        });
+    } else if (document.readyState === 'interactive') {
+        showAt(85);
+        creep(95);
+    } else {
+        showAt(95);
+    }
+
+    if (document.readyState === 'complete') {
+        finish();
+    } else {
+        window.addEventListener('load', finish);
+    }
+    failsafe = setTimeout(hide, 12000); // never leave the bar stuck
+
+    // Reset if the page is restored from bfcache (back/forward buttons)
+    window.addEventListener('pageshow', function (e) {
+        if (e.persisted) {
+            clearInterval(timer);
+            clearTimeout(failsafe);
+            clearTimeout(hideTimer);
+            bar.classList.remove('active');
+            bar.style.width = '0%';
+        }
+    });
+})();
+</script>
+
 <!-- Sidebar Navigation -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">

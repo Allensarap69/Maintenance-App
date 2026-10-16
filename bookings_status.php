@@ -2,12 +2,25 @@
 session_start();
 require 'db.php';
 require 'motorcycle_health_helper.php';
+require_once 'sms_helper.php';
+require_once 'sms_config.php';
+require_once 'SMSTemplates.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['booking_id']) && $_POST['action'] === 'complete') {
     $booking_id = (int)$_POST['booking_id'];
     if ($booking_id > 0) {
         try {
             $pdo->beginTransaction();
+
+            $stmt_fetch = $pdo->prepare("
+                SELECT b.user_id, b.vehicle_id, b.service_ids, b.package_ids, b.schedule_date,
+                       u.phone AS customer_phone
+                FROM bookings b
+                JOIN users u ON b.user_id = u.id
+                WHERE b.id = ?
+            ");
+            $stmt_fetch->execute([$booking_id]);
+            $booking_data = $stmt_fetch->fetch(PDO::FETCH_ASSOC);
 
             // Find any mechanic(s) linked to this booking
             $mechanic_ids = [];
@@ -54,10 +67,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['boo
             recordCompletedBookingHistory($booking_id);
 
             $pdo->commit();
-            $_SESSION['booking_flash'] = "Booking #{$booking_id} marked as completed ({$movedRows} row).";
-        } catch (PDOException $e) {
-            $pdo->rollBack();
-            $_SESSION['booking_flash'] = "Database error: " . $e->getMessage();
+
+            // Send completion SMS after commit (best-effort; does not fail the completion)
+            $sms_sent = false;
+            $sms_result = null;
+
+            if (SMS_ENABLED && $booking_data && !empty($booking_data['customer_phone'])) {
+                $sms = new SMSHelper();
+                $date_formatted = date('M j, Y', strtotime($booking_data['schedule_date']));
+                $service_names = get_service_names($pdo, $booking_data['service_ids'], $booking_data['package_ids'] ?? '[]');
+
+                $sms_message = SMSTemplates::serviceCompleted($date_formatted, $service_names);
+
+                $sms_result = $sms->sendSMS(
+                    $booking_data['customer_phone'],
+                    $sms_message,
+                    'SERVICE_COMPLETED',
+                    [
+                        'user_id' => $booking_data['user_id'] ?? null,
+                        'customer_id' => $booking_data['user_id'] ?? null,
+                        'booking_id' => $booking_id,
+                        'motorcycle_id' => $booking_data['vehicle_id'] ?? null,
+                        'notification_key' => 'SERVICE_COMPLETED_' . $booking_id
+                    ]
+                );
+                $sms_sent = !empty($sms_result['success']) && empty($sms_result['error_code']);
+            }
+
+            $flash_msg = "Booking #{$booking_id} marked as completed ({$movedRows} row).";
+            if ($sms_sent) {
+                $flash_msg .= " SMS sent.";
+            } elseif (is_array($sms_result) && empty($sms_result['success'])) {
+                $flash_msg .= " SMS failed: " . ($sms_result['message'] ?? 'unknown error');
+            }
+            $_SESSION['booking_flash'] = $flash_msg;
+        } catch (Exception $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            $_SESSION['booking_flash'] = "Error: " . $e->getMessage();
         }
     } else {
         $_SESSION['booking_flash'] = "Invalid booking ID received.";
@@ -101,17 +149,34 @@ function get_mechanic_names($pdo, $booking_id) {
     }
 }
 
-function get_service_names($pdo, $service_ids_json) {
-    $ids = json_decode($service_ids_json, true);
-    if (empty($ids) || !is_array($ids)) return "N/A";
-    $placeholders = rtrim(str_repeat('?,', count($ids)), ',');
-    try {
-        $stmt = $pdo->prepare("SELECT service_name FROM services WHERE id IN ($placeholders)");
-        $stmt->execute($ids);
-        return implode(', ', array_column($stmt->fetchAll(), 'service_name'));
-    } catch (PDOException $e) {
-        return "Error";
+function get_service_names($pdo, $service_ids_json, $package_ids_json = '[]') {
+    $service_ids = json_decode($service_ids_json, true) ?: [];
+    $package_ids = json_decode($package_ids_json, true) ?: [];
+    $names = [];
+
+    if (!empty($service_ids) && is_array($service_ids)) {
+        $placeholders = rtrim(str_repeat('?,', count($service_ids)), ',');
+        try {
+            $stmt = $pdo->prepare("SELECT service_name FROM services WHERE id IN ($placeholders)");
+            $stmt->execute($service_ids);
+            $names = array_merge($names, array_column($stmt->fetchAll(), 'service_name'));
+        } catch (PDOException $e) {
+            return "Error";
+        }
     }
+
+    if (!empty($package_ids) && is_array($package_ids)) {
+        $placeholders = rtrim(str_repeat('?,', count($package_ids)), ',');
+        try {
+            $stmt = $pdo->prepare("SELECT package_name FROM service_packages WHERE id IN ($placeholders)");
+            $stmt->execute($package_ids);
+            $names = array_merge($names, array_column($stmt->fetchAll(), 'package_name'));
+        } catch (PDOException $e) {
+            return "Error";
+        }
+    }
+
+    return empty($names) ? "N/A" : implode(', ', $names);
 }
 
 function format_phone($phone) {

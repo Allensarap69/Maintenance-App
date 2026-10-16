@@ -2360,6 +2360,53 @@ $alerts = array_slice($alerts, 0, 5);
 </script>
 
 <?php if (isset($_SESSION['show_confirmation_modal']) && $_SESSION['show_confirmation_modal']): ?>
+<style>
+    /* Compact booking confirmation modal on phones */
+    @media (max-width: 576px) {
+        #confirmationModal .modal-dialog {
+            margin: 0.5rem auto;
+            max-width: 340px;
+        }
+        #confirmationModal .modal-content {
+            border-radius: 14px !important;
+        }
+        #confirmationModal .modal-header {
+            padding: 12px 16px !important;
+        }
+        #confirmationModal .modal-title {
+            font-size: 0.95rem;
+        }
+        #confirmationModal .modal-body {
+            padding: 0.9rem !important;
+        }
+        #confirmationModal .modal-body .mb-4 {
+            margin-bottom: 0.6rem !important;
+        }
+        #confirmationModal .modal-body i.bi-calendar-check {
+            font-size: 2.2rem !important;
+        }
+        #confirmationModal .modal-body h4 {
+            font-size: 1.05rem;
+            margin-bottom: 0.4rem !important;
+        }
+        #confirmationModal .modal-body p.lead {
+            font-size: 0.82rem;
+            margin-bottom: 0.6rem !important;
+        }
+        #confirmationModal .alert {
+            padding: 0.5rem 0.65rem;
+            font-size: 0.75rem;
+            margin-bottom: 0;
+        }
+        #confirmationModal .modal-footer {
+            padding: 0.6rem 0.9rem 1rem !important;
+        }
+        #confirmationModal .modal-footer .btn {
+            padding: 8px 20px !important;
+            font-size: 0.82rem !important;
+        }
+    }
+</style>
 <!-- Booking Confirmation Modal -->
 <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

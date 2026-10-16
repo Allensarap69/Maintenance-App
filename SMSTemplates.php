@@ -50,6 +50,36 @@ class SMSTemplates {
         ]);
     }
 
+    public static function appointmentRejected($date, $time, $service) {
+        $template = "Mindanao Eversure: We're sorry, your motorcycle service appointment for {date} at {time} (Service: {service}) has been declined. Please book another schedule or contact us for assistance.";
+        return self::replace($template, [
+            'date' => $date,
+            'time' => $time,
+            'service' => $service
+        ]);
+    }
+
+    public static function serviceCompleted($date, $service) {
+        $template = "Mindanao Eversure: Your motorcycle service has been completed on {date}. Service: {service}. Thank you for choosing Mindanao Eversure Corporation!";
+        return self::replace($template, [
+            'date' => $date,
+            'service' => $service
+        ]);
+    }
+
+    public static function emergencyAccepted($mechanicName) {
+        $mechanic_text = !empty($mechanicName) ? " Mechanic {$mechanicName} has been assigned to assist you." : "";
+        return "Mindanao Eversure: Your emergency service request has been accepted.{$mechanic_text} Please keep your phone accessible.";
+    }
+
+    public static function emergencyDeclined() {
+        return "Mindanao Eversure: We're sorry, your emergency service request has been declined. Please contact us or submit another request for assistance.";
+    }
+
+    public static function emergencyCompleted() {
+        return "Mindanao Eversure: Your emergency service has been completed. Thank you for choosing Mindanao Eversure Corporation!";
+    }
+
     public static function appointmentReminder($date, $time, $service) {
         $template = "Mindanao Eversure: Reminder: Your motorcycle service appointment is tomorrow, {date} at {time}. Service: {service}. We look forward to serving you.";
         return self::replace($template, [

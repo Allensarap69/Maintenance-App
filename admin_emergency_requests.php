@@ -124,11 +124,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accept_request'])) {
                     : " We are now assigning a mechanic.";
                 $message = "Hi " . $request['customer_name'] . ", your emergency service request for " . $request['motorcycle_info'] . " has been ACCEPTED." . $mechNote;
                 $result = $sms->sendSMS($request['customer_phone'], $message, 'EMERGENCY_ACCEPTED', [
+                    'user_id' => $request['customer_id'],
                     'customer_id' => $request['customer_id'],
-                    'booking_id' => $request_id,
+                    'mechanic_id' => $request['assigned_mechanic_id'] ?? null,
+                    'motorcycle_id' => $request['motorcycle_id'] ?? null,
                     'notification_key' => 'EMERGENCY_ACCEPTED_' . $request_id
                 ]);
-                if (!$result['success']) {
+                if (!empty($result['success']) && empty($result['error_code'])) {
+                    $smsNote = ' SMS sent.';
+                } elseif (empty($result['success'])) {
                     $smsNote = ' SMS not sent: ' . $result['message'];
                 }
             } catch (Exception $smsError) {
@@ -231,11 +235,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['decline_request'])) {
                 $sms = new SMSHelper();
                 $message = "Hi " . $request['customer_name'] . ", we are sorry but your emergency service request for " . $request['motorcycle_info'] . " has been DECLINED. Please contact us for more info.";
                 $result = $sms->sendSMS($request['customer_phone'], $message, 'EMERGENCY_DECLINED', [
+                    'user_id' => $request['customer_id'],
                     'customer_id' => $request['customer_id'],
-                    'booking_id' => $request_id,
+                    'mechanic_id' => $request['assigned_mechanic_id'] ?? null,
+                    'motorcycle_id' => $request['motorcycle_id'] ?? null,
                     'notification_key' => 'EMERGENCY_DECLINED_' . $request_id
                 ]);
-                if (!$result['success']) {
+                if (!empty($result['success']) && empty($result['error_code'])) {
+                    $smsNote = ' SMS sent.';
+                } elseif (empty($result['success'])) {
                     $smsNote = ' SMS not sent: ' . $result['message'];
                 }
             } catch (Exception $smsError) {

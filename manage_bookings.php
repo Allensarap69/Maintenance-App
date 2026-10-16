@@ -214,6 +214,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'accept' && isset($_GET['id'])
             // Send appointment confirmation SMS after commit (best-effort; does not fail the booking)
             $sms = new SMSHelper();
             $sms_sent = false;
+            $sms_result = null;
 
             if (SMS_ENABLED && !empty($booking_data['customer_phone'])) {
                 $date_formatted = date('M j, Y', strtotime($booking_data['schedule_date']));
@@ -244,7 +245,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'accept' && isset($_GET['id'])
 
             $mechanic_count = count($assigned_mechanic_ids);
             $msg = "Appointment #{$booking_id} CONFIRMED! {$mechanic_count} Mechanic(s) set to BUSY.";
-            if ($sms_sent) $msg .= " SMS sent.";
+            if ($sms_sent) {
+                $msg .= " SMS sent.";
+            } elseif (is_array($sms_result) && empty($sms_result['success'])) {
+                $msg .= " SMS failed: " . ($sms_result['message'] ?? 'unknown error');
+            }
             $msg_type = "success";
         } else {
             $pdo->rollBack();
@@ -324,6 +329,21 @@ if (isset($_GET['action'], $_GET['id'])) {
     if ($action == 'rejected') {
         $pdo->beginTransaction();
         try {
+            $stmt_fetch = $pdo->prepare("
+                SELECT b.id AS booking_id, b.user_id, b.vehicle_id, b.service_ids,
+                       b.package_ids, b.schedule_date, b.schedule_start_time,
+                       u.phone as customer_phone
+                FROM bookings b
+                JOIN users u ON b.user_id = u.id
+                WHERE b.id = ?
+            ");
+            $stmt_fetch->execute([$id]);
+            $reject_data = $stmt_fetch->fetch(PDO::FETCH_ASSOC);
+
+            if (!$reject_data) {
+                throw new Exception("Booking not found.");
+            }
+
             $stmt_bm = $pdo->prepare("SELECT mechanic_id FROM booking_mechanics WHERE booking_id = ?");
             $stmt_bm->execute([$id]);
             $mech_ids = array_column($stmt_bm->fetchAll(PDO::FETCH_ASSOC), 'mechanic_id');
@@ -354,10 +374,49 @@ if (isset($_GET['action'], $_GET['id'])) {
 
             $pdo->commit();
             log_audit($pdo, 'booking_rejected', 'booking', (int)$id);
+
+            // Send rejection SMS after commit (best-effort; does not fail the rejection)
+            $sms_sent = false;
+            $sms_result = null;
+
+            if (SMS_ENABLED && !empty($reject_data['customer_phone'])) {
+                $sms = new SMSHelper();
+                $date_formatted = date('M j, Y', strtotime($reject_data['schedule_date']));
+                $time_formatted = date('g:i A', strtotime($reject_data['schedule_start_time']));
+                $service_names = get_service_names($pdo, $reject_data['service_ids'], $reject_data['package_ids'] ?? '[]');
+
+                $sms_message = SMSTemplates::appointmentRejected(
+                    $date_formatted,
+                    $time_formatted,
+                    $service_names
+                );
+
+                $sms_result = $sms->sendSMS(
+                    $reject_data['customer_phone'],
+                    $sms_message,
+                    'APPOINTMENT_REJECTION',
+                    [
+                        'user_id' => $reject_data['user_id'] ?? null,
+                        'customer_id' => $reject_data['user_id'] ?? null,
+                        'booking_id' => (int)$id,
+                        'motorcycle_id' => $reject_data['vehicle_id'] ?? null,
+                        'notification_key' => 'APPOINTMENT_REJECTION_' . (int)$id
+                    ]
+                );
+                $sms_sent = !empty($sms_result['success']) && empty($sms_result['error_code']);
+            }
+
             $msg = "Booking #{$id} has been rejected.";
+            if ($sms_sent) {
+                $msg .= " SMS sent.";
+            } elseif (is_array($sms_result) && empty($sms_result['success'])) {
+                $msg .= " SMS failed: " . ($sms_result['message'] ?? 'unknown error');
+            }
             $msg_type = "success";
         } catch (Exception $e) {
-            $pdo->rollBack();
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
             $msg = "Error: " . $e->getMessage();
             $msg_type = "error";
         }

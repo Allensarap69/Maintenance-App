@@ -2,6 +2,9 @@
 session_start();
 require 'db.php';
 require 'motorcycle_health_helper.php';
+require_once 'sms_helper.php';
+require_once 'sms_config.php';
+require_once 'SMSTemplates.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && isset($_POST['request_id'])) {
     $request_id = (int)$_POST['request_id'];
@@ -32,10 +35,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && isset($_
             if ($mechanic_id > 0) {
                 $pdo->prepare("UPDATE emergency_service_requests SET assigned_mechanic_id = ? WHERE id = ?")->execute([$mechanic_id, $request_id]);
                 $pdo->prepare("UPDATE mechanics SET status = 'Busy' WHERE id = ?")->execute([$mechanic_id]);
-                $_SESSION['emergency_flash'] = "Request #{$request_id} accepted ({$movedRows} row).";
+                $flash_msg = "Request #{$request_id} accepted ({$movedRows} row).";
             } else {
-                $_SESSION['emergency_flash'] = "Request #{$request_id} accepted ({$movedRows} row), but no mechanic was selected.";
+                $flash_msg = "Request #{$request_id} accepted ({$movedRows} row), but no mechanic was selected.";
             }
+            if ($movedRows > 0) {
+                $flash_msg .= smsSuffix(sendEmergencySMS($pdo, $request_id, 'accept', $mechanic_id));
+            }
+            $_SESSION['emergency_flash'] = $flash_msg;
             header("Location: emergency_status.php?tab=accepted");
             exit;
         } elseif ($action === 'decline') {
@@ -43,7 +50,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && isset($_
             $stmt = $pdo->prepare("UPDATE emergency_service_requests SET request_status = 'declined', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND request_status != 'declined'");
             $stmt->execute([$request_id]);
             $movedRows = $stmt->rowCount();
-            $_SESSION['emergency_flash'] = "Request #{$request_id} declined ({$movedRows} row).";
+            $flash_msg = "Request #{$request_id} declined ({$movedRows} row).";
+            if ($movedRows > 0) {
+                $flash_msg .= smsSuffix(sendEmergencySMS($pdo, $request_id, 'decline'));
+            }
+            $_SESSION['emergency_flash'] = $flash_msg;
             header("Location: emergency_status.php?tab=declined");
             exit;
         } elseif ($action === 'complete') {
@@ -75,7 +86,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && isset($_
                 }
             }
 
-            $_SESSION['emergency_flash'] = "Request #{$request_id} completed ({$movedRows} row).";
+            $flash_msg = "Request #{$request_id} completed ({$movedRows} row).";
+            if ($movedRows > 0) {
+                $flash_msg .= smsSuffix(sendEmergencySMS($pdo, $request_id, 'complete', $assigned ? (int)$assigned : 0));
+            }
+            $_SESSION['emergency_flash'] = $flash_msg;
             header("Location: emergency_status.php?tab=completed");
             exit;
         }
@@ -110,6 +125,56 @@ function format_phone($phone) {
         return '+' . substr($clean, 0, 2) . ' ' . substr($clean, 2, 3) . ' ' . substr($clean, 5, 3) . ' ' . substr($clean, 8);
     }
     return $phone;
+}
+
+function smsSuffix($sms_result) {
+    if (!is_array($sms_result)) return '';
+    if (!empty($sms_result['success']) && empty($sms_result['error_code'])) return " SMS sent.";
+    if (empty($sms_result['success'])) return " SMS failed: " . ($sms_result['message'] ?? 'unknown error');
+    return '';
+}
+
+function sendEmergencySMS($pdo, $request_id, $action, $mechanic_id = 0) {
+    if (!SMS_ENABLED) return null;
+
+    $stmt = $pdo->prepare("
+        SELECT esr.customer_id, esr.motorcycle_id, esr.contact_number,
+               u.phone AS customer_phone, m.name AS mechanic_name
+        FROM emergency_service_requests esr
+        JOIN users u ON esr.customer_id = u.id
+        LEFT JOIN mechanics m ON esr.assigned_mechanic_id = m.id
+        WHERE esr.id = ?
+    ");
+    $stmt->execute([$request_id]);
+    $req = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$req) return null;
+
+    $to = !empty($req['contact_number']) ? $req['contact_number'] : $req['customer_phone'];
+    if (empty($to)) return null;
+
+    if ($action === 'accept') {
+        $message = SMSTemplates::emergencyAccepted($req['mechanic_name']);
+        $type = 'EMERGENCY_ACCEPTED';
+    } elseif ($action === 'decline') {
+        $message = SMSTemplates::emergencyDeclined();
+        $type = 'EMERGENCY_DECLINED';
+    } else {
+        $message = SMSTemplates::emergencyCompleted();
+        $type = 'EMERGENCY_COMPLETED';
+    }
+
+    $sms = new SMSHelper();
+    try {
+        return $sms->sendSMS($to, $message, $type, [
+            'user_id' => $req['customer_id'] ?? null,
+            'customer_id' => $req['customer_id'] ?? null,
+            'mechanic_id' => $mechanic_id ?: null,
+            'motorcycle_id' => $req['motorcycle_id'] ?? null,
+            'notification_key' => $type . '_' . $request_id
+        ]);
+    } catch (Exception $e) {
+        return ['success' => false, 'message' => $e->getMessage(), 'error_code' => 'EXCEPTION'];
+    }
 }
 
 function renderList($requests, $listId, $activeTab, $tabKey) {

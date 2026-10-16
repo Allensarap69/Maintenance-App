@@ -997,13 +997,14 @@
         }
         .navbar-custom.scrolled { box-shadow: 0 10px 30px rgba(11, 31, 77, 0.08); }
         .brand-mark {
-            width: 34px;
-            height: 34px;
+            width: auto;
+            height: 42px;
             background: transparent;
-            color: #FACC15;
             border-radius: 0;
             box-shadow: none;
+            padding: 0;
         }
+        .brand-mark img { height: 100%; width: auto; display: block; }
         .brand-mark i { width: 34px; height: 34px; }
         .brand-tagline {
             color: #FACC15;
@@ -1216,15 +1217,15 @@
             margin-bottom: 22px;
         }
         .dash-brand-mark {
-            width: 25px;
-            height: 25px;
+            width: auto;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: transparent;
-            color: var(--mf-yellow);
-            border-radius: 7px;
+            border-radius: 0;
         }
+        .dash-brand-mark img { height: 100%; width: auto; display: block; }
         .dash-brand-mark i { width: 14px; height: 14px; }
         .dash-nav { display: grid; gap: 7px; }
         .dash-nav span {
@@ -1582,6 +1583,7 @@
             background: #071739;
         }
 
+
         .modal-blur-effect .modal-dialog {
             width: calc(100% - 32px);
             max-width: 820px;
@@ -1651,17 +1653,15 @@
             gap: 10px;
         }
         .auth-visual-logo {
-            width: 40px;
-            height: 40px;
+            width: auto;
+            height: 48px;
             flex: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 12px;
             background: transparent;
-            color: var(--mf-yellow);
         }
-        .auth-visual-logo i { width: 22px; height: 22px; }
+        .auth-visual-logo img { height: 100%; width: auto; display: block; }
         .auth-visual-name {
             color: #ffffff;
             font-size: 0.9rem;

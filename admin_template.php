@@ -550,7 +550,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <a href="dashboard_admin.php" class="sidebar-brand">
-                <i class="bi bi-gear-fill"></i>
+                <img src="eversure-logo.png" alt="Mindanao Eversure" style="height: 34px; width: auto; flex: none;">
                 <span>Mindanao Eversure</span>
             </a>
         </div>

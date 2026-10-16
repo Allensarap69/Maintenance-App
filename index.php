@@ -212,6 +212,7 @@ $login_button_text = 'Login';
         })();
     </script>
     <title>Mindanao Eversure | Motor Maintenance System</title>
+    <link rel="icon" type="image/png" href="eversure-logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -235,7 +236,7 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
 <nav class="navbar navbar-expand-lg fixed-top navbar-custom">
     <div class="container">
         <a class="navbar-brand" href="index.php" aria-label="Mindanao Eversure home">
-            <span class="brand-mark"><i data-lucide="motorbike"></i></span>
+            <span class="brand-mark"><img src="eversure-logo.png" alt="Mindanao Eversure logo"></span>
             <span>
                 Mindanao Eversure
                 <small class="brand-tagline">MOTORCYCLE SERVICE</small>
@@ -316,7 +317,7 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
                     <div class="dashboard-preview" data-reveal data-delay="160">
                         <aside class="dashboard-sidebar" aria-label="Dashboard preview navigation">
                             <div class="dash-brand">
-                                <span class="dash-brand-mark"><i data-lucide="wrench"></i></span>
+                                <span class="dash-brand-mark"><img src="eversure-logo.png" alt="Eversure logo"></span>
                                 <span>Eversure</span>
                             </div>
                             <nav class="dash-nav">
@@ -746,7 +747,7 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
     <div class="container">
         <div class="footer-top">
             <a class="navbar-brand" href="index.php" aria-label="Mindanao Eversure home">
-                <span class="brand-mark"><i data-lucide="motorbike"></i></span>
+                <span class="brand-mark"><img src="eversure-logo.png" alt="Mindanao Eversure logo"></span>
                 <span>
                     Mindanao Eversure
                     <small class="brand-tagline">MOTORCYCLE SERVICE</small>
@@ -782,7 +783,7 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
         <div class="auth-shell">
           <aside class="auth-visual" aria-label="Mindanao Eversure account benefits">
             <div class="auth-visual-brand">
-              <span class="auth-visual-logo"><i data-lucide="motorbike"></i></span>
+              <span class="auth-visual-logo"><img src="eversure-logo.png" alt="Mindanao Eversure logo"></span>
               <span class="auth-visual-name">Mindanao Eversure<small>Motorcycle Service</small></span>
             </div>
             <div class="auth-visual-copy">
@@ -870,7 +871,7 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
         <div class="auth-shell">
           <aside class="auth-visual" aria-label="Mindanao Eversure registration benefits">
             <div class="auth-visual-brand">
-              <span class="auth-visual-logo"><i data-lucide="motorbike"></i></span>
+              <span class="auth-visual-logo"><img src="eversure-logo.png" alt="Mindanao Eversure logo"></span>
               <span class="auth-visual-name">Mindanao Eversure<small>Motorcycle Service</small></span>
             </div>
             <div class="auth-visual-copy">

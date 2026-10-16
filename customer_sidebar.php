@@ -191,7 +191,7 @@ $totalNotificationCount = count($customerNotificationItems);
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <a href="dashboard_customer.php" class="sidebar-brand">
-            <i data-lucide="motorbike" style="width: 34px; height: 34px;"></i>
+            <img src="eversure-logo.png" alt="Mindanao Eversure" style="height: 40px; width: auto; flex: none;">
             <span style="white-space: nowrap; font-size: 1rem; line-height: 1.2;">
                 Mindanao Eversure
                 <small style="display: block; font-size: .55rem; letter-spacing: .12em; white-space: nowrap; color: #FACC15; line-height: 1;">MOTORCYCLE SERVICE</small>
@@ -264,7 +264,7 @@ $totalNotificationCount = count($customerNotificationItems);
     
     <div class="sidebar-footer">
         <div class="sidebar-footer-text">
-            <i data-lucide="motorbike" style="width: 20px; height: 20px;"></i>
+            <img src="eversure-logo.png" alt="Mindanao Eversure" style="height: 22px; width: auto; flex: none;">
             <span>Mindanao Eversure</span>
         </div>
         <div class="sidebar-footer-copyright">

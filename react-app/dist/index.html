@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" class="public-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mindanao Eversure — Motorcycle Service Scheduling & Monitoring System. Book services, track maintenance, monitor motorcycle health, and get smart reminders.">
+    <meta name="theme-color" content="#ffffff">
+    <script>
+        (function () {
+            var t = localStorage.getItem('theme');
+            if (localStorage.getItem('themeManual') !== '1' || (t !== 'dark' && t !== 'light')) {
+                t = 'light';
+            }
+            localStorage.setItem('theme', t);
+            document.documentElement.setAttribute('data-theme', t);
+            var meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.setAttribute('content', t === 'dark' ? '#0b1220' : '#ffffff');
+        })();
+    </script>
+    <title>Mindanao Eversure | Motor Maintenance System</title>
+    <link rel="icon" type="image/png" href="eversure-logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <noscript><style>[data-reveal]{opacity:1!important;transform:none!important}.bar-fill{width:var(--w)!important}</style></noscript>
+  <script type="module" crossorigin src="/assets/index-BWIL0fIT.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-C6fnR18q.css">
+</head>
+<body class="mev-landing">
+    <div id="root"></div>
+</body>
+</html>

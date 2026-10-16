@@ -1,0 +1,105 @@
+/* ============================================
+   GLOBAL FONT SYSTEM - Mindanao Eversure
+   Rugged & Industrial (Workshop / Garage) Theme
+   --------------------------------------------
+   Headers & UI Titles: Barlow Condensed / Oswald
+   Body & Data:         Barlow / Work Sans
+   ============================================ */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&family=Dancing+Script:wght@600&display=swap');
+
+/* Body & Data (Mileage, Status, forms, tables) */
+html body,
+html body button,
+html body input,
+html body select,
+html body textarea,
+html body optgroup,
+html body .sidebar,
+html body .fc {
+    font-family: 'Barlow', 'Work Sans', sans-serif !important;
+}
+
+/* Headers & UI Titles */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6,
+.display-1, .display-2, .display-3, .display-4, .display-5, .display-6,
+.page-title,
+.card-title,
+.modal-title,
+.hero-title,
+.section-title,
+.menu-title,
+.navbar-brand,
+.sidebar-brand,
+.card-header {
+    font-family: 'Barlow Condensed', 'Oswald', sans-serif !important;
+    letter-spacing: 0.03em;
+}
+
+/* ============================================
+   BASE TEXT SIZE - Portals (Admin / Customer / Mechanic)
+   Slightly larger than the 16px browser default so all
+   rem-based text scales up a bit. Public pages opt out
+   via class="public-page" on <html>. Tune the % to taste.
+   ============================================ */
+html:not(.public-page) {
+    font-size: 108%;
+}
+
+/* ============================================
+   GLOBAL UI OVERRIDES - SweetAlert2 compact size
+   ============================================ */
+.swal2-popup:not(.swal2-toast) {
+    width: 21em !important;
+    max-width: 92vw !important;
+    padding: 1.1rem 1.2rem !important;
+    font-size: 0.85rem !important;
+    border-radius: 14px !important;
+}
+
+.swal2-title {
+    font-size: 1.25em !important;
+    padding: 0.2em 0 0 !important;
+    line-height: 1.25 !important;
+}
+
+.swal2-html-container {
+    font-size: 0.95em !important;
+    margin: 0.5em 0 0 !important;
+    line-height: 1.45 !important;
+}
+
+.swal2-icon {
+    margin: 0.6em auto 0.5em !important;
+    transform: scale(0.72);
+}
+
+.swal2-actions {
+    margin-top: 0.9em !important;
+    padding: 0 !important;
+    gap: 8px !important;
+}
+
+.swal2-styled {
+    padding: 0.45em 1.3em !important;
+    font-size: 0.88em !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+}
+
+.swal2-footer,
+.swal2-validation-message,
+.swal2-timer-progress-bar-container {
+    font-size: 0.78em !important;
+}
+
+.swal2-close {
+    font-size: 1.6em !important;
+}
+
+.swal2-input,
+.swal2-textarea,
+.swal2-select {
+    font-size: 0.9em !important;
+    margin: 0.6em auto 0 !important;
+}

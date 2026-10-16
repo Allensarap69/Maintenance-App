@@ -1,0 +1,155 @@
+/* ==========================================================
+   mobile.css — shared responsive layer for phones & tablets.
+   The PHP site itself is the mobile experience (no separate
+   app). Loaded on every portal + public page, near the end of
+   <head>, so page <style> blocks can still fine-tune it.
+
+   Every override lives inside `@media screen and` so printed
+   receipts/invoices keep their desktop layout.
+   ========================================================== */
+
+/* ---------- Global guards (all viewports) ---------- */
+img, svg, video, canvas, iframe, embed, object { max-width: 100%; }
+img, video { height: auto; }
+pre { overflow-x: auto; max-width: 100%; }
+code { overflow-wrap: anywhere; }
+
+/* Leaflet maps get an explicit pixel width inline — clamp it */
+.leaflet-container { max-width: 100%; }
+
+/* Bootstrap-compatible scroll wrapper, defined here so pages
+   that don't load Bootstrap still get sideways-scrolling tables */
+.table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* ---------- Tablets & below ---------- */
+@media screen and (max-width: 991.98px) {
+    /* Decorative absolutely-positioned art (bg circles, floating
+       header icons) must never cause sideways scrolling */
+    html, body {
+        overflow-x: hidden;
+        overflow-x: clip;
+    }
+
+    /* Reclaim the sidebar gutter on any page whose own CSS
+       forgot to collapse it (portal sheets already handle it) */
+    .main-wrapper,
+    .main-content,
+    .content-area,
+    .page-content,
+    .dashboard-content {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .top-header { left: 0; }
+
+    /* Toolbars & filter bars wrap instead of overflowing */
+    .toolbar,
+    .filters,
+    .filter-bar,
+    [class*="toolbar"],
+    [class*="filter-bar"] {
+        flex-wrap: wrap !important;
+    }
+}
+
+/* ---------- Phones & small tablets ---------- */
+@media screen and (max-width: 767.98px) {
+    /* Tables not inside .table-responsive still scroll sideways
+       instead of crushing the layout. The inner anonymous table
+       keeps normal row/column layout; the block just clips+scrolls. */
+    table {
+        display: block;
+        overflow-x: auto;
+        max-width: 100%;
+    }
+    thead th { white-space: nowrap; }
+    /* FullCalendar renders fixed table internals — leave them be */
+    .fc table,
+    .fc-scrollgrid {
+        display: table;
+        overflow: visible;
+    }
+
+    .page-title {
+        font-size: clamp(1rem, 5vw, 1.4rem) !important;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Dialogs & menus never exceed the viewport */
+    .modal-dialog,
+    .modal-content,
+    .modal-container,
+    [class*="modal-box"],
+    [class*="modal-card"] {
+        max-width: calc(100vw - 24px) !important;
+    }
+    .dropdown-menu {
+        max-width: calc(100vw - 16px);
+        overflow-x: auto;
+    }
+    .toastify { max-width: calc(100vw - 32px); }
+
+    /* Filter bars / action groups wrap; children may shrink */
+    [class*="filter"] { flex-wrap: wrap !important; }
+    [class*="filter"] > *,
+    [class*="actions"] > * { min-width: 0; }
+    [class*="actions"] { flex-wrap: wrap !important; }
+    .btn-group { flex-wrap: wrap; }
+
+    /* Long unbroken strings (plates, emails, URLs) wrap anywhere
+       rather than pushing the page sideways */
+    td, th, dd, dt, li, .card, .card-body, .list-group-item {
+        overflow-wrap: anywhere;
+    }
+}
+
+/* ---------- Phones (portrait) ---------- */
+@media screen and (max-width: 575.98px) {
+    /* Multi-column grids collapse to a single column.
+       Matches *-grid / *-stats containers; grid-template-columns
+       is a no-op on non-grid elements so false positives are free */
+    [class*="grid"],
+    [class*="stats"] {
+        grid-template-columns: 1fr !important;
+        flex-wrap: wrap !important;
+    }
+    [class*="grid"] > *,
+    [class*="stats"] > * { min-width: 0; }
+
+    /* Custom "row" layouts (label/value pairs, list rows built
+       from flex or grid) stack vertically. Excludes Bootstrap
+       .row / .row-cols-* / .flex-row which are already fine. */
+    [class*="-row"]:not([class*="flex-row"]):not([class*="row-cols"]) {
+        flex-direction: column !important;
+        grid-template-columns: 1fr !important;
+    }
+    [class*="-row"] > * { min-width: 0; }
+
+    /* Form controls may shrink inside narrow flex rows */
+    input, select, textarea { min-width: 0; max-width: 100%; }
+
+    /* Tighten chrome so content gets the pixels */
+    .content-area,
+    .main-content,
+    .page-content,
+    .dashboard-content,
+    .container-fluid,
+    .container {
+        padding-left: .75rem !important;
+        padding-right: .75rem !important;
+    }
+    .card-body, .card-header { padding: .875rem 1rem; }
+    .modal-header, .modal-body, .modal-footer {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}

@@ -495,7 +495,9 @@ $active_page = basename($_SERVER['PHP_SELF']);
            ============================================ */
         .top-bar {
             background: var(--primary-gradient);
-            padding: 15px 30px;
+            padding: 12px 30px;
+            height: 60px;
+            box-sizing: border-box;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             display: flex;
             align-items: center;
@@ -508,7 +510,7 @@ $active_page = basename($_SERVER['PHP_SELF']);
 
         .main-content {
             flex: 1;
-            margin-left: 280px;
+            margin-left: 312px;
             padding: 0;
             min-height: 100vh;
             display: flex;

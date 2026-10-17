@@ -206,7 +206,7 @@ try {
         }
 
         .main-content {
-            margin-left: 280px;
+            margin-left: 312px;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -217,7 +217,9 @@ try {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            padding: 18px 32px;
+            padding: 12px 30px;
+            height: 60px;
+            box-sizing: border-box;
             display: flex;
             align-items: center;
             justify-content: space-between;

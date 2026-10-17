@@ -1204,7 +1204,7 @@ foreach ($packages as $pkg) {
 
             <div class="col-md-4">
                 
-                <div class="price-summary mb-4" style="position: sticky; top: 60px; z-index: 100;">
+                <div class="price-summary mb-4" style="position: sticky; top: 92px; z-index: 100;">
                     <h5 class="text-center mb-3 fw-bold" style="color: var(--primary-color); font-size: 1.1rem;">Service & Time Summary</h5>
                     <div class="text-center">
                         <small class="d-block mb-2" style="color: var(--text-light); font-size: 0.9rem;">Total Estimated Service Time:</small>

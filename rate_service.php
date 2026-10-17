@@ -184,14 +184,16 @@ $pageTitle = 'Rate Your Service';
         }
         .main-content {
             flex: 1;
-            margin-left: 280px;
+            margin-left: 312px;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
         .top-bar {
             background: var(--primary-gradient);
-            padding: 15px 30px;
+            padding: 12px 30px;
+            height: 60px;
+            box-sizing: border-box;
             display: flex;
             align-items: center;
             justify-content: space-between;

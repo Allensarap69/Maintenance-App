@@ -1002,6 +1002,20 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
             new bootstrap.Modal(document.getElementById('registerModal')).show();
         <?php endif; ?>
 
+        // Show a spinner + lock the button while the login/register POST
+        // round-trips. The submit event only fires after HTML5 validation
+        // passes; on failure the server re-renders the page with the
+        // button reset, on success the page navigates away.
+        document.querySelectorAll('#loginModal form, #registerModal form').forEach(function (form) {
+            form.addEventListener('submit', function () {
+                var btn = form.querySelector('.auth-submit');
+                if (!btn || btn.disabled) return;
+                var label = form.closest('#registerModal') ? 'Creating account…' : 'Signing in…';
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>' + label;
+            });
+        });
+
         // Dark mode toggle
         const themeToggle = document.getElementById('themeToggle');
         const themeMeta = document.querySelector('meta[name="theme-color"]');

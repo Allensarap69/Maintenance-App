@@ -269,8 +269,8 @@ $totalNotificationCount = count($customerNotificationItems);
                 <small style="display: block; font-size: .55rem; letter-spacing: .12em; white-space: nowrap; color: #FACC15; line-height: 1;">MOTORCYCLE SERVICE</small>
             </span>
         </a>
-        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Toggle Sidebar">
-            <i class="bi bi-chevron-left"></i>
+        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Close sidebar">
+            <i class="bi bi-x-lg"></i>
         </button>
     </div>
     
@@ -363,9 +363,16 @@ $totalNotificationCount = count($customerNotificationItems);
         const mainContent = document.querySelector('.main-content');
 
         if (sidebarToggle && sidebar && sidebarOverlay) {
+            sidebarToggle.title = 'Toggle sidebar';
+            sidebarToggle.setAttribute('aria-label', 'Toggle sidebar');
             sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('active');
-                sidebarOverlay.classList.toggle('active');
+                if (window.innerWidth <= 992) {
+                    sidebar.classList.toggle('active');
+                    sidebarOverlay.classList.toggle('active');
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    if (mainContent) mainContent.classList.toggle('expanded');
+                }
             });
 
             sidebarOverlay.addEventListener('click', function() {
@@ -695,25 +702,20 @@ $totalNotificationCount = count($customerNotificationItems);
             });
         }
 
-        // Sidebar collapse functionality
-        if (sidebarCollapseBtn && sidebar && mainContent) {
+        // In-sidebar button is only visible on mobile — it closes the drawer
+        if (sidebarCollapseBtn && sidebar) {
             sidebarCollapseBtn.addEventListener('click', function() {
-                if (window.innerWidth <= 992) {
-                    sidebar.classList.remove('active');
-                    if (sidebarOverlay) sidebarOverlay.classList.remove('active');
-                    return;
-                }
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('expanded');
+                sidebar.classList.remove('active');
+                if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+            });
+        }
 
-                // Update collapse button icon
-                const icon = sidebarCollapseBtn.querySelector('i');
-                if (sidebar.classList.contains('collapsed')) {
-                    icon.classList.remove('bi-chevron-left');
-                    icon.classList.add('bi-chevron-right');
-                } else {
-                    icon.classList.remove('bi-chevron-right');
-                    icon.classList.add('bi-chevron-left');
+        // Collapsed is a desktop-only state — reset it when entering mobile
+        if (window.matchMedia && sidebar) {
+            window.matchMedia('(max-width: 992px)').addEventListener('change', function(e) {
+                if (e.matches) {
+                    sidebar.classList.remove('collapsed');
+                    if (mainContent) mainContent.classList.remove('expanded');
                 }
             });
         }

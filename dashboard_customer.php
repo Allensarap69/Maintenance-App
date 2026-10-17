@@ -258,7 +258,7 @@ $alerts = array_slice($alerts, 0, 5);
         /* --- Main Content Area --- */
         .main-content {
             flex: 1;
-            margin-left: 280px;
+            margin-left: 312px;
             padding: 0;
             min-height: 100vh;
             transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -268,7 +268,7 @@ $alerts = array_slice($alerts, 0, 5);
         }
 
         .main-content.expanded {
-            margin-left: 80px;
+            margin-left: 112px;
         }
 
         .content-area {
@@ -359,7 +359,7 @@ $alerts = array_slice($alerts, 0, 5);
 
         @media (max-width: 992px) {
             .sidebar {
-                transform: translateX(-100%);
+                transform: translateX(calc(-100% - 32px));
             }
 
             .sidebar.active {
@@ -1162,10 +1162,11 @@ $alerts = array_slice($alerts, 0, 5);
             justify-content: space-between;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             position: fixed;
-            top: 0;
-            left: 280px;
-            right: 0;
+            top: 16px;
+            left: 312px;
+            right: 16px;
             z-index: 1030;
+            border-radius: 16px;
             border-bottom: 2px solid rgba(250, 204, 21, 0.3);
             overflow: visible;
             height: 60px;
@@ -1188,14 +1189,14 @@ $alerts = array_slice($alerts, 0, 5);
             );
         }
 
-        .main-content.expanded .top-bar { left: 80px; }
+        .main-content.expanded .top-bar { left: 112px; }
 
         @media (max-width: 992px) {
-            .top-bar { left: 0; padding: 12px 20px; }
-            .main-content.expanded .top-bar { left: 0; }
+            .top-bar { left: 16px; right: 16px; padding: 12px 20px; }
+            .main-content.expanded .top-bar { left: 16px; }
         }
 
-        .content-area { padding-top: 90px; }
+        .content-area { padding-top: 92px; }
 
         .top-bar-title {
             font-size: 1.4rem;
@@ -1218,7 +1219,6 @@ $alerts = array_slice($alerts, 0, 5);
             color: white;
             cursor: pointer;
             padding: 0;
-            margin-right: 15px;
         }
 
         .top-bar-user {

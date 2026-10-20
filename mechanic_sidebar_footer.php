@@ -34,15 +34,16 @@
             }
         });
 
-        // Scroll to Top
+        // Scroll to Top — the page scroller is .main-content (bounded container)
+        const pageScroller = document.querySelector('.main-content') || document.scrollingElement;
         function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            pageScroller.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // Scroll to Top Button Visibility
         const scrollTopBtn = document.getElementById('scrollTop');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 300) {
+        pageScroller.addEventListener('scroll', () => {
+            if (pageScroller.scrollTop > 300) {
                 scrollTopBtn.classList.add('visible');
             } else {
                 scrollTopBtn.classList.remove('visible');
@@ -116,7 +117,7 @@
         .sidebar-brand i { background: var(--accent-gradient) !important; -webkit-background-clip: text !important; background-clip: text !important; color: transparent !important; }
         html[data-theme="light"] .menu-item:hover, html[data-theme="light"] .menu-item.active { color: #FACC15; background: rgba(30,58,95,0.1); }
         .menu-item::before { background: var(--accent-gradient) !important; }
-        html[data-theme="light"] .top-header { background: rgba(255,255,255,0.95) !important; border-bottom: 2px solid #FACC15 !important; box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important; }
+        html[data-theme="light"] .top-header { background: #ffffff !important; box-shadow: 0 8px 30px rgba(0,0,0,0.10) !important; }
         .top-header .page-title { color: var(--text-dark) !important; }
         .top-header .page-title i { color: #FACC15 !important; background: none !important; -webkit-background-clip: initial !important; background-clip: initial !important; }
         .top-header .text-muted { color: var(--text-dark) !important; }

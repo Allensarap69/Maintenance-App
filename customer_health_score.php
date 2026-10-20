@@ -207,24 +207,27 @@ try {
 
         .main-content {
             margin-left: 312px;
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             background-color: var(--bg-canvas);
+            /* Scroll region starts at the floating bar's bottom edge —
+               content clips flush under it and never reaches the margins */
+            padding-top: 76px;
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
         .top-bar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: #ffffff;
             padding: 12px 30px;
             height: 60px;
             box-sizing: border-box;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            position: sticky;
-            top: 0;
+            position: fixed;
+            top: 16px;
             z-index: 1020;
             border-bottom: 1px solid var(--border-color);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
@@ -315,7 +318,7 @@ try {
         }
 
         .content-area {
-            padding: 32px;
+            padding: 16px 32px 32px;
             max-width: 1400px;
             width: 100%;
             margin: 0 auto;
@@ -350,10 +353,10 @@ try {
             flex-shrink: 0;
         }
 
-        .stat-icon-primary { background: rgba(59, 130, 246, 0.12); color: var(--accent-blue); }
-        .stat-icon-success { background: rgba(16, 185, 129, 0.12); color: var(--accent-green); }
-        .stat-icon-warning { background: rgba(250, 204, 21, 0.12); color: #EAB308; }
-        .stat-icon-info { background: rgba(139, 92, 246, 0.12); color: var(--accent-purple); }
+        .stat-icon-primary { color: var(--accent-blue); }
+        .stat-icon-success { color: var(--accent-green); }
+        .stat-icon-warning { color: #EAB308; }
+        .stat-icon-info { color: var(--accent-purple); }
 
         .stat-value {
             font-size: 1.6rem;
@@ -469,7 +472,6 @@ try {
             justify-content: center;
             font-size: 0.9rem;
             flex-shrink: 0;
-            background: rgba(0, 0, 0, 0.04);
             color: var(--text-main);
         }
 
@@ -867,7 +869,7 @@ try {
 
         @media (max-width: 992px) {
             .main-content { margin-left: 0; }
-            .content-area { padding: 20px; }
+            .content-area { padding: 16px 20px 20px; }
             .sidebar-toggle { display: block; }
         }
 

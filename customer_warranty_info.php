@@ -342,22 +342,18 @@ $pageTitle = 'Warranty Information';
         }
 
         .stat-icon-primary {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.1) 0%, rgba(30, 58, 95, 0.05) 100%);
             color: var(--primary-color);
         }
 
         .stat-icon-success {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%);
             color: var(--success-color);
         }
 
         .stat-icon-warning {
-            background: linear-gradient(135deg, rgba(250, 204, 21, 0.1) 0%, rgba(250, 204, 21, 0.05) 100%);
             color: #EAB308;
         }
 
         .stat-icon-info {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
             color: var(--info-color);
         }
 

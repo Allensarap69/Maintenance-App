@@ -307,17 +307,38 @@
         flex: 1;
         margin-left: 312px;
         padding: 0;
-        min-height: 100vh;
+        /* Bounded to the viewport; the scroll region starts at the floating
+           top bar's bottom edge so content clips flush under it and can
+           never reach the exposed margins */
+        height: 100vh;
+        padding-top: 76px;
+        box-sizing: border-box;
         transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        width: calc(100% - 312px);
+        width: calc(100% - 312px - 16px);
     }
+
+    /* Frosted edge masks — hide content scrolling under the floating bar's
+       exposed margins (top gap, right edge; left edge on mobile only).
+       Real elements, not pseudo-elements, so no ancestor backdrop-filter
+       or transform can capture their positioning. */
+    .edge-mask {
+        position: fixed;
+        background: rgba(255, 255, 255, 0.55);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        pointer-events: none;
+        z-index: 99;
+    }
+    .edge-mask-top { top: 0; left: 0; right: 0; height: 16px; }
+    .edge-mask-right { top: 0; right: 0; bottom: 0; width: 16px; }
+    .edge-mask-left { top: 0; left: 0; bottom: 0; width: 16px; display: none; }
 
     .main-content.expanded {
         margin-left: 112px;
-        width: calc(100% - 112px);
+        width: calc(100% - 112px - 16px);
     }
 
     .main-content.expanded .top-bar {
@@ -372,6 +393,12 @@
         height: 2px;
         background: #FACC15;
     }
+
+    /* Frosted strip above the floating top bar — hides content scrolling
+       through the 16px gap between the bar and the viewport edge.
+       Implemented via .edge-mask-top (a real element), since a fixed
+       ::before here would anchor to the bar itself when a page applies
+       backdrop-filter/transform to it. */
 
     .top-bar-title {
         font-size: 1.3rem;
@@ -566,10 +593,10 @@
         flex-shrink: 0;
     }
 
-    .notification-item.booking .notification-icon { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
-    .notification-item.emergency .notification-icon { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
-    .notification-item.warranty .notification-icon { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
-    .notification-item.health .notification-icon { background: rgba(234, 179, 8, 0.15); color: #ca8a04; }
+    .notification-item.booking .notification-icon { color: #3b82f6; }
+    .notification-item.emergency .notification-icon { color: #ef4444; }
+    .notification-item.warranty .notification-icon { color: #8b5cf6; }
+    .notification-item.health .notification-icon { color: #ca8a04; }
 
     .notification-item-text {
         flex: 1;
@@ -729,7 +756,7 @@
     }
 
     .content-area {
-        padding: 92px 30px 30px 30px;
+        padding: 16px 30px 30px 30px;
         overflow-y: auto;
         overflow-x: hidden;
         flex: 1;
@@ -771,12 +798,12 @@
 
         .main-content {
             margin-left: 0;
-            width: 100%;
+            width: calc(100% - 16px);
         }
 
         .main-content.expanded {
             margin-left: 0;
-            width: 100%;
+            width: calc(100% - 16px);
         }
 
         .main-content.expanded .top-bar {
@@ -791,6 +818,10 @@
             padding: 12px 20px;
             left: 16px;
             right: 16px;
+        }
+
+        .edge-mask-left {
+            display: block;
         }
 
         .top-bar-title {
@@ -816,7 +847,7 @@
         }
 
         .content-area {
-            padding: 92px 20px 20px 20px;
+            padding: 16px 20px 20px 20px;
         }
 
         .sidebar-overlay {
@@ -996,6 +1027,11 @@
 
     /* Top bar - same navy as sidebar for a unified frame */
     html[data-theme="dark"] .top-bar { background: #0a0f1e !important; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45) !important; border-color: rgba(255, 255, 255, 0.07) !important; }
+    html[data-theme="dark"] .edge-mask { background: rgba(10, 15, 30, 0.55); }
+
+    @media print {
+        .edge-mask { display: none !important; }
+    }
     html[data-theme="dark"] .top-bar-title { color: #e2e8f0 !important; }
     html[data-theme="dark"] .top-bar-user-profile:hover { background: rgba(255, 255, 255, 0.06) !important; }
     html[data-theme="dark"] .top-bar-user-name { color: #e2e8f0 !important; }

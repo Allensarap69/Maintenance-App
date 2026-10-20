@@ -185,6 +185,11 @@ require __DIR__ . '/partials/head.php';
     <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
+    <!-- Frosted edge masks — hide content scrolling under the floating header's margins -->
+    <div class="edge-mask edge-mask-top" aria-hidden="true"></div>
+    <div class="edge-mask edge-mask-right" aria-hidden="true"></div>
+    <div class="edge-mask edge-mask-left" aria-hidden="true"></div>
+
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">

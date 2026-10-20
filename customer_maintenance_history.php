@@ -706,10 +706,10 @@ $pageTitle = 'Maintenance History';
             flex: 1;
         }
 
-        .stat-icon-primary { background: rgba(59, 130, 246, 0.12); color: var(--info-color); }
-        .stat-icon-success { background: rgba(16, 185, 129, 0.12); color: var(--success-color); }
-        .stat-icon-warning { background: rgba(250, 204, 21, 0.12); color: #EAB308; }
-        .stat-icon-info { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
+        .stat-icon-primary { color: var(--info-color); }
+        .stat-icon-success { color: var(--success-color); }
+        .stat-icon-warning { color: #EAB308; }
+        .stat-icon-info { color: #8b5cf6; }
 
         .stat-value { font-size: 1.6rem; font-weight: 800; color: var(--text-dark); line-height: 1.1; word-break: break-word; }
         .stat-label { font-size: 0.78rem; font-weight: 600; color: var(--text-light); margin-top: 2px; word-break: break-word; }

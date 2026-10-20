@@ -197,9 +197,10 @@ $pageTitle = 'Rate Your Service';
             display: flex;
             align-items: center;
             justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 1020;
+            position: fixed;
+            top: 16px;
+            z-index: 1030;
+            border-radius: 16px;
             border-bottom: 2px solid rgba(250, 204, 21, 0.3);
         }
         .top-bar-title { font-size: 1.2rem; font-weight: 700; color: white; }
@@ -211,7 +212,7 @@ $pageTitle = 'Rate Your Service';
         }
         .top-bar-user-name { color: white; font-size: 0.9rem; font-weight: 600; }
         .top-bar-user-role { color: rgba(255,255,255,0.7); font-size: 0.75rem; }
-        .content-area { padding: 30px; flex: 1; }
+        .content-area { padding: 16px 30px 30px; flex: 1; }
 
         .feedback-card {
             max-width: 640px;
@@ -267,7 +268,7 @@ $pageTitle = 'Rate Your Service';
         }
         .submitted-box .check-icon {
             width: 64px; height: 64px; border-radius: 50%;
-            background: rgba(16, 185, 129, 0.12); color: #10b981;
+            color: #10b981;
             display: inline-flex; align-items: center; justify-content: center;
             font-size: 2rem; margin-bottom: 12px;
         }

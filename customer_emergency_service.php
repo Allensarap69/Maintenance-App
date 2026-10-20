@@ -308,11 +308,11 @@ $pageTitle = 'Emergency Service Request';
             font-size: 1.4rem;
             flex-shrink: 0;
         }
-        .stat-icon-primary { background: rgba(59, 130, 246, 0.12); color: var(--info-color); }
-        .stat-icon-warning { background: rgba(250, 204, 21, 0.12); color: #EAB308; }
-        .stat-icon-info { background: rgba(59, 130, 246, 0.12); color: var(--info-color); }
-        .stat-icon-success { background: rgba(16, 185, 129, 0.12); color: var(--success-color); }
-        .stat-icon-danger { background: rgba(239, 68, 68, 0.12); color: var(--danger-color); }
+        .stat-icon-primary { color: var(--info-color); }
+        .stat-icon-warning { color: #EAB308; }
+        .stat-icon-info { color: var(--info-color); }
+        .stat-icon-success { color: var(--success-color); }
+        .stat-icon-danger { color: var(--danger-color); }
 
         .stat-value { font-size: 1.6rem; font-weight: 800; color: var(--text-dark); line-height: 1.1; }
         .stat-label { font-size: 0.78rem; font-weight: 600; color: var(--text-light); margin-top: 2px; }

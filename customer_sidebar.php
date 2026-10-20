@@ -72,6 +72,11 @@ $totalNotificationCount = count($customerNotificationItems);
 <!-- Sidebar Overlay for Mobile -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+<!-- Frosted edge masks — hide content scrolling under the floating bar's margins -->
+<div class="edge-mask edge-mask-top" aria-hidden="true"></div>
+<div class="edge-mask edge-mask-right" aria-hidden="true"></div>
+<div class="edge-mask edge-mask-left" aria-hidden="true"></div>
+
 <!-- Top page-loading line + spinner overlay (shows while navigating between modules) -->
 <style>
     #pageLoadingBar {

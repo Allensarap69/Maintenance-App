@@ -202,18 +202,19 @@
             background: rgba(255, 255, 255, 0.5);
         }
 
-        /* Sidebar */
+        /* Sidebar — floating card, same as the customer portal */
         .sidebar {
             position: fixed;
-            top: 0; left: 0;
+            top: 16px; left: 16px;
             width: var(--sidebar-width);
-            height: 100vh;
+            height: calc(100vh - 32px);
             z-index: 1000;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             transition: transform 0.3s ease, width 0.3s ease;
-            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
         }
 
         .sidebar::-webkit-scrollbar { width: 6px; }
@@ -242,7 +243,7 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, #3b82f6 0%, #FACC15 100%);
+            background: #FACC15;
         }
 
         .sidebar-brand {
@@ -521,12 +522,36 @@
 
         /* Main Content */
         .main-wrapper {
-            margin-left: var(--sidebar-width);
-            min-height: 100vh;
+            margin-left: calc(var(--sidebar-width) + 32px);
+            /* Bounded to the viewport; the scroll region starts at the
+               floating top header's bottom edge so content clips flush
+               under it and can never reach the exposed margins */
+            height: 100vh;
+            padding-top: 76px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
             transition: margin-left 0.3s ease;
             background: transparent;
-            width: calc(100% - var(--sidebar-width));
+            width: calc(100% - var(--sidebar-width) - 48px);
         }
+
+        /* Frosted edge masks — hide content scrolling under the floating
+           header's exposed margins (top gap, right edge; left edge on
+           mobile only). Real elements, not pseudo-elements, so no ancestor
+           backdrop-filter or transform can capture their positioning. */
+        .edge-mask {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.55);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            pointer-events: none;
+            z-index: 99;
+        }
+        .edge-mask-top { top: 0; left: 0; right: 0; height: 16px; }
+        .edge-mask-right { top: 0; right: 0; bottom: 0; width: 16px; }
+        .edge-mask-left { top: 0; left: 0; bottom: 0; width: 16px; display: none; }
 
         .top-header {
             background: #ffffff;
@@ -534,19 +559,35 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.10);
             position: fixed;
-            top: 0;
-            left: var(--sidebar-width);
-            right: 0;
+            top: 16px;
+            left: calc(var(--sidebar-width) + 32px);
+            right: 16px;
             z-index: 100;
-            border-bottom: 2px solid rgba(30, 58, 95, 0.3);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
             overflow: visible;
             height: 60px;
             transition: left 0.3s ease;
         }
 
-        .top-header::after { display: none; }
+        /* Yellow accent line — same as the customer portal top bar */
+        .top-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 16px;
+            right: 16px;
+            height: 2px;
+            background: #FACC15;
+        }
+
+        /* Frosted strip above the floating header — hides content scrolling
+           through the 16px gap between the header and the viewport edge.
+           Implemented via .edge-mask-top (a real element), since a fixed
+           ::before here would anchor to the header itself if a page ever
+           applies backdrop-filter/transform to it. */
 
         .top-header .page-title,
         .top-header .text-muted {
@@ -686,9 +727,12 @@
         }
 
         .main-content {
-            padding: 60px 30px 30px 30px;
+            flex: 1;
+            padding: 16px 30px 30px 30px;
+            overflow-y: auto;
+            overflow-x: hidden;
             background: transparent;
-            min-height: calc(100vh - 80px);
+            min-height: 0;
         }
 
         /* Page content wrapper used by mechanic pages */
@@ -737,11 +781,12 @@
 
         /* Responsive */
         @media (max-width: 991px) {
-            .sidebar { transform: translateX(-100%); }
+            .sidebar { transform: translateX(calc(-100% - 32px)); }
             .sidebar.show { transform: translateX(0); }
-            .main-wrapper { margin-left: 0; width: 100%; }
+            .main-wrapper { margin-left: 0; width: calc(100% - 16px); }
             .btn-toggle-sidebar { display: block; }
-            .top-header { left: 0; padding: 12px 20px; }
+            .top-header { left: 16px; right: 16px; padding: 12px 20px; }
+            .edge-mask-left { display: block; }
         }
 
         @media (max-width: 768px) {
@@ -752,7 +797,7 @@
             .header-user-wrap { gap: 6px; padding: 4px 6px; }
             .header-user-wrap .user-avatar { width: 36px; height: 36px; font-size: 1rem; }
             .header-user-dropdown { min-width: 160px; }
-            .main-content { padding: 76px 15px 15px; }
+            .main-content { padding: 16px 15px 15px; }
         }
 
         @media (max-width: 576px) {
@@ -760,7 +805,7 @@
             .page-title { font-size: 1rem; gap: 6px; }
             .mech-notifications { margin-right: 4px; }
             .notification-bell { width: 36px; height: 36px; font-size: 1.1rem; }
-            .main-content { padding: 70px 12px 12px; }
+            .main-content { padding: 16px 12px 12px; }
         }
 
         /* Scroll to top */
@@ -980,11 +1025,11 @@
         @media (max-width: 576px) {
             .notification-dropdown {
                 position: fixed;
-                top: 66px;
+                top: 82px;
                 left: auto;
                 right: 8px;
                 width: min(320px, calc(100vw - 16px));
-                max-height: calc(100vh - 84px);
+                max-height: calc(100vh - 98px);
                 transform-origin: top right;
                 display: flex;
                 flex-direction: column;
@@ -1115,8 +1160,15 @@
     /* Top header */
     html[data-theme="dark"] .top-header {
         background: #0a0f1e !important;
-        border-bottom: 2px solid rgba(250, 204, 21, 0.4) !important;
-        box-shadow: none !important;
+        border-color: rgba(255, 255, 255, 0.07) !important;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45) !important;
+    }
+    html[data-theme="dark"] .edge-mask {
+        background: rgba(10, 15, 30, 0.55);
+    }
+
+    @media print {
+        .edge-mask { display: none !important; }
     }
     html[data-theme="dark"] .top-header .page-title,
     html[data-theme="dark"] .top-header .btn-toggle-sidebar,

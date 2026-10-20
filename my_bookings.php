@@ -502,9 +502,10 @@ $active_page = basename($_SERVER['PHP_SELF']);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 1020;
+            position: fixed;
+            top: 16px;
+            z-index: 1030;
+            border-radius: 16px;
             border-bottom: 2px solid rgba(250, 204, 21, 0.3);
         }
 
@@ -519,7 +520,7 @@ $active_page = basename($_SERVER['PHP_SELF']);
         }
 
         .content-area {
-            padding: 30px;
+            padding: 16px 30px 30px;
             overflow-y: auto;
             flex: 1;
         }

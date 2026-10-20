@@ -484,10 +484,10 @@ $alerts = array_slice($alerts, 0, 5);
             font-size: 1.5rem;
         }
 
-        .stat-card.primary .stat-icon-wrapper { background: rgba(15, 23, 42, 0.1); color: var(--primary-color); }
-        .stat-card.success .stat-icon-wrapper { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .stat-card.warning .stat-icon-wrapper { background: rgba(250, 204, 21, 0.1); color: var(--accent-color); }
-        .stat-card.info .stat-icon-wrapper { background: rgba(59, 130, 246, 0.1); color: var(--info); }
+        .stat-card.primary .stat-icon-wrapper { color: var(--primary-color); }
+        .stat-card.success .stat-icon-wrapper { color: var(--success); }
+        .stat-card.warning .stat-icon-wrapper { color: var(--accent-color); }
+        .stat-card.info .stat-icon-wrapper { color: var(--info); }
 
         .stat-value {
             font-size: 2.5rem;
@@ -610,7 +610,6 @@ $alerts = array_slice($alerts, 0, 5);
         .action-icon-wrapper {
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, rgba(250, 204, 21, 0.1) 0%, rgba(250, 204, 21, 0.05) 100%);
             border-radius: 15px;
             display: flex;
             align-items: center;
@@ -620,7 +619,6 @@ $alerts = array_slice($alerts, 0, 5);
         }
 
         .action-card:hover .action-icon-wrapper {
-            background: var(--accent-gradient);
             transform: rotate(-5deg) scale(1.1);
         }
 
@@ -628,10 +626,6 @@ $alerts = array_slice($alerts, 0, 5);
             font-size: 1.5rem;
             color: var(--accent-color);
             
-        }
-
-        .action-card:hover .action-icon {
-            color: white;
         }
 
         .action-title {
@@ -828,7 +822,6 @@ $alerts = array_slice($alerts, 0, 5);
         .motorcycle-icon-wrapper {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.1) 0%, rgba(15, 23, 42, 0.05) 100%);
             border-radius: 20px;
             display: flex;
             align-items: center;
@@ -838,7 +831,6 @@ $alerts = array_slice($alerts, 0, 5);
         }
 
         .motorcycle-card:hover .motorcycle-icon-wrapper {
-            background: var(--primary-gradient);
             transform: rotate(-5deg) scale(1.1);
         }
 
@@ -846,10 +838,6 @@ $alerts = array_slice($alerts, 0, 5);
             font-size: 2.5rem;
             color: var(--primary-color);
             
-        }
-
-        .motorcycle-card:hover .motorcycle-icon {
-            color: white;
         }
 
         .motorcycle-brand {

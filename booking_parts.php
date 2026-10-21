@@ -326,7 +326,7 @@ if ($role === 'admin') {
                     <?php if ($pending_count > 0 && $open): ?>
                     <form method="POST" class="m-0 mt-2">
                         <input type="hidden" name="booking_id" value="<?= (int)$booking_id ?>">
-                        <button type="submit" name="notify_customer" value="1" class="btn btn-warning text-dark rounded-pill w-100 btn-sm fw-bold">
+                        <button type="submit" name="notify_customer" value="1" class="btn btn-warning text-dark rounded-pill w-100 btn-sm fw-bold" onclick="setTimeout(() => { this.disabled = true; }, 0);">
                             <i class="bi bi-send me-1"></i>Notify Customer — <?= $pending_count ?> part(s) awaiting approval
                         </button>
                     </form>

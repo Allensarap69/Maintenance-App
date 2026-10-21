@@ -2,6 +2,8 @@
 session_start();
 require 'db.php';
 require 'motorcycle_health_helper.php';
+require_once 'sms_helper.php';
+require_once 'SMSTemplates.php';
 
 // Security: mechanic only
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'mechanic') {
@@ -77,12 +79,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $check = $pdo->prepare("SELECT id FROM bookings WHERE id = ? AND mechanic_id = ? AND status IN ('assigned','accepted')");
             $check->execute([$booking_id, $mechanic_id]);
             if ($check->fetch()) {
+                $stmt_fetch = $pdo->prepare("
+                    SELECT b.user_id, b.vehicle_id, b.service_ids, b.package_ids, b.schedule_date,
+                           u.phone AS customer_phone
+                    FROM bookings b
+                    JOIN users u ON b.user_id = u.id
+                    WHERE b.id = ?
+                ");
+                $stmt_fetch->execute([$booking_id]);
+                $booking_data = $stmt_fetch->fetch(PDO::FETCH_ASSOC);
+
                 $pdo->prepare("UPDATE bookings SET status = 'in_progress' WHERE id = ?")->execute([$booking_id]);
                 $pdo->prepare("UPDATE mechanics SET status = 'Busy', current_booking_id = ? WHERE id = ?")->execute([$booking_id, $mechanic_id]);
-                
+
                 $pdo->commit();
                 $msg = "✅ Job #{$booking_id} started.";
                 $msg_type = "success";
+
+                // Send start SMS after commit (best-effort; does not fail the action)
+                if (SMS_ENABLED && $booking_data && !empty($booking_data['customer_phone'])) {
+                    try {
+                        $sms = new SMSHelper();
+                        $date_formatted = date('M j, Y', strtotime($booking_data['schedule_date']));
+                        $service_names = get_service_names($pdo, $booking_data['service_ids'], $booking_data['package_ids'] ?? '[]');
+                        $sms_result = $sms->sendSMS(
+                            $booking_data['customer_phone'],
+                            SMSTemplates::serviceStarted($date_formatted, $service_names),
+                            'SERVICE_STARTED',
+                            [
+                                'user_id' => $booking_data['user_id'] ?? null,
+                                'customer_id' => $booking_data['user_id'] ?? null,
+                                'booking_id' => $booking_id,
+                                'motorcycle_id' => $booking_data['vehicle_id'] ?? null,
+                                'notification_key' => 'SERVICE_STARTED_' . $booking_id
+                            ]
+                        );
+                        if (!empty($sms_result['success'])) {
+                            $msg .= " SMS sent.";
+                        } else {
+                            $msg .= " SMS failed: " . ($sms_result['message'] ?? 'unknown error');
+                        }
+                    } catch (Throwable $e) {
+                        error_log("Start SMS error for booking #{$booking_id}: " . $e->getMessage());
+                        $msg .= " SMS could not be sent.";
+                    }
+                }
             } else {
                 $pdo->rollBack();
                 $msg = "❌ Job cannot be started.";
@@ -95,6 +136,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $check = $pdo->prepare("SELECT id FROM bookings WHERE id = ? AND mechanic_id = ? AND status IN ('in_progress','assigned','accepted')");
             $check->execute([$booking_id, $mechanic_id]);
             if ($check->fetch()) {
+                $stmt_fetch = $pdo->prepare("
+                    SELECT b.user_id, b.vehicle_id, b.service_ids, b.package_ids, b.schedule_date,
+                           u.phone AS customer_phone
+                    FROM bookings b
+                    JOIN users u ON b.user_id = u.id
+                    WHERE b.id = ?
+                ");
+                $stmt_fetch->execute([$booking_id]);
+                $booking_data = $stmt_fetch->fetch(PDO::FETCH_ASSOC);
+
                 $pdo->prepare("UPDATE bookings SET status = 'completed' WHERE id = ?")->execute([$booking_id]);
                 recordCompletedBookingHistory($booking_id);
                 $pdo->prepare("UPDATE mechanics SET current_booking_id = NULL WHERE id = ?")->execute([$mechanic_id]);
@@ -114,6 +165,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pdo->commit();
                 $msg = "✅ Job #{$booking_id} completed.";
                 $msg_type = "success";
+
+                // Send completion SMS after commit (best-effort; does not fail the completion)
+                if (SMS_ENABLED && $booking_data && !empty($booking_data['customer_phone'])) {
+                    try {
+                        $sms = new SMSHelper();
+                        $date_formatted = date('M j, Y', strtotime($booking_data['schedule_date']));
+                        $service_names = get_service_names($pdo, $booking_data['service_ids'], $booking_data['package_ids'] ?? '[]');
+                        $sms_result = $sms->sendSMS(
+                            $booking_data['customer_phone'],
+                            SMSTemplates::serviceCompleted($date_formatted, $service_names),
+                            'SERVICE_COMPLETED',
+                            [
+                                'user_id' => $booking_data['user_id'] ?? null,
+                                'customer_id' => $booking_data['user_id'] ?? null,
+                                'booking_id' => $booking_id,
+                                'motorcycle_id' => $booking_data['vehicle_id'] ?? null,
+                                'notification_key' => 'SERVICE_COMPLETED_' . $booking_id
+                            ]
+                        );
+                        if (!empty($sms_result['success']) && empty($sms_result['error_code'])) {
+                            $msg .= " SMS sent.";
+                        } else {
+                            $msg .= " SMS failed: " . ($sms_result['message'] ?? 'unknown error');
+                        }
+                    } catch (Throwable $e) {
+                        error_log("Completion SMS error for booking #{$booking_id}: " . $e->getMessage());
+                        $msg .= " SMS could not be sent.";
+                    }
+                }
             } else {
                 $pdo->rollBack();
                 $msg = "❌ Invalid job or job is not in progress.";
@@ -305,6 +385,42 @@ function getServiceText($service_ids_json, $services) {
         }
     }
     return !empty($labels) ? implode(', ', $labels) : 'N/A';
+}
+
+function get_service_names($pdo, $service_ids_json, $package_ids_json = '[]') {
+    $decode = function ($v) {
+        if (empty($v)) return [];
+        $d = json_decode($v, true);
+        if (is_array($d)) return $d;
+        return array_filter(array_map('trim', explode(',', (string)$v)));
+    };
+    $service_ids = $decode($service_ids_json);
+    $package_ids = $decode($package_ids_json);
+    $names = [];
+
+    if (!empty($service_ids)) {
+        $placeholders = rtrim(str_repeat('?,', count($service_ids)), ',');
+        try {
+            $stmt = $pdo->prepare("SELECT service_name FROM services WHERE id IN ($placeholders)");
+            $stmt->execute(array_values($service_ids));
+            $names = array_merge($names, array_column($stmt->fetchAll(), 'service_name'));
+        } catch (PDOException $e) {
+            return "Error";
+        }
+    }
+
+    if (!empty($package_ids)) {
+        $placeholders = rtrim(str_repeat('?,', count($package_ids)), ',');
+        try {
+            $stmt = $pdo->prepare("SELECT package_name FROM service_packages WHERE id IN ($placeholders)");
+            $stmt->execute(array_values($package_ids));
+            $names = array_merge($names, array_column($stmt->fetchAll(), 'package_name'));
+        } catch (PDOException $e) {
+            return "Error";
+        }
+    }
+
+    return empty($names) ? "N/A" : implode(', ', $names);
 }
 
 // Build today's schedule from current jobs and all emergency requests

@@ -514,13 +514,19 @@ function notify_customer_pending_parts($pdo, $booking_id) {
     ensure_management_tables($pdo);
     try {
         $pend = $pdo->prepare(
-            "SELECT bp.quantity, bp.unit_price, p.name
+            "SELECT bp.id, bp.quantity, bp.unit_price, p.name
              FROM booking_parts bp JOIN parts p ON p.id = bp.part_id
-             WHERE bp.booking_id = ? AND bp.status = 'pending'"
+             WHERE bp.booking_id = ? AND bp.status = 'pending'
+             ORDER BY bp.id"
         );
         $pend->execute([(int)$booking_id]);
         $rows = $pend->fetchAll(PDO::FETCH_ASSOC);
         if (!$rows) return ['ok' => false, 'msg' => 'No parts awaiting approval.'];
+
+        // Dedupe key: refresh/double-click resubmits hit isAlreadySent() and skip;
+        // a changed set of pending parts produces a new key and still notifies.
+        $fingerprint = md5(implode('|', array_map(fn($r) => (int)$r['id'] . ':' . (int)$r['quantity'], $rows)));
+        $notif_key = 'PART_APPROVAL_' . (int)$booking_id . '_' . $fingerprint;
 
         $stmt = $pdo->prepare(
             "SELECT u.id, u.phone, u.name FROM bookings b JOIN users u ON u.id = b.user_id WHERE b.id = ?"
@@ -537,14 +543,20 @@ function notify_customer_pending_parts($pdo, $booking_id) {
 
         $cname = trim((string)($cust['name'] ?? ''));
         $greet = $cname !== '' ? "Dear {$cname}, " : 'Dear Customer, ';
-        $message = $greet . "this is Mindanao Eversure Motor Maintenance. Parts added to your Booking #{$booking_id} need your approval: {$list} (total ₱" . number_format($total, 2) . "). Please check My Bookings to approve or decline. Thank you.";
+        $message = $greet . "this is Mindanao Eversure Motor Maintenance. Parts added to your Booking #{$booking_id} need your approval: {$list} (total PHP " . number_format($total, 2) . "). Please check My Bookings to approve or decline. Thank you.";
+        $message = preg_replace('/[^\x20-\x7E]/', '', $message);
 
         if (!file_exists(__DIR__ . '/sms_helper.php')) return ['ok' => false, 'msg' => 'SMS not configured.'];
         require_once __DIR__ . '/sms_helper.php';
         $res = (new SMSHelper())->sendSMS($cust['phone'], $message, 'PART_APPROVAL', [
             'booking_id' => (int)$booking_id,
             'user_id' => (int)$cust['id'],
+            'notification_key' => $notif_key,
         ]);
+
+        if (($res['error_code'] ?? '') === 'DUPLICATE') {
+            return ['ok' => true, 'msg' => 'Customer was already notified about these parts.'];
+        }
 
         log_audit($pdo, 'parts_notify_sent', 'booking', $booking_id, count($rows) . ' pending part(s), ₱' . number_format($total, 2));
         return $res['success']

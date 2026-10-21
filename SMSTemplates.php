@@ -59,6 +59,14 @@ class SMSTemplates {
         ]);
     }
 
+    public static function serviceStarted($date, $service) {
+        $template = "Mindanao Eversure: Work has started on your motorcycle service scheduled for {date}. Service: {service}. We will notify you once the service is completed.";
+        return self::replace($template, [
+            'date' => $date,
+            'service' => $service
+        ]);
+    }
+
     public static function serviceCompleted($date, $service) {
         $template = "Mindanao Eversure: Your motorcycle service has been completed on {date}. Service: {service}. Thank you for choosing Mindanao Eversure Corporation!";
         return self::replace($template, [

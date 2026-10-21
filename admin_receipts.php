@@ -12,14 +12,19 @@ ensure_management_tables($pdo);
 
 // --- All payment records (receipts uploaded by customers live in the payments table) ---
 $payments = $pdo->query(
-    "SELECT b.id AS booking_id, b.schedule_date, b.status AS booking_status, b.total_price,
+    "SELECT b.id AS booking_id, b.schedule_date, b.schedule_start_time, b.schedule_end_time,
+            b.status AS booking_status, b.total_price, b.service_ids, b.package_ids, b.created_at AS booked_at,
             p.id AS payment_id, p.amount, p.payment_method, p.transaction_type,
             p.transaction_ref, p.receipt_path, p.status AS payment_status, p.created_at AS payment_at,
-            u.name AS customer_name, u.username,
-            i.id AS invoice_id, i.invoice_no
+            u.name AS customer_name, u.username, u.phone AS customer_phone, u.email AS customer_email,
+            v.brand, v.model, v.year_model, v.plate_number,
+            pm.name AS primary_mechanic,
+            i.id AS invoice_id, i.invoice_no, i.total AS invoice_total
      FROM bookings b
      LEFT JOIN payments p ON p.booking_id = b.id
      LEFT JOIN users u ON u.id = b.user_id
+     LEFT JOIN motorcycles v ON v.id = b.vehicle_id
+     LEFT JOIN mechanics pm ON pm.id = b.mechanic_id
      LEFT JOIN invoices i ON i.booking_id = b.id
      WHERE b.status IN ('completed', 'rejected', 'deposit_rejected')
      ORDER BY b.schedule_date DESC, b.id DESC"
@@ -36,14 +41,61 @@ foreach ($payments as &$p) {
 }
 unset($p);
 
+// --- Bulk lookups powering the detail modal (mechanics, services/packages, parts, invoice lines) ---
+$decode_ids = function ($raw) {
+    $ids = json_decode((string)$raw, true);
+    if (!is_array($ids)) $ids = explode(',', (string)$raw);
+    return array_values(array_filter(array_map('intval', $ids)));
+};
+
+$booking_ids = array_values(array_unique(array_map('intval', array_column($payments, 'booking_id'))));
+$in_bookings = $booking_ids ? implode(',', $booking_ids) : '0';
+$mech_map = $parts_map = $svc_map = $pkg_map = $inv_map = [];
+
+try {
+    foreach ($pdo->query("SELECT bm.booking_id, m.name FROM booking_mechanics bm JOIN mechanics m ON m.id = bm.mechanic_id WHERE bm.booking_id IN ($in_bookings) ORDER BY m.name")->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $mech_map[$r['booking_id']][] = $r['name'];
+    }
+    foreach ($pdo->query("SELECT bp.booking_id, bp.quantity, bp.unit_price, bp.status, pt.name FROM booking_parts bp JOIN parts pt ON pt.id = bp.part_id WHERE bp.booking_id IN ($in_bookings) ORDER BY bp.id")->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $parts_map[$r['booking_id']][] = $r;
+    }
+} catch (Exception $e) { /* junction/parts tables may not exist yet */ }
+
+$svc_ids = $pkg_ids = [];
+foreach ($payments as $p) {
+    foreach ($decode_ids($p['service_ids']) as $id) $svc_ids[$id] = true;
+    foreach ($decode_ids($p['package_ids']) as $id) $pkg_ids[$id] = true;
+}
+if ($svc_ids) {
+    foreach ($pdo->query("SELECT id, service_name, price FROM services WHERE id IN (" . implode(',', array_keys($svc_ids)) . ")")->fetchAll(PDO::FETCH_ASSOC) as $s) {
+        $svc_map[(int)$s['id']] = $s;
+    }
+}
+try {
+    if ($pkg_ids) {
+        foreach ($pdo->query("SELECT id, package_name, price FROM service_packages WHERE id IN (" . implode(',', array_keys($pkg_ids)) . ")")->fetchAll(PDO::FETCH_ASSOC) as $s) {
+            $pkg_map[(int)$s['id']] = $s;
+        }
+    }
+    $invoice_ids = array_values(array_unique(array_filter(array_map('intval', array_column($payments, 'invoice_id')))));
+    if ($invoice_ids) {
+        foreach ($pdo->query("SELECT invoice_id, item_type, description, quantity, line_total FROM invoice_items WHERE invoice_id IN (" . implode(',', $invoice_ids) . ") ORDER BY id")->fetchAll(PDO::FETCH_ASSOC) as $r) {
+            $inv_map[$r['invoice_id']][] = $r;
+        }
+    }
+} catch (Exception $e) { /* management tables may not exist yet */ }
+
 // --- Emergency requests (no payment table link — the "receipt" is the request slip) ---
 $emergencies = $pdo->query(
-    "SELECT esr.id, esr.motorcycle_issue, esr.image_path, esr.service_type, esr.request_status,
-            esr.location, esr.location_description, esr.contact_number, esr.created_at,
-            u.name AS customer_name, u.username, mech.name AS mechanic_name
+    "SELECT esr.id, esr.motorcycle_issue, esr.problem_description, esr.image_path, esr.service_type,
+            esr.request_status, esr.priority, esr.location, esr.location_description, esr.contact_number,
+            esr.created_at, esr.updated_at,
+            u.name AS customer_name, u.username, mech.name AS mechanic_name,
+            v.brand, v.model, v.year_model, v.plate_number
      FROM emergency_service_requests esr
      LEFT JOIN users u ON u.id = esr.customer_id
      LEFT JOIN mechanics mech ON mech.id = esr.assigned_mechanic_id
+     LEFT JOIN motorcycles v ON v.id = esr.motorcycle_id
      WHERE esr.request_status IN ('completed', 'complete', 'declined', 'decline', 'rejected', 'reject')
      ORDER BY esr.created_at DESC"
 )->fetchAll(PDO::FETCH_ASSOC);
@@ -154,11 +206,61 @@ require 'admin_sidebar_template.php';
     .rct-act.rct-view:hover { color:#d97706; }
     .rct-act.rct-print:hover { color:#1d4ed8; }
     button.rct-act { background:none; border:none; cursor:pointer; }
-    /* Details modal */
-    .rct-dl { display:grid; grid-template-columns:auto 1fr; gap:.4rem 1rem; font-size:.8rem; margin:0; }
-    .rct-dl dt { color:#64748b; font-weight:600; white-space:nowrap; }
-    .rct-dl dd { margin:0; font-weight:600; text-align:right; word-break:break-word; }
-    html[data-theme="dark"] .rct-dl dt { color:#94a3b8; }
+    /* Details modal — receipt-style document */
+    .rct-receipt-dialog { max-width:660px; }
+    .rct-receipt-close { position:absolute; top:.7rem; right:.75rem; z-index:5; filter:invert(1) grayscale(100%); opacity:.85; }
+    .rcpt { background:#fff; border-radius:inherit; overflow:hidden; font-size:.8rem; }
+    .rcpt-head { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1.05rem 1.4rem; background:linear-gradient(135deg,#0f172a,#1e3a5f); color:#fff; position:relative; }
+    .rcpt-head::after { content:''; position:absolute; left:0; right:0; bottom:0; height:3px; background:linear-gradient(90deg,#3b82f6,#FACC15); }
+    .rcpt-brand { display:flex; align-items:center; gap:.6rem; min-width:0; }
+    .rcpt-mark { width:36px; height:36px; border-radius:9px; background:rgba(250,204,21,.15); border:1px solid rgba(250,204,21,.4); color:#FACC15; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+    .rcpt-bname { font-size:.84rem; font-weight:800; }
+    .rcpt-bsub { font-size:.58rem; color:rgba(255,255,255,.6); }
+    .rcpt-doc { text-align:right; padding-right:1.3rem; }
+    .rcpt-doctype { font-size:.56rem; font-weight:800; text-transform:uppercase; letter-spacing:.14em; color:#FACC15; }
+    .rcpt-no { font-size:1.15rem; font-weight:800; line-height:1.15; }
+    .rcpt-pill { display:inline-block; margin-top:4px; padding:2px 9px; border-radius:99px; font-size:.56rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; border:1px solid; }
+    .rcpt-pill.ok { background:rgba(16,185,129,.15); color:#34d399; border-color:rgba(52,211,153,.4); }
+    .rcpt-pill.bad { background:rgba(239,68,68,.15); color:#fca5a5; border-color:rgba(252,165,165,.4); }
+    .rcpt-pill.warn { background:rgba(250,204,21,.15); color:#fde047; border-color:rgba(250,204,21,.4); }
+    .rcpt-meta { display:flex; flex-wrap:wrap; gap:3px 18px; padding:7px 22px; background:#f8fafc; border-bottom:1px solid #e5e7eb; font-size:.68rem; color:#6b7280; }
+    .rcpt-meta b { color:#111827; }
+    .rcpt-body { padding:14px 22px 16px; }
+    .rcpt-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+    .rcpt-card { border:1px solid #e5e7eb; border-radius:9px; padding:8px 10px; min-width:0; }
+    .rcpt-card h6 { font-size:.54rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#1e3a5f; margin:0 0 3px; }
+    .rcpt-card .v { font-size:.76rem; font-weight:700; word-break:break-word; }
+    .rcpt-card .s { font-size:.64rem; color:#6b7280; word-break:break-word; }
+    .rcpt-label { font-size:.58rem; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:#6b7280; margin-bottom:2px; }
+    .rcpt-items { width:100%; border-collapse:collapse; border-top:2px solid #1e3a5f; }
+    .rcpt-items td { padding:7px 0; border-bottom:1px solid #eef2f7; font-size:.76rem; vertical-align:top; }
+    .rcpt-items .it-meta { font-size:.64rem; color:#94a3b8; font-weight:500; }
+    .rcpt-items .it-amt { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; padding-left:.75rem; }
+    .rcpt-total { display:flex; justify-content:space-between; align-items:center; border-top:2px solid #1e3a5f; margin-top:6px; padding-top:7px; font-size:.9rem; font-weight:800; color:#1e3a5f; }
+    .rcpt-chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+    .rcpt-chip { background:#f8fafc; border:1px solid #e5e7eb; border-radius:7px; padding:4px 10px; font-size:.66rem; color:#6b7280; }
+    .rcpt-chip b { color:#111827; font-weight:700; }
+    .rcpt-detail-dl { display:grid; grid-template-columns:auto 1fr; gap:3px 12px; margin:10px 0 0; font-size:.74rem; }
+    .rcpt-detail-dl dt { color:#64748b; font-weight:600; white-space:nowrap; }
+    .rcpt-detail-dl dd { margin:0; text-align:right; font-weight:600; word-break:break-word; }
+    .rcpt-imglink { margin-top:12px; font-size:.72rem; }
+    .rcpt-foot { margin-top:14px; padding-top:10px; border-top:1px dashed #e5e7eb; text-align:center; font-size:.6rem; color:#9ca3af; }
+    @media (max-width:560px) { .rcpt-cards { grid-template-columns:1fr; } .rcpt-doc { padding-right:1rem; } }
+    html[data-theme="dark"] .rcpt { background:#161e33; color:#e2e8f0; }
+    html[data-theme="dark"] .rcpt-meta { background:rgba(255,255,255,.03); border-bottom-color:rgba(255,255,255,.09); color:#94a3b8; }
+    html[data-theme="dark"] .rcpt-meta b { color:#e2e8f0; }
+    html[data-theme="dark"] .rcpt-card { border-color:#2a3350; }
+    html[data-theme="dark"] .rcpt-card h6 { color:#93c5fd; }
+    html[data-theme="dark"] .rcpt-card .s { color:#94a3b8; }
+    html[data-theme="dark"] .rcpt-items { border-top-color:#3b82f6; }
+    html[data-theme="dark"] .rcpt-items td { border-bottom-color:rgba(255,255,255,.07); }
+    html[data-theme="dark"] .rcpt-items .it-meta { color:#64748b; }
+    html[data-theme="dark"] .rcpt-total { border-top-color:#3b82f6; color:#93c5fd; }
+    html[data-theme="dark"] .rcpt-chip { background:#141b30; border-color:#2a3350; color:#94a3b8; }
+    html[data-theme="dark"] .rcpt-chip b { color:#e2e8f0; }
+    html[data-theme="dark"] .rcpt-detail-dl dt { color:#94a3b8; }
+    html[data-theme="dark"] .rcpt-imglink { color:#cbd5e1; border-color:#2a3350; }
+    html[data-theme="dark"] .rcpt-foot { border-top-color:rgba(255,255,255,.12); color:#64748b; }
     .rct-empty { text-align:center; padding:2.5rem 1rem; color:#94a3b8; }
     .rct-empty i { font-size:2rem; display:block; margin-bottom:.5rem; }
     html[data-theme="dark"] .rct-stat { background:#141b30; border-color:rgba(255,255,255,.09); box-shadow:0 4px 20px rgba(0,0,0,.35); }
@@ -299,18 +401,71 @@ require 'admin_sidebar_template.php';
                         $customer = trim($p['customer_name'] ?: $p['username'] ?: 'Unknown');
                         $pmethod = strtolower((string)$p['payment_method']);
                         $search = strtolower("#{$p['booking_id']} {$customer} {$p['transaction_ref']} {$p['invoice_no']} {$p['payment_id']}");
-                        $fields = [
-                            'Booking'   => '#' . $p['booking_id'],
-                            'Customer'  => $customer,
-                            'Scheduled' => date('M j, Y', strtotime($p['schedule_date'])),
-                            'Status'    => $is_rej_booking ? 'Rejected' : 'Completed',
-                            'Payment'   => $has_pay ? ucfirst($st) . ' payment' : 'No payment recorded',
-                            'Method'    => $has_pay ? ucfirst((string)$p['payment_method']) : '—',
-                            'Type'      => $has_pay ? ($p['transaction_type'] === 'deposit' ? 'Deposit' : 'Full payment') : '—',
-                            'Ref No'    => $p['transaction_ref'] ?: '—',
-                            'Amount'    => $p['amount'] !== null ? '₱' . number_format((float)$p['amount'], 2) : '—',
-                            'Invoice'   => $p['invoice_no'] ?: '—',
-                            'Submitted' => $p['payment_at'] ? date('M j, Y g:i A', strtotime($p['payment_at'])) : '—',
+                        $vehicle = trim("{$p['year_model']} {$p['brand']} {$p['model']}");
+                        $mechanics = $mech_map[$p['booking_id']] ?? [];
+                        if (!$mechanics && $p['primary_mechanic']) $mechanics = [$p['primary_mechanic']];
+                        $sched = date('M j, Y', strtotime($p['schedule_date']));
+                        if ($p['schedule_start_time']) {
+                            $sched .= ' · ' . date('g:i A', strtotime($p['schedule_start_time']));
+                            if ($p['schedule_end_time']) $sched .= '–' . date('g:i A', strtotime($p['schedule_end_time']));
+                        }
+                        // Itemized charges — invoice lines when issued, else booked services/packages + parts
+                        $items = [];
+                        $detail_total = '₱' . number_format((float)$p['total_price'], 2);
+                        if (!empty($p['invoice_id']) && !empty($inv_map[$p['invoice_id']])) {
+                            foreach ($inv_map[$p['invoice_id']] as $it) {
+                                $items[] = [
+                                    'desc'   => $it['description'],
+                                    'meta'   => ucfirst($it['item_type']) . ((int)$it['quantity'] > 1 ? ' ×' . (int)$it['quantity'] : ''),
+                                    'amount' => '₱' . number_format((float)$it['line_total'], 2),
+                                ];
+                            }
+                            if ($p['invoice_total'] !== null) $detail_total = '₱' . number_format((float)$p['invoice_total'], 2);
+                        } else {
+                            foreach ($decode_ids($p['service_ids']) as $sid) {
+                                if (isset($svc_map[$sid])) $items[] = ['desc' => $svc_map[$sid]['service_name'], 'meta' => 'Service', 'amount' => '₱' . number_format((float)$svc_map[$sid]['price'], 2)];
+                            }
+                            foreach ($decode_ids($p['package_ids']) as $pid) {
+                                if (isset($pkg_map[$pid])) $items[] = ['desc' => $pkg_map[$pid]['package_name'], 'meta' => 'Package', 'amount' => '₱' . number_format((float)$pkg_map[$pid]['price'], 2)];
+                            }
+                            foreach ($parts_map[$p['booking_id']] ?? [] as $pt) {
+                                $items[] = [
+                                    'desc'   => $pt['name'],
+                                    'meta'   => 'Part ×' . (int)$pt['quantity'] . ' · ' . ucfirst($pt['status']),
+                                    'amount' => '₱' . number_format((float)$pt['unit_price'] * (int)$pt['quantity'], 2),
+                                ];
+                            }
+                        }
+                        // Receipt-style payload for the detail modal
+                        $receipt = [
+                            'doc'        => $is_rej_booking ? 'Booking Record' : 'Service Receipt',
+                            'no'         => '#' . sprintf('%04d', (int)$p['booking_id']),
+                            'statusText' => $is_rej_booking ? 'Rejected' : 'Completed',
+                            'statusCls'  => $is_rej_booking ? 'bad' : 'ok',
+                            'meta'       => array_values(array_filter([
+                                $p['payment_at'] ? ['Issued', date('M j, Y g:i A', strtotime($p['payment_at']))] : null,
+                                ['Schedule', $sched],
+                                $p['booked_at'] ? ['Booked On', date('M j, Y', strtotime($p['booked_at']))] : null,
+                            ])),
+                            'cards'      => [
+                                ['label' => 'Customer', 'v' => $customer, 'subs' => array_values(array_filter([$p['customer_phone'], $p['customer_email']]))],
+                                ['label' => 'Vehicle', 'v' => $vehicle ?: 'N/A', 'subs' => array_values(array_filter([$p['plate_number'] ? 'Plate: ' . $p['plate_number'] : null]))],
+                                ['label' => 'Mechanic(s)', 'v' => $mechanics ? implode(', ', $mechanics) : 'Unassigned', 'subs' => []],
+                            ],
+                            'itemsLabel' => 'Services & Charges',
+                            'items'      => $items,
+                            'totalLabel' => $p['invoice_id'] ? 'Invoice Total' : 'Booking Total',
+                            'total'      => $detail_total,
+                            'chips'      => array_values(array_filter([
+                                $has_pay ? ['Method', ucfirst((string)$p['payment_method'])] : ['Payment', 'No payment recorded'],
+                                $has_pay && $p['transaction_type'] ? ['Type', $p['transaction_type'] === 'deposit' ? 'Deposit' : 'Full payment'] : null,
+                                $has_pay && $p['transaction_ref'] ? ['Ref No', $p['transaction_ref']] : null,
+                                $has_pay ? ['Payment', ucfirst($st)] : null,
+                                $has_pay && $p['amount'] !== null ? ['Amount Paid', '₱' . number_format((float)$p['amount'], 2)] : null,
+                                $p['invoice_no'] ? ['Invoice', $p['invoice_no']] : null,
+                            ])),
+                            'img'      => $has_img ? $p['receipt_path'] : '',
+                            'imgLabel' => 'View uploaded receipt',
                         ];
                     ?>
                     <tr data-status="<?= htmlspecialchars($st) ?>"
@@ -341,9 +496,7 @@ require 'admin_sidebar_template.php';
                         <td class="text-end">
                             <button type="button" class="rct-act rct-view" title="View details"
                                     data-bs-toggle="modal" data-bs-target="#rctDetailModal"
-                                    data-title="Booking #<?= (int)$p['booking_id'] ?>"
-                                    data-img="<?= $has_img ? htmlspecialchars($p['receipt_path']) : '' ?>"
-                                    data-fields="<?= htmlspecialchars(json_encode($fields), ENT_QUOTES) ?>"><i class="bi bi-eye"></i></button>
+                                    data-receipt="<?= htmlspecialchars(json_encode($receipt), ENT_QUOTES) ?>"><i class="bi bi-eye"></i></button>
                             <a href="print_receipt.php?booking_id=<?= (int)$p['booking_id'] ?>" class="rct-act rct-print" title="Print receipt"><i class="bi bi-printer"></i></a>
                         </td>
                     </tr>
@@ -369,16 +522,38 @@ require 'admin_sidebar_template.php';
                         preg_match('/₱([\d,]+(?:\.\d+)?)/', $e['motorcycle_issue'], $pm);
                         $issue_name = trim(preg_replace('/\s*\(₱[\d,\.]+\)\s*/', '', $e['motorcycle_issue']));
                         $search = strtolower("#{$e['id']} {$customer} {$issue_name} {$e['mechanic_name']} {$e['location_description']} {$e['location']}");
-                        $e_fields = [
-                            'Request'  => '#' . $e['id'],
-                            'Customer' => $customer,
-                            'Issue'    => $issue_name . (isset($pm[1]) ? ' — ₱' . number_format((float)str_replace(',', '', $pm[1]), 2) : ''),
-                            'Type'     => $e['service_type'] === 'tow_service' ? 'Tow & Lift' : 'On-Site Repair',
-                            'Mechanic' => $e['mechanic_name'] ?: 'Unassigned',
-                            'Location' => $e['location_description'] ?: ($e['location'] ?: '—'),
-                            'Contact'  => $e['contact_number'] ?: '—',
-                            'Status'   => ucwords(str_replace('_', ' ', $e['request_status'])),
-                            'Requested'=> date('M j, Y g:i A', strtotime($e['created_at'])),
+                        $clean_txt = fn($s) => trim((string)preg_replace('/^[\s\'",]+|[\s\'",]+$/u', '', (string)$s));
+                        $e_vehicle = trim("{$e['year_model']} {$e['brand']} {$e['model']}");
+                        $e_desc = $clean_txt($e['problem_description']);
+                        $e_loc  = $clean_txt($e['location_description']) ?: $clean_txt($e['location']);
+                        $e_receipt = [
+                            'doc'        => 'Emergency Request Slip',
+                            'no'         => '#' . sprintf('%04d', (int)$e['id']),
+                            'statusText' => ucwords(str_replace('_', ' ', $e['request_status'])),
+                            'statusCls'  => $grp === 'completed' ? 'ok' : 'bad',
+                            'meta'       => array_values(array_filter([
+                                ['Requested', date('M j, Y g:i A', strtotime($e['created_at']))],
+                                $e['updated_at'] ? ['Last Update', date('M j, Y g:i A', strtotime($e['updated_at']))] : null,
+                                ['Priority', ucfirst($e['priority'] ?? 'medium')],
+                            ])),
+                            'cards'      => [
+                                ['label' => 'Customer', 'v' => $customer, 'subs' => array_values(array_filter([$e['contact_number']]))],
+                                ['label' => 'Vehicle', 'v' => $e_vehicle ?: 'N/A', 'subs' => array_values(array_filter([$e['plate_number'] ? 'Plate: ' . $e['plate_number'] : null]))],
+                                ['label' => 'Mechanic', 'v' => $e['mechanic_name'] ?: 'Unassigned', 'subs' => []],
+                            ],
+                            'itemsLabel' => 'Requested Service',
+                            'items'      => [[
+                                'desc'   => $issue_name,
+                                'meta'   => $e['service_type'] === 'tow_service' ? 'Tow & Lift' : 'On-Site Repair',
+                                'amount' => isset($pm[1]) ? '₱' . number_format((float)str_replace(',', '', $pm[1]), 2) : '',
+                            ]],
+                            'details'    => array_values(array_filter([
+                                $e_desc ? ['Description', $e_desc] : null,
+                                $e_loc ? ['Location', $e_loc] : null,
+                                ($e['latitude'] && $e['longitude']) ? ['Coordinates', $e['latitude'] . ', ' . $e['longitude']] : null,
+                            ])),
+                            'img'      => $has_img ? $e['image_path'] : '',
+                            'imgLabel' => 'View issue photo',
                         ];
                     ?>
                     <tr data-emg="<?= htmlspecialchars($grp) ?>"
@@ -408,9 +583,7 @@ require 'admin_sidebar_template.php';
                             <a href="print_emergency_receipt.php?request_id=<?= (int)$e['id'] ?>" class="rct-act rct-print" title="Print request slip"><i class="bi bi-printer"></i></a>
                             <button type="button" class="rct-act rct-view" title="View details"
                                     data-bs-toggle="modal" data-bs-target="#rctDetailModal"
-                                    data-title="Emergency Request #<?= (int)$e['id'] ?>"
-                                    data-img="<?= $has_img ? htmlspecialchars($e['image_path']) : '' ?>"
-                                    data-fields="<?= htmlspecialchars(json_encode($e_fields), ENT_QUOTES) ?>"><i class="bi bi-eye"></i></button>
+                                    data-receipt="<?= htmlspecialchars(json_encode($e_receipt), ENT_QUOTES) ?>"><i class="bi bi-eye"></i></button>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -436,16 +609,10 @@ require 'admin_sidebar_template.php';
 </div>
 
 <div class="modal fade" id="rctDetailModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered rct-receipt-dialog modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header py-2">
-                <h6 class="modal-title" id="rctDetailTitle">Details</h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-3">
-                <img src="" id="rctDetailImg" class="img-fluid rounded mb-3 d-none" alt="Receipt">
-                <dl class="rct-dl" id="rctDetailFields"></dl>
-            </div>
+            <button type="button" class="btn-close rct-receipt-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-body p-0" id="rctDetailBody"></div>
         </div>
     </div>
 </div>
@@ -542,29 +709,120 @@ require 'admin_sidebar_template.php';
     const imgModal = document.getElementById('rctImgModal');
     imgModal.addEventListener('show.bs.modal', e => {
         const t = e.relatedTarget;
+        if (!t) return; // opened programmatically — src/label already set
         document.getElementById('rctImgFull').src = t.dataset.imgSrc;
         document.getElementById('rctImgLabel').textContent = t.dataset.imgLabel;
     });
 
-    // Details modal (view icon on both tabs)
+    // Details modal — receipt-style rendering
+    const rcEl = (tag, cls, text) => {
+        const el = document.createElement(tag);
+        if (cls) el.className = cls;
+        if (text !== undefined && text !== null) el.textContent = text;
+        return el;
+    };
+
+    function buildReceipt(r) {
+        const root = rcEl('div', 'rcpt');
+        // Header: brand + doc type/no + status pill
+        const head = rcEl('div', 'rcpt-head');
+        const brand = rcEl('div', 'rcpt-brand');
+        const mark = rcEl('div', 'rcpt-mark');
+        mark.innerHTML = '<i class="bi bi-wrench-adjustable-circle"></i>';
+        const bt = rcEl('div');
+        bt.append(rcEl('div', 'rcpt-bname', 'Advance Motorcycle Service'),
+                  rcEl('div', 'rcpt-bsub', 'Official Service Document'));
+        brand.append(mark, bt);
+        const doc = rcEl('div', 'rcpt-doc');
+        doc.append(rcEl('div', 'rcpt-doctype', r.doc || 'Record'),
+                   rcEl('div', 'rcpt-no', r.no || ''));
+        if (r.statusText) doc.appendChild(rcEl('span', 'rcpt-pill ' + (r.statusCls || 'warn'), r.statusText));
+        head.append(brand, doc);
+        root.appendChild(head);
+        // Meta strip
+        if (r.meta && r.meta.length) {
+            const meta = rcEl('div', 'rcpt-meta');
+            r.meta.forEach(([k, v]) => {
+                const s = rcEl('span');
+                s.append(rcEl('b', '', k + ':'), document.createTextNode(' ' + v));
+                meta.appendChild(s);
+            });
+            root.appendChild(meta);
+        }
+        const bodyEl = rcEl('div', 'rcpt-body');
+        // Info cards
+        if (r.cards && r.cards.length) {
+            const cards = rcEl('div', 'rcpt-cards');
+            r.cards.forEach(c => {
+                const card = rcEl('div', 'rcpt-card');
+                card.append(rcEl('h6', '', c.label), rcEl('div', 'v', c.v));
+                (c.subs || []).forEach(s => card.appendChild(rcEl('div', 's', s)));
+                cards.appendChild(card);
+            });
+            bodyEl.appendChild(cards);
+        }
+        // Itemized charges
+        if (r.items && r.items.length) {
+            bodyEl.appendChild(rcEl('div', 'rcpt-label', r.itemsLabel || 'Itemized Charges'));
+            const tb = document.createElement('tbody');
+            r.items.forEach(it => {
+                const tr = document.createElement('tr');
+                const d = rcEl('td', '', it.desc);
+                if (it.meta) d.appendChild(rcEl('div', 'it-meta', it.meta));
+                tr.append(d, rcEl('td', 'it-amt', it.amount));
+                tb.appendChild(tr);
+            });
+            const tbl = rcEl('table', 'rcpt-items');
+            tbl.appendChild(tb);
+            bodyEl.appendChild(tbl);
+            if (r.total) {
+                const tt = rcEl('div', 'rcpt-total');
+                tt.append(rcEl('span', '', r.totalLabel || 'Total'), rcEl('span', '', r.total));
+                bodyEl.appendChild(tt);
+            }
+        }
+        // Extra detail rows (e.g. emergency location/description)
+        if (r.details && r.details.length) {
+            const dl = rcEl('dl', 'rcpt-detail-dl');
+            r.details.forEach(([k, v]) => dl.append(rcEl('dt', '', k), rcEl('dd', '', v)));
+            bodyEl.appendChild(dl);
+        }
+        // Payment chips
+        if (r.chips && r.chips.length) {
+            const chips = rcEl('div', 'rcpt-chips');
+            r.chips.forEach(([k, v]) => {
+                const c = rcEl('span', 'rcpt-chip');
+                c.append(document.createTextNode(k + ': '), rcEl('b', '', v));
+                chips.appendChild(c);
+            });
+            bodyEl.appendChild(chips);
+        }
+        // Uploaded receipt/photo link → image modal
+        if (r.img) {
+            const btn = rcEl('button', 'btn btn-sm btn-outline-secondary rcpt-imglink');
+            btn.type = 'button';
+            btn.innerHTML = '<i class="bi bi-image me-1"></i>' + (r.imgLabel || 'View attachment');
+            btn.addEventListener('click', () => {
+                document.getElementById('rctImgFull').src = r.img;
+                document.getElementById('rctImgLabel').textContent = (r.doc || 'Receipt') + ' ' + (r.no || '');
+                bootstrap.Modal.getOrCreateInstance(imgModal).show();
+            });
+            bodyEl.appendChild(btn);
+        }
+        bodyEl.appendChild(rcEl('div', 'rcpt-foot', 'Advance Motorcycle Service · System-generated record'));
+        root.appendChild(bodyEl);
+        return root;
+    }
+
     const detailModal = document.getElementById('rctDetailModal');
+    const detailBody = document.getElementById('rctDetailBody');
     detailModal.addEventListener('show.bs.modal', e => {
         const t = e.relatedTarget;
-        document.getElementById('rctDetailTitle').textContent = t.dataset.title;
-        const img = document.getElementById('rctDetailImg');
-        if (t.dataset.img) { img.src = t.dataset.img; img.classList.remove('d-none'); }
-        else { img.src = ''; img.classList.add('d-none'); }
-        const dl = document.getElementById('rctDetailFields');
-        dl.innerHTML = '';
-        let fields = {};
-        try { fields = JSON.parse(t.dataset.fields || '{}'); } catch (_) {}
-        Object.entries(fields).forEach(([k, v]) => {
-            const dt = document.createElement('dt');
-            const dd = document.createElement('dd');
-            dt.textContent = k;
-            dd.textContent = v;
-            dl.append(dt, dd);
-        });
+        if (!t) return;
+        let r = {};
+        try { r = JSON.parse(t.dataset.receipt || '{}'); } catch (_) {}
+        detailBody.innerHTML = '';
+        detailBody.appendChild(buildReceipt(r));
     });
 })();
 </script>

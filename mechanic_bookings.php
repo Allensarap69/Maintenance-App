@@ -505,7 +505,16 @@ include 'mechanic_sidebar.php';
         .job-info { flex: 1 1 100%; }
     }
     /* Filter pills */
-    .filter-pill { border-radius: 999px; padding: .35rem 1rem; }
+    .filter-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+    .filter-tabs::-webkit-scrollbar { display: none; }
+    .filter-pill { border-radius: 999px; padding: .35rem 1rem; flex: 1 1 auto; white-space: nowrap; text-align: center; }
+    .filter-pill .pill-short { display: none; }
+    @media (max-width: 575.98px) {
+        .filter-tabs { gap: .4rem !important; }
+        .filter-pill { padding: .32rem .55rem; font-size: .72rem; }
+        .filter-pill .pill-full { display: none; }
+        .filter-pill .pill-short { display: inline; }
+    }
     /* Stat cards */
     .stat-card .stat-num { font-size: 1.6rem; font-weight: 700; line-height: 1.1; }
     .emergency-table,
@@ -570,16 +579,16 @@ include 'mechanic_sidebar.php';
             <?php endforeach; ?>
         </div>
 
-        <div class="d-flex gap-2 mb-4 flex-wrap">
+        <div class="d-flex gap-2 mb-4 filter-tabs">
             <?php
             $tabs = [
-                'all' => 'All (' . count($all_jobs) . ')',
-                'open' => 'Open (' . $counts['open'] . ')',
-                'in_progress' => 'In Progress (' . $counts['in_progress'] . ')',
-                'completed' => 'Completed (' . $counts['completed'] . ')',
+                'all' => ['All', 'All', count($all_jobs)],
+                'open' => ['Open', 'Open', $counts['open']],
+                'in_progress' => ['In Progress', 'Progress', $counts['in_progress']],
+                'completed' => ['Completed', 'Done', $counts['completed']],
             ];
-            foreach ($tabs as $key => $label): ?>
-                <a href="?filter=<?= $key ?>" class="btn btn-sm filter-pill <?= $filter === $key ? 'btn-dark' : 'btn-outline-secondary' ?>"><?= $label ?></a>
+            foreach ($tabs as $key => [$full, $short, $num]): ?>
+                <a href="?filter=<?= $key ?>" class="btn btn-sm filter-pill <?= $filter === $key ? 'btn-dark' : 'btn-outline-secondary' ?>"><span class="pill-full"><?= $full ?> (<?= $num ?>)</span><span class="pill-short"><?= $short ?> (<?= $num ?>)</span></a>
             <?php endforeach; ?>
         </div>
 

@@ -124,7 +124,7 @@
         .sidebar-brand i { background: none !important; -webkit-background-clip: initial !important; background-clip: initial !important; color: #EAB308 !important; }
         .menu-item:hover, .menu-item.active { color: #0f172a; background: rgba(15,23,42,0.06); }
         .menu-item::before { background: var(--accent-gradient) !important; }
-        .top-header { background: rgba(255,255,255,0.95) !important; border-bottom: 2px solid #FACC15 !important; box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important; }
+        .top-header { background: rgba(255,255,255,0.95) !important; border-bottom: none !important; box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important; }
         .top-header .page-title { color: var(--text-dark) !important; }
         .top-header .page-title i { color: #FACC15 !important; background: none !important; -webkit-background-clip: initial !important; background-clip: initial !important; }
         .top-header .text-muted { color: var(--text-dark) !important; }

@@ -54,6 +54,193 @@ require __DIR__ . '/partials/head.php';
     </script>
 </head>
 <body>
+    <!-- Top page-loading line + spinner overlay (shows while navigating between modules) -->
+    <style>
+        #pageLoadingBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            width: 0%;
+            background: #FACC15;
+            box-shadow: 0 0 6px rgba(250, 204, 21, 0.8);
+            z-index: 999999;
+            opacity: 0;
+            pointer-events: none;
+            transition: width .3s ease, opacity .3s ease;
+        }
+        #pageLoadingBar.active { opacity: 1; }
+
+        #pageLoader {
+            position: fixed;
+            inset: 0;
+            z-index: 999998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 14px;
+            background: rgba(248, 250, 252, 0.72);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity .18s ease, visibility .18s ease;
+            pointer-events: none;
+        }
+        [data-theme="dark"] #pageLoader { background: rgba(15, 23, 42, 0.72); }
+        #pageLoader.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        .page-loader-spinner {
+            width: 46px;
+            height: 46px;
+            border: 4px solid rgba(250, 204, 21, 0.25);
+            border-top-color: #FACC15;
+            border-radius: 50%;
+            animation: pageLoaderSpin .8s linear infinite;
+        }
+        .page-loader-text {
+            font-family: 'Poppins', sans-serif;
+            font-size: .78rem;
+            font-weight: 500;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+        [data-theme="dark"] .page-loader-text { color: #94a3b8; }
+        @keyframes pageLoaderSpin { to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) {
+            .page-loader-spinner { animation-duration: 1.6s; }
+        }
+    </style>
+    <div id="pageLoadingBar"></div>
+    <div id="pageLoader" role="status" aria-label="Loading">
+        <div class="page-loader-spinner"></div>
+        <div class="page-loader-text">Loading</div>
+    </div>
+    <script>
+    (function () {
+        var bar = document.getElementById('pageLoadingBar');
+        var loader = document.getElementById('pageLoader');
+        if (!bar) return;
+        var timer = null, failsafe = null, hideTimer = null, cancelCheck = null, pct = 0;
+        var unloading = false;
+
+        function showLoader() { if (loader) loader.classList.add('active'); }
+        function hideLoader() { if (loader) loader.classList.remove('active'); }
+
+        function showAt(v) {
+            clearTimeout(hideTimer);
+            bar.classList.add('active');
+            pct = v;
+            bar.style.width = pct + '%';
+        }
+
+        function creep(cap) {
+            clearInterval(timer);
+            timer = setInterval(function () {
+                pct += Math.random() * 15;
+                if (pct >= cap) { pct = cap; clearInterval(timer); }
+                bar.style.width = pct + '%';
+            }, 150);
+        }
+
+        function hide() {
+            clearInterval(timer);
+            clearTimeout(failsafe);
+            bar.classList.remove('active');
+            hideLoader();
+            hideTimer = setTimeout(function () { bar.style.width = '0%'; }, 300);
+        }
+
+        // Bar reaches 100% only when the page (and its content) is fully loaded
+        function finish() {
+            clearInterval(timer);
+            clearTimeout(failsafe);
+            bar.classList.add('active');
+            bar.style.width = '100%';
+            hideLoader();
+            hideTimer = setTimeout(hide, 300);
+        }
+
+        // Outgoing page: show bar + spinner when an internal link/form navigates
+        function start() {
+            showAt(30);
+            creep(90);
+            showLoader();
+            clearTimeout(cancelCheck);
+            clearTimeout(failsafe);
+            // If no beforeunload follows, the navigation was cancelled client-side
+            // (e.g. onclick="return confirm(...)" declined) — reset the indicators.
+            cancelCheck = setTimeout(function () {
+                if (!unloading) hide();
+            }, 500);
+            failsafe = setTimeout(hide, 8000); // no navigation happened — reset
+        }
+
+        document.addEventListener('click', function (e) {
+            var a = e.target.closest('a[href]');
+            if (!a) return;
+            var href = a.getAttribute('href');
+            if (!href || href.charAt(0) === '#' || a.target === '_blank' ||
+                /^(javascript:|tel:|mailto:)/i.test(href) || a.hasAttribute('download')) return;
+            if (a.hostname && a.hostname !== location.hostname) return;
+            start();
+        }, true);
+
+        document.addEventListener('submit', function (e) {
+            if (e.target && e.target.target === '_blank') return;
+            start();
+        }, true);
+
+        window.addEventListener('beforeunload', function () {
+            unloading = true;
+            start();
+        });
+
+        // Incoming page: spinner covers the parse; progress follows real load stages
+        if (document.readyState === 'loading') {
+            showAt(15);
+            creep(70); // still parsing HTML/resources
+            showLoader();
+            document.addEventListener('DOMContentLoaded', function () {
+                showAt(85); // DOM ready — content is now displaying
+                creep(95);
+                hideLoader();
+            });
+        } else if (document.readyState === 'interactive') {
+            showAt(85);
+            creep(95);
+        } else {
+            showAt(95);
+        }
+
+        if (document.readyState === 'complete') {
+            finish();
+        } else {
+            window.addEventListener('load', finish);
+        }
+        failsafe = setTimeout(hide, 12000); // never leave the indicators stuck
+
+        // Reset if the page is restored from bfcache (back/forward buttons)
+        window.addEventListener('pageshow', function (e) {
+            if (e.persisted) {
+                unloading = false;
+                clearInterval(timer);
+                clearTimeout(failsafe);
+                clearTimeout(hideTimer);
+                clearTimeout(cancelCheck);
+                bar.classList.remove('active');
+                bar.style.width = '0%';
+                hideLoader();
+            }
+        });
+    })();
+    </script>
+
     <!-- Animated Background -->
     <div class="bg-animation">
         <div class="circle"></div>
@@ -88,9 +275,6 @@ require __DIR__ . '/partials/head.php';
                     <small style="display: block; font-size: .55rem; letter-spacing: .12em; white-space: nowrap; color: #FACC15; line-height: 1;">MOTORCYCLE SERVICE</small>
                 </span>
             </a>
-            <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Toggle Sidebar">
-                <i class="bi bi-chevron-left"></i>
-            </button>
         </div>
 
         <nav class="sidebar-menu">
@@ -263,23 +447,6 @@ require __DIR__ . '/partials/head.php';
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const collapseBtn = document.getElementById('sidebarCollapseBtn');
-            if (collapseBtn) {
-                collapseBtn.addEventListener('click', function () {
-                    document.body.classList.toggle('collapsed');
-                    const icon = collapseBtn.querySelector('i');
-                    if (icon) {
-                        if (document.body.classList.contains('collapsed')) {
-                            icon.classList.remove('bi-chevron-left');
-                            icon.classList.add('bi-chevron-right');
-                        } else {
-                            icon.classList.remove('bi-chevron-right');
-                            icon.classList.add('bi-chevron-left');
-                        }
-                    }
-                });
-            }
-
             // Collapsible parent menus
             document.querySelectorAll('.menu-parent').forEach(function (btn) {
                 btn.addEventListener('click', function () {
@@ -521,6 +688,9 @@ require __DIR__ . '/partials/head.php';
                 <i class="bi bi-speedometer2"></i>
                 <i class="bi bi-calendar-check"></i>
             </div>
+            <button class="btn-toggle-sidebar" title="Toggle Sidebar" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
             <h1 class="page-title">
                 <i class="bi bi-speedometer2"></i>
                 <?= isset($pageTitle) ? $pageTitle : 'Admin' ?>

@@ -225,7 +225,7 @@
         }
 
         .sidebar-header {
-            padding: 12px 20px;
+            padding: 10px 20px;
             border-bottom: none;
             background: transparent;
             display: flex;
@@ -569,13 +569,23 @@
             left: var(--sidebar-width);
             right: 0;
             z-index: 100;
-            border-bottom: 2px solid rgba(30, 58, 95, 0.3);
+            border-bottom: none;
             overflow: visible;
             height: 60px;
             transition: left 0.3s ease, padding-left 0.3s ease;
         }
 
-        .top-header::after { display: none; }
+        /* Same yellow line as .sidebar-header::after — one continuous rule across the top */
+        .top-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #FACC15 0%, #FDE047 100%);
+            box-shadow: 0 2px 12px rgba(250, 204, 21, 0.35);
+        }
 
         .top-header .page-title,
         .top-header .text-muted {
@@ -1110,7 +1120,7 @@
         animation: fadeIn 0.3s ease forwards;
     }
     body.collapsed .sidebar-header {
-        padding: 12px 10px;
+        padding: 10px;
         justify-content: center;
         gap: 6px;
     }
@@ -1172,7 +1182,7 @@
         /* Top header */
         html[data-theme="dark"] .top-header {
             background: #0a0f1e !important;
-            border-bottom: 2px solid rgba(250, 204, 21, 0.4) !important;
+            border-bottom: none !important;
             box-shadow: none !important;
         }
         html[data-theme="dark"] .top-header .page-title,

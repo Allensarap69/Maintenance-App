@@ -89,7 +89,7 @@ try {
 $emergencies = $pdo->query(
     "SELECT esr.id, esr.motorcycle_issue, esr.problem_description, esr.image_path, esr.service_type,
             esr.request_status, esr.priority, esr.location, esr.location_description, esr.contact_number,
-            esr.created_at, esr.updated_at,
+            esr.latitude, esr.longitude, esr.created_at, esr.updated_at,
             u.name AS customer_name, u.username, mech.name AS mechanic_name,
             v.brand, v.model, v.year_model, v.plate_number
      FROM emergency_service_requests esr
@@ -550,7 +550,7 @@ require 'admin_sidebar_template.php';
                             'details'    => array_values(array_filter([
                                 $e_desc ? ['Description', $e_desc] : null,
                                 $e_loc ? ['Location', $e_loc] : null,
-                                ($e['latitude'] && $e['longitude']) ? ['Coordinates', $e['latitude'] . ', ' . $e['longitude']] : null,
+                                (!empty($e['latitude']) && !empty($e['longitude'])) ? ['Coordinates', $e['latitude'] . ', ' . $e['longitude']] : null,
                             ])),
                             'img'      => $has_img ? $e['image_path'] : '',
                             'imgLabel' => 'View issue photo',

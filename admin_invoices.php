@@ -222,12 +222,88 @@ require 'admin_sidebar_template.php';
         tr[data-view] { cursor:pointer; }
         .inv-stat[data-filter] { cursor:pointer; transition:transform .12s ease, box-shadow .12s ease; }
         .inv-stat[data-filter]:hover { transform:translateY(-1px); box-shadow:0 4px 14px rgba(0,0,0,.08); }
-        /* Print: invoice detail card only, hide interactive elements */
+        /* Invoice detail dialog — document style (same language as receipts modal) */
+        .invd-dialog { max-width:780px; }
+        .invd-close { position:absolute; top:.85rem; right:.9rem; z-index:5; filter:invert(1) grayscale(100%); opacity:.85; }
+        .invd { background:#fff; border-radius:inherit; overflow:hidden; font-size:.82rem; }
+        .invd-head { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1.05rem 1.4rem; background:linear-gradient(135deg,#0f172a,#1e3a5f); color:#fff; position:relative; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+        .invd-head::after { content:''; position:absolute; left:0; right:0; bottom:0; height:3px; background:linear-gradient(90deg,#3b82f6,#FACC15); }
+        .invd-brand { display:flex; align-items:center; gap:.6rem; min-width:0; }
+        .invd-mark { width:38px; height:38px; border-radius:10px; background:rgba(250,204,21,.15); border:1px solid rgba(250,204,21,.4); color:#FACC15; display:flex; align-items:center; justify-content:center; font-size:1.05rem; flex-shrink:0; }
+        .invd-bname { font-size:.86rem; font-weight:800; }
+        .invd-bsub { font-size:.6rem; color:rgba(255,255,255,.6); }
+        .invd-doc { text-align:right; padding-right:1.4rem; }
+        .invd-doctype { font-size:.56rem; font-weight:800; text-transform:uppercase; letter-spacing:.14em; color:#FACC15; }
+        .invd-no { font-size:1.05rem; font-weight:800; line-height:1.2; white-space:nowrap; }
+        .invd-pill { display:inline-block; margin-top:4px; padding:2px 9px; border-radius:99px; font-size:.56rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; border:1px solid; }
+        .invd-pill.ok { background:rgba(16,185,129,.15); color:#34d399; border-color:rgba(52,211,153,.4); }
+        .invd-pill.bad { background:rgba(239,68,68,.15); color:#fca5a5; border-color:rgba(252,165,165,.4); }
+        .invd-pill.warn { background:rgba(250,204,21,.15); color:#fde047; border-color:rgba(250,204,21,.4); }
+        .invd-pill.void { background:rgba(148,163,184,.15); color:#cbd5e1; border-color:rgba(148,163,184,.4); }
+        .invd-pill.sm { margin-top:0; padding:1px 7px; font-size:.52rem; color:#64748b; border-color:#e2e8f0; background:#f8fafc; }
+        .invd-pill.sm.ok { color:#047857; border-color:#a7f3d0; background:#ecfdf5; }
+        .invd-pill.sm.warn { color:#b45309; border-color:#fde68a; background:#fffbeb; }
+        .invd-meta { display:flex; flex-wrap:wrap; gap:3px 18px; padding:7px 22px; background:#f8fafc; border-bottom:1px solid #e5e7eb; font-size:.7rem; color:#6b7280; }
+        .invd-meta b { color:#111827; }
+        .invd-body { padding:14px 22px 16px; }
+        .invd-sums { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+        .invd-sum { border:1px solid #e5e7eb; border-radius:9px; padding:8px 12px; }
+        .invd-sum-label { font-size:.56rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#64748b; }
+        .invd-sum-val { font-size:1.02rem; font-weight:800; font-variant-numeric:tabular-nums; }
+        .invd-label { font-size:.58rem; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:#6b7280; margin-bottom:2px; }
+        .invd-items { width:100%; border-collapse:collapse; border-top:2px solid #1e3a5f; }
+        .invd-items td { padding:7px 0; border-bottom:1px solid #eef2f7; font-size:.78rem; vertical-align:top; }
+        .invd-items .it-meta { font-size:.66rem; color:#94a3b8; font-weight:500; }
+        .invd-items .it-amt { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; padding-left:.75rem; font-weight:600; }
+        .invd-totals { margin:10px 0 0 auto; width:min(280px,100%); }
+        .invd-trow { display:flex; justify-content:space-between; padding:3px 0; font-size:.76rem; color:#64748b; }
+        .invd-trow span:last-child { font-variant-numeric:tabular-nums; font-weight:600; color:#1e293b; }
+        .invd-trow.invd-grand { border-top:2px solid #1e3a5f; margin-top:5px; padding-top:7px; font-size:.92rem; font-weight:800; color:#1e3a5f; }
+        .invd-trow.invd-grand span:last-child { color:#1e3a5f; }
+        .invd-trow.paid span:last-child { color:#047857; }
+        .invd-trow.bal span:last-child { color:#dc2626; }
+        .invd-empty { font-size:.74rem; color:#94a3b8; margin:.25rem 0 0; }
+        .invd-pay { margin-top:14px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:.7rem .9rem; }
+        .invd-pay h6 { font-size:.72rem; font-weight:800; color:#047857; margin-bottom:.5rem; }
+        .invd-paidfull { margin-top:12px; font-size:.78rem; font-weight:700; color:#047857; }
+        .invd-foot { margin-top:14px; padding-top:10px; border-top:1px dashed #e5e7eb; text-align:center; font-size:.6rem; color:#9ca3af; }
+        .invd-actions { display:flex; align-items:center; gap:.5rem; padding:.6rem 1.4rem; border-top:1px solid #eef2f7; background:#f8fafc; }
+        @media (max-width:560px) { .invd-sums { grid-template-columns:1fr; } .invd-doc { padding-right:1.1rem; } .invd-no { font-size:.9rem; } }
+        html[data-theme="dark"] #invDetailModal .modal-content { background:#161e33; color:#e2e8f0; border:1px solid #2a3350; }
+        html[data-theme="dark"] .invd { background:#161e33; color:#e2e8f0; }
+        html[data-theme="dark"] .invd-meta { background:rgba(255,255,255,.03); border-bottom-color:rgba(255,255,255,.09); color:#94a3b8; }
+        html[data-theme="dark"] .invd-meta b { color:#e2e8f0; }
+        html[data-theme="dark"] .invd-sum { border-color:#2a3350; }
+        html[data-theme="dark"] .invd-sum-label { color:#94a3b8; }
+        html[data-theme="dark"] .invd-sum-val { color:#e2e8f0; }
+        html[data-theme="dark"] .invd-label { color:#94a3b8; }
+        html[data-theme="dark"] .invd-items { border-top-color:#3b82f6; }
+        html[data-theme="dark"] .invd-items td { border-bottom-color:rgba(255,255,255,.07); }
+        html[data-theme="dark"] .invd-items .it-meta { color:#64748b; }
+        html[data-theme="dark"] .invd-trow { color:#94a3b8; }
+        html[data-theme="dark"] .invd-trow span:last-child { color:#e2e8f0; }
+        html[data-theme="dark"] .invd-trow.invd-grand { border-top-color:#3b82f6; color:#93c5fd; }
+        html[data-theme="dark"] .invd-trow.invd-grand span:last-child { color:#93c5fd; }
+        html[data-theme="dark"] .invd-trow.paid span:last-child { color:#34d399; }
+        html[data-theme="dark"] .invd-trow.bal span:last-child { color:#f87171; }
+        html[data-theme="dark"] .invd-pay { background:rgba(16,185,129,.08); border-color:rgba(16,185,129,.25); }
+        html[data-theme="dark"] .invd-pay h6 { color:#34d399; }
+        html[data-theme="dark"] .invd-paidfull { color:#34d399; }
+        html[data-theme="dark"] .invd-foot { border-top-color:rgba(255,255,255,.12); color:#64748b; }
+        html[data-theme="dark"] .invd-actions { background:rgba(255,255,255,.02); border-top-color:rgba(255,255,255,.09); }
+        html[data-theme="dark"] .invd-pill.sm { background:#141b30; border-color:#2a3350; color:#cbd5e1; }
+        html[data-theme="dark"] .invd-pill.sm.ok { color:#34d399; border-color:rgba(52,211,153,.35); background:rgba(16,185,129,.12); }
+        html[data-theme="dark"] .invd-pill.sm.warn { color:#fbbf24; border-color:rgba(250,204,21,.3); background:rgba(250,204,21,.1); }
+        html[data-theme="dark"] #invDetailModal .text-success { color:#34d399 !important; }
+        html[data-theme="dark"] #invDetailModal .text-danger { color:#f87171 !important; }
+        html[data-theme="dark"] #invDetailModal .text-muted { color:#94a3b8 !important; }
+        /* Print: invoice detail dialog only, hide interactive elements */
         @media print {
             body * { visibility:hidden; }
-            #invDetailCard, #invDetailCard * { visibility:visible; }
-            #invDetailCard { position:absolute; top:0; left:0; width:100%; }
-            #invDetailCard .no-print { display:none !important; }
+            #invDetailModal, #invDetailModal * { visibility:visible; }
+            #invDetailModal { position:absolute; top:0; left:0; width:100%; height:auto; overflow:visible; }
+            #invDetailModal .modal-body, #invDetailCard { max-height:none !important; overflow:visible !important; }
+            #invDetailModal .no-print { display:none !important; }
         }
         .inv-page .card { border-radius:12px; }
         .inv-page .card-body { padding:.8rem 1rem; }
@@ -327,10 +403,6 @@ require 'admin_sidebar_template.php';
     </div>
 
     <?php if ($msg): ?>
-    <div class="alert alert-<?= $msg_type === 'success' ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
-        <?= $msg ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
     <script>
         // Strip flash params so the toast does not re-appear on refresh or navigation
         (function () {
@@ -340,101 +412,157 @@ require 'admin_sidebar_template.php';
             history.replaceState(null, '', u.toString());
         })();
     </script>
+    <?php if (!$view_invoice): ?>
+    <div class="alert alert-<?= $msg_type === 'success' ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
+        <?= $msg ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <?php endif; ?>
     <?php endif; ?>
 
-    <?php if ($view_invoice): $bal = max(0, $view_invoice['total'] - $view_invoice['amount_paid']); ?>
-    <div class="card mb-3" id="invDetailCard">
-        <div class="card-header inv-head inv-head-blue justify-content-between">
-            <span><i class="bi bi-receipt me-1"></i>Invoice <?= htmlspecialchars($view_invoice['invoice_no']) ?>
-                <span class="badge <?= $status_badge[$view_invoice['status']] ?> ms-2"><?= strtoupper($view_invoice['status']) ?></span>
-            </span>
-            <div class="d-flex gap-2 no-print">
-                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="window.print()"><i class="bi bi-printer me-1"></i>Print</button>
-                <a href="admin_invoices.php" class="btn btn-sm btn-outline-secondary rounded-pill px-3">Close</a>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-7">
-                    <p class="mb-1"><strong>Customer:</strong> <?= htmlspecialchars($view_invoice['customer_name']) ?> (<?= htmlspecialchars($view_invoice['email']) ?>)</p>
-                    <p class="mb-3"><strong>Booking:</strong> #<?= (int)$view_invoice['booking_id'] ?> · <strong>Issued:</strong> <?= date('M j, Y g:i A', strtotime($view_invoice['created_at'])) ?></p>
-                    <table class="table table-sm">
-                        <thead><tr><th>Item</th><th>Type</th><th class="text-end">Qty</th><th class="text-end">Unit</th><th class="text-end">Total</th></tr></thead>
-                        <tbody>
-                            <?php foreach ($view_items as $it): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($it['description']) ?></td>
-                                <td><span class="badge bg-light text-dark border"><?= $it['item_type'] ?></span></td>
-                                <td class="text-end"><?= (int)$it['quantity'] ?></td>
-                                <td class="text-end">₱<?= number_format($it['unit_price'], 2) ?></td>
-                                <td class="text-end">₱<?= number_format($it['line_total'], 2) ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                        <tfoot>
-                            <tr><td colspan="4" class="text-end text-muted">Services subtotal</td><td class="text-end">₱<?= number_format($view_invoice['subtotal'], 2) ?></td></tr>
-                            <tr><td colspan="4" class="text-end text-muted">Parts subtotal</td><td class="text-end">₱<?= number_format($view_invoice['parts_total'], 2) ?></td></tr>
-                            <tr class="fw-bold"><td colspan="4" class="text-end">Total</td><td class="text-end">₱<?= number_format($view_invoice['total'], 2) ?></td></tr>
-                            <tr><td colspan="4" class="text-end text-success">Paid</td><td class="text-end text-success">₱<?= number_format($view_invoice['amount_paid'], 2) ?></td></tr>
-                            <tr class="fw-bold"><td colspan="4" class="text-end text-danger">Balance</td><td class="text-end text-danger">₱<?= number_format($bal, 2) ?></td></tr>
-                        </tfoot>
-                    </table>
-                </div>
-                <div class="col-md-5">
-                    <h6 class="fw-bold">Payment History</h6>
-                    <?php if (empty($view_payments)): ?>
-                        <p class="text-muted small">No payments recorded.</p>
-                    <?php else: ?>
-                    <table class="table table-sm">
-                        <thead><tr><th>Date</th><th>Method</th><th>Type</th><th>Status</th><th class="text-end">Amount</th></tr></thead>
-                        <tbody>
-                            <?php foreach ($view_payments as $pay): ?>
-                            <tr>
-                                <td><?= date('M j, Y', strtotime($pay['created_at'])) ?></td>
-                                <td><?= htmlspecialchars($pay['payment_method']) ?></td>
-                                <td><?= htmlspecialchars($pay['transaction_type'] ?: '—') ?></td>
-                                <td><span class="badge <?= $pay['status'] === 'verified' ? 'bg-success' : 'bg-warning text-dark' ?>"><?= $pay['status'] ?></span></td>
-                                <td class="text-end">₱<?= number_format($pay['amount'], 2) ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                    <?php endif; ?>
+    <?php if ($view_invoice): $bal = max(0, $view_invoice['total'] - $view_invoice['amount_paid']);
+        $inv_pill = ['unpaid' => 'bad', 'partial' => 'warn', 'paid' => 'ok', 'void' => 'void'][$view_invoice['status']] ?? 'warn'; ?>
+    <div class="modal fade" id="invDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable invd-dialog">
+            <div class="modal-content" id="invDetailCard">
+                <div class="modal-body p-0">
+                    <div class="invd">
+                        <div class="invd-head">
+                            <div class="invd-brand">
+                                <div class="invd-mark"><i class="bi bi-receipt"></i></div>
+                                <div>
+                                    <div class="invd-bname">Advance Motorcycle Service</div>
+                                    <div class="invd-bsub">Service Invoice</div>
+                                </div>
+                            </div>
+                            <div class="invd-doc">
+                                <div class="invd-doctype">Invoice</div>
+                                <div class="invd-no"><?= htmlspecialchars($view_invoice['invoice_no']) ?></div>
+                                <span class="invd-pill <?= $inv_pill ?>"><?= strtoupper($view_invoice['status']) ?></span>
+                            </div>
+                            <button type="button" class="btn-close invd-close no-print" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="invd-meta">
+                            <span><b>Customer:</b> <?= htmlspecialchars($view_invoice['customer_name']) ?></span>
+                            <span><b>Booking:</b> #<?= (int)$view_invoice['booking_id'] ?></span>
+                            <span><b>Issued:</b> <?= date('M j, Y g:i A', strtotime($view_invoice['created_at'])) ?></span>
+                            <span><b>Email:</b> <?= htmlspecialchars($view_invoice['email']) ?></span>
+                            <?php if (!empty($view_invoice['phone'])): ?>
+                            <span><b>Phone:</b> <?= htmlspecialchars($view_invoice['phone']) ?></span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="invd-body">
+                            <?php if ($msg): ?>
+                            <div class="alert alert-<?= $msg_type === 'success' ? 'success' : 'danger' ?> alert-dismissible fade show py-2" role="alert">
+                                <?= $msg ?>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <?php endif; ?>
 
-                    <?php if ($view_invoice['status'] !== 'void' && $bal > 0.005): ?>
-                    <div class="pay-card mt-3 no-print">
-                        <h6 class="fw-bold mb-2"><i class="bi bi-cash-coin me-1"></i>Record Payment</h6>
-                        <form method="POST" class="row g-2">
-                            <input type="hidden" name="record_payment" value="1">
-                            <input type="hidden" name="form_token" value="<?= $_SESSION['pay_form_token'] = $_SESSION['pay_form_token'] ?? bin2hex(random_bytes(16)) ?>">
-                            <input type="hidden" name="invoice_id" value="<?= (int)$view_invoice['id'] ?>">
-                            <div class="col-5">
-                                <input type="number" name="amount" step="0.01" min="0.01" max="<?= $bal ?>" class="form-control form-control-sm"
-                                       value="<?= number_format($bal, 2, '.', '') ?>" required>
+                            <div class="invd-sums">
+                                <div class="invd-sum"><div class="invd-sum-label">Invoice Total</div><div class="invd-sum-val">₱<?= number_format($view_invoice['total'], 2) ?></div></div>
+                                <div class="invd-sum"><div class="invd-sum-label">Amount Paid</div><div class="invd-sum-val text-success">₱<?= number_format($view_invoice['amount_paid'], 2) ?></div></div>
+                                <div class="invd-sum"><div class="invd-sum-label">Balance Due</div><div class="invd-sum-val <?= $bal > 0.005 ? 'text-danger' : 'text-muted' ?>">₱<?= number_format($bal, 2) ?></div></div>
                             </div>
-                            <div class="col-4">
-                                <select name="method" class="form-select form-select-sm">
-                                    <option value="cash">Cash</option>
-                                    <option value="gcash">GCash</option>
-                                </select>
+
+                            <div class="invd-label">Itemized Charges</div>
+                            <table class="invd-items">
+                                <tbody>
+                                    <?php foreach ($view_items as $it): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($it['description']) ?>
+                                            <div class="it-meta"><?= htmlspecialchars($it['item_type']) ?> · Qty <?= (int)$it['quantity'] ?> × ₱<?= number_format($it['unit_price'], 2) ?></div>
+                                        </td>
+                                        <td class="it-amt">₱<?= number_format($it['line_total'], 2) ?></td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                            <div class="invd-totals">
+                                <div class="invd-trow"><span>Services subtotal</span><span>₱<?= number_format($view_invoice['subtotal'], 2) ?></span></div>
+                                <div class="invd-trow"><span>Parts subtotal</span><span>₱<?= number_format($view_invoice['parts_total'], 2) ?></span></div>
+                                <div class="invd-trow invd-grand"><span>Total</span><span>₱<?= number_format($view_invoice['total'], 2) ?></span></div>
+                                <div class="invd-trow paid"><span>Paid</span><span>₱<?= number_format($view_invoice['amount_paid'], 2) ?></span></div>
+                                <div class="invd-trow bal"><span>Balance due</span><span>₱<?= number_format($bal, 2) ?></span></div>
                             </div>
-                            <div class="col-3">
-                                <button class="btn btn-sm btn-success w-100 rounded-pill fw-bold">Pay</button>
+
+                            <div class="invd-label mt-3">Payment History</div>
+                            <?php if (empty($view_payments)): ?>
+                                <p class="invd-empty">No payments recorded yet.</p>
+                            <?php else: ?>
+                            <table class="invd-items">
+                                <tbody>
+                                    <?php foreach ($view_payments as $pay): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars(ucfirst($pay['payment_method'])) ?>
+                                            <span class="invd-pill sm <?= $pay['status'] === 'verified' ? 'ok' : 'warn' ?>"><?= htmlspecialchars($pay['status']) ?></span>
+                                            <div class="it-meta"><?= date('M j, Y', strtotime($pay['created_at'])) ?> · <?= htmlspecialchars($pay['transaction_type'] ?: 'payment') ?></div>
+                                        </td>
+                                        <td class="it-amt">₱<?= number_format($pay['amount'], 2) ?></td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                            <?php endif; ?>
+
+                            <?php if ($view_invoice['status'] !== 'void' && $bal > 0.005): ?>
+                            <div class="invd-pay no-print">
+                                <h6><i class="bi bi-cash-coin me-1"></i>Record Payment</h6>
+                                <form method="POST" class="row g-2">
+                                    <input type="hidden" name="record_payment" value="1">
+                                    <input type="hidden" name="form_token" value="<?= $_SESSION['pay_form_token'] = $_SESSION['pay_form_token'] ?? bin2hex(random_bytes(16)) ?>">
+                                    <input type="hidden" name="invoice_id" value="<?= (int)$view_invoice['id'] ?>">
+                                    <div class="col-5">
+                                        <input type="number" name="amount" step="0.01" min="0.01" max="<?= $bal ?>" class="form-control form-control-sm"
+                                               value="<?= number_format($bal, 2, '.', '') ?>" required>
+                                    </div>
+                                    <div class="col-4">
+                                        <select name="method" class="form-select form-select-sm">
+                                            <option value="cash">Cash</option>
+                                            <option value="gcash">GCash</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-3">
+                                        <button class="btn btn-sm btn-success w-100 rounded-pill fw-bold">Pay</button>
+                                    </div>
+                                </form>
                             </div>
-                        </form>
+                            <?php elseif ($view_invoice['status'] !== 'void'): ?>
+                            <div class="invd-paidfull"><i class="bi bi-check-circle-fill me-1"></i>Paid in full — thank you!</div>
+                            <?php endif; ?>
+
+                            <div class="invd-foot">Advance Motorcycle Service · System-generated invoice</div>
+                        </div>
                     </div>
-                    <?php endif; ?>
-
+                </div>
+                <div class="invd-actions no-print">
                     <?php if ($view_invoice['status'] !== 'void'): ?>
-                    <form method="POST" class="mt-3 no-print" onsubmit="return confirm('Void this invoice? Payments stay on record.');">
+                    <form method="POST" class="mb-0" onsubmit="return confirm('Void this invoice? Payments stay on record.');">
                         <input type="hidden" name="invoice_id" value="<?= (int)$view_invoice['id'] ?>">
-                        <button name="void_invoice" class="btn btn-sm btn-outline-danger">Void Invoice</button>
+                        <button name="void_invoice" class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="bi bi-x-circle me-1"></i>Void</button>
                     </form>
                     <?php endif; ?>
+                    <div class="ms-auto d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="window.print()"><i class="bi bi-printer me-1"></i>Print</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" data-bs-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        // Auto-open the invoice dialog whenever ?view=<id> is in the URL
+        document.addEventListener('DOMContentLoaded', function () {
+            var el = document.getElementById('invDetailModal');
+            if (!el || typeof bootstrap === 'undefined') return;
+            new bootstrap.Modal(el).show();
+            el.addEventListener('hidden.bs.modal', function () {
+                var u = new URL(window.location.href);
+                u.searchParams.delete('view');
+                history.replaceState(null, '', u.toString());
+            });
+        });
+    </script>
     <?php endif; ?>
 
     <div class="row g-3 inv-cols">

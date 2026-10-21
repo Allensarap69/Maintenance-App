@@ -2,6 +2,7 @@
 session_start();
 require 'db.php';
 require 'motorcycle_health_helper.php';
+require 'management_helper.php';
 
 // Security: mechanic only
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'mechanic') {
@@ -164,7 +165,8 @@ $emergency_stmt = $pdo->prepare("
         m.year_model,
         m.plate_number,
         m.color,
-        m.current_mileage
+        m.current_mileage,
+        m.image
     FROM emergency_service_requests esr
     JOIN users c ON esr.customer_id = c.id
     LEFT JOIN motorcycles m ON esr.motorcycle_id = m.id
@@ -182,96 +184,98 @@ $emergency_stmt = $pdo->prepare("
 $emergency_stmt->execute([$mechanic_id]);
 $emergency_requests = $emergency_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-function renderEmergencyTable($emergencies) {
+function renderEmergencyCards($emergencies) {
     if (empty($emergencies)): ?>
         <div class="text-center py-5 text-muted">
             <i class="bi bi-inbox fs-1 d-block mb-3"></i>
             <p class="mb-0">No emergency requests assigned.</p>
         </div>
-    <?php else: ?>
-        <div class="table-responsive-card">
-            <table class="table emergency-table align-middle">
-                <thead>
-                    <tr>
-                        <th>Customer</th>
-                        <th>Issue</th>
-                        <th>Priority</th>
-                        <th class="d-none d-md-table-cell">Vehicle</th>
-                        <th class="d-none d-md-table-cell">Status</th>
-                        <th class="text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($emergencies as $req):
-                        $vehicle_text = ($req['brand'] ? $req['brand'] . ' ' . $req['model'] : 'N/A') . ($req['plate_number'] ? ' (' . $req['plate_number'] . ')' : '');
-                    ?>
-                        <tr>
-                            <td>
-                                <?= htmlspecialchars($req['customer_name']) ?>
-                                <br><small class="text-muted"><?= htmlspecialchars($req['customer_phone'] ?? '') ?></small>
-                            </td>
-                            <td>
-                                <?= htmlspecialchars($req['issue_type'] ?? 'N/A') ?>
-                                <br>
-                                <?php if (($req['service_type'] ?? 'onsite_repair') === 'tow_service'): ?>
-                                    <small class="badge rounded-pill bg-warning text-dark"><i class="bi bi-truck me-1"></i>Tow &amp; Lift</small>
-                                <?php else: ?>
-                                    <small class="badge rounded-pill bg-primary"><i class="bi bi-wrench-adjustable-circle me-1"></i>Fix On-Site</small>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <span class="badge rounded-pill bg-<?= 
-                                    strtolower($req['priority'] ?? '') === 'urgent' ? 'danger' : 
-                                    (strtolower($req['priority'] ?? '') === 'high' ? 'warning' : 'info')
-                                ?>">
-                                    <?= htmlspecialchars(ucfirst($req['priority'] ?? 'Normal')) ?>
-                                </span>
-                            </td>
-                            <td class="d-none d-md-table-cell"><?= htmlspecialchars($vehicle_text) ?></td>
-                            <td class="d-none d-md-table-cell">
-                                <span class="badge rounded-pill bg-<?= 
-                                    $req['status'] === 'completed' ? 'success' : 
-                                    ($req['status'] === 'assigned' ? 'primary' : 
-                                    ($req['status'] === 'accepted' ? 'info' : 
-                                    ($req['status'] === 'in_progress' ? 'warning' : 'secondary')))
-                                ?>">
-                                    <?= htmlspecialchars(ucfirst($req['status'])) ?>
-                                </span>
-                            </td>
-                            <td class="text-center">
-                                <div class="d-flex justify-content-center gap-1">
-                                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#emergencyModal<?= $req['id'] ?>" title="View details">
-                                        <i class="bi bi-eye d-inline d-md-none"></i><span class="d-none d-md-inline">Details</span>
-                                    </button>
-                                    <?php if ($req['status'] === 'assigned'): ?>
-                                        <form method="post" action="" class="d-inline" onsubmit="return confirm('Accept this emergency request?');">
-                                            <input type="hidden" name="emergency_id" value="<?= $req['id'] ?>">
-                                            <button type="submit" name="accept_emergency" class="btn btn-sm btn-primary" title="Accept emergency">
-                                                <i class="bi bi-check d-inline d-md-none"></i><span class="d-none d-md-inline">Accept</span>
-                                            </button>
-                                        </form>
-                                    <?php endif; ?>
-                                    <?php if (in_array($req['status'], ['accepted', 'in_progress'])): ?>
-                                        <form method="post" action="" class="d-inline" onsubmit="return confirm('Mark this emergency request as completed?');">
-                                            <input type="hidden" name="emergency_id" value="<?= $req['id'] ?>">
-                                            <button type="submit" name="mark_emergency_complete" class="btn btn-sm btn-success" title="Mark as complete">
-                                                <i class="bi bi-check-lg d-inline d-md-none"></i><span class="d-none d-md-inline">Complete</span>
-                                            </button>
-                                        </form>
-                                    <?php endif; ?>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+    <?php else:
+        foreach ($emergencies as $req):
+            $vehicle_text = ($req['brand'] ? $req['brand'] . ' ' . $req['model'] : 'N/A') . ($req['plate_number'] ? ' (' . $req['plate_number'] . ')' : '');
+            $moto_image = resolve_moto_image($req);
+            $accent = match ($req['status']) {
+                'completed' => '#10b981',
+                'in_progress' => '#f59e0b',
+                'accepted' => '#3b82f6',
+                'assigned' => '#8b5cf6',
+                default => '#94a3b8',
+            };
+        ?>
+        <div class="card border-0 shadow-sm job-card mb-3" style="border-left:4px solid <?= $accent ?> !important;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small fw-semibold"><i class="bi bi-hash"></i><?= $req['id'] ?> &middot; <?= $req['created_at'] ? date('M d, Y g:i A', strtotime($req['created_at'])) : '-' ?></span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill bg-<?= 
+                            strtolower($req['priority'] ?? '') === 'urgent' ? 'danger' : 
+                            (strtolower($req['priority'] ?? '') === 'high' ? 'warning' : 'info')
+                        ?>">
+                            <?= htmlspecialchars(ucfirst($req['priority'] ?? 'Normal')) ?>
+                        </span>
+                        <span class="badge rounded-pill bg-<?= 
+                            $req['status'] === 'completed' ? 'success' : 
+                            ($req['status'] === 'assigned' ? 'primary' : 
+                            ($req['status'] === 'accepted' ? 'info' : 
+                            ($req['status'] === 'in_progress' ? 'warning' : 'secondary')))
+                        ?>">
+                            <?= htmlspecialchars(ucfirst(str_replace('_', ' ', $req['status']))) ?>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="job-layout">
+                    <div class="job-img">
+                        <img src="<?= htmlspecialchars($moto_image) ?>" alt="Motorcycle" onerror="this.src='MOTOR.jpg'">
+                    </div>
+
+                    <div class="job-info">
+                        <p class="job-label"><i class="bi bi-person me-1"></i>Customer</p>
+                        <p class="job-text"><strong><?= htmlspecialchars($req['customer_name']) ?></strong><br><span class="text-muted"><i class="bi bi-telephone me-1"></i><?= htmlspecialchars($req['customer_phone'] ?? '') ?></span></p>
+                    </div>
+
+                    <div class="job-info">
+                        <p class="job-label"><i class="bi bi-exclamation-triangle me-1"></i>Issue</p>
+                        <p class="job-text fw-semibold mb-1"><?= htmlspecialchars($req['issue_type'] ?? 'N/A') ?></p>
+                        <?php if (($req['service_type'] ?? 'onsite_repair') === 'tow_service'): ?>
+                            <span class="badge rounded-pill bg-warning text-dark"><i class="bi bi-truck me-1"></i>Tow &amp; Lift</span>
+                        <?php else: ?>
+                            <span class="badge rounded-pill bg-primary"><i class="bi bi-wrench-adjustable-circle me-1"></i>Fix On-Site</span>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="job-info">
+                        <p class="job-label"><i class="bi bi-motorcycle me-1"></i>Vehicle</p>
+                        <p class="job-text fw-semibold"><?= htmlspecialchars($vehicle_text) ?></p>
+                    </div>
+                </div>
+
+                <div class="job-actions">
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#emergencyModal<?= $req['id'] ?>">
+                        <i class="bi bi-eye me-1"></i>Details
+                    </button>
+                    <?php if ($req['status'] === 'assigned'): ?>
+                        <form method="post" action="" class="d-inline" onsubmit="return confirm('Accept this emergency request?');">
+                            <input type="hidden" name="emergency_id" value="<?= $req['id'] ?>">
+                            <button type="submit" name="accept_emergency" class="btn btn-sm btn-primary"><i class="bi bi-check me-1"></i>Accept</button>
+                        </form>
+                    <?php endif; ?>
+                    <?php if (in_array($req['status'], ['accepted', 'in_progress'])): ?>
+                        <form method="post" action="" class="d-inline" onsubmit="return confirm('Mark this emergency request as completed?');">
+                            <input type="hidden" name="emergency_id" value="<?= $req['id'] ?>">
+                            <button type="submit" name="mark_emergency_complete" class="btn btn-sm btn-success"><i class="bi bi-check-lg me-1"></i>Complete</button>
+                        </form>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
-    <?php endif;
+        <?php endforeach;
+    endif;
 }
 
 function renderEmergencyModal($req) {
     $vehicle_text = ($req['brand'] ? $req['brand'] . ' ' . $req['model'] : 'N/A') . ($req['plate_number'] ? ' (' . $req['plate_number'] . ')' : '');
-    $motorcycle_image = !empty($req['image_path']) ? $req['image_path'] : 'MOTOR.jpg';
+    $motorcycle_image = resolve_moto_image($req);
     $maps_url = !empty($req['latitude']) && !empty($req['longitude']) ? 'https://www.google.com/maps/dir/?api=1&destination=' . urlencode($req['latitude'] . ',' . $req['longitude']) : '#';
 
     $color_lower = strtolower($req['color'] ?? '');
@@ -437,17 +441,29 @@ include 'mechanic_sidebar.php';
 ?>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-    .emergency-table,
-    .emergency-table thead,
-    .emergency-table tbody,
-    .emergency-table tfoot,
-    .emergency-table tr,
-    .emergency-table th,
-    .emergency-table td {
-        background-color: transparent !important;
+    .job-layout { display: flex; gap: 1rem; }
+    .job-img { flex: 0 0 96px; align-self: center; }
+    .job-img img { width: 96px; height: 96px; object-fit: cover; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; padding: 3px; }
+    .job-info { flex: 1 1 0; min-width: 0; }
+    .job-label { text-transform: uppercase; font-size: 0.64rem; letter-spacing: .05em; color: #94a3b8; margin-bottom: .2rem; font-weight: 600; }
+    .job-text { font-size: 0.8rem; margin-bottom: .1rem; line-height: 1.3; }
+    .job-card .card-body { padding: .75rem 1.1rem !important; }
+    .job-card { transition: box-shadow .2s ease, transform .2s ease; }
+    .job-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.08) !important; }
+    .job-actions { display: flex; justify-content: flex-end; gap: .5rem; flex-wrap: wrap; background: #f8fafc; border-radius: 10px; padding: .4rem .65rem; margin-top: .6rem; }
+    .job-actions .btn { border-radius: 999px; padding: .3rem .9rem; font-size: .78rem; font-weight: 600; }
+    .job-actions .btn:hover { transform: translateY(-1px); }
+    @media (min-width: 992px) {
+        .job-info + .job-info { border-left: 1px dashed #e2e8f0; padding-left: 1.25rem; }
     }
-    .emergency-table tbody tr:hover {
-        background-color: transparent !important;
+    @media (max-width: 991.98px) {
+        .job-layout { flex-wrap: wrap; }
+        .job-img { flex-basis: 100%; display: flex; justify-content: center; }
+        .job-img img { width: 100%; max-width: 200px; height: 110px; }
+        .job-info { flex: 1 1 45%; }
+    }
+    @media (max-width: 575.98px) {
+        .job-info { flex: 1 1 100%; }
     }
 
     .emergency-modal {
@@ -681,7 +697,7 @@ include 'mechanic_sidebar.php';
 
         <div class="p-4">
             <h5 class="fw-bold mb-3">Assigned Emergency Requests</h5>
-            <?php renderEmergencyTable($emergency_requests); ?>
+            <?php renderEmergencyCards($emergency_requests); ?>
         </div>
     </div>
 </div>

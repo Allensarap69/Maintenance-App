@@ -394,6 +394,10 @@ require __DIR__ . '/partials/head.php';
                     <i data-lucide="file-image"></i>
                     <span>Receipts</span>
                 </a>
+                <a href="admin_payment_settings.php" class="menu-item <?= $currentPage == 'admin_payment_settings' ? 'active' : '' ?>" data-tooltip="Payment Settings">
+                    <i data-lucide="qr-code"></i>
+                    <span>Payment Settings</span>
+                </a>
                 <a href="reports.php" class="menu-item <?= $currentPage == 'reports' ? 'active' : '' ?>" data-tooltip="Reports">
                     <i data-lucide="bar-chart-3"></i>
                     <span>Reports</span>

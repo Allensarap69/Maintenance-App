@@ -90,10 +90,72 @@ $mechanic_ids_array = $booking_data['mechanic_ids']; // ARRAY of ALL mechanic ID
 $slot_id = $booking_data['slot_id'] ?? null; // Keep null if not used
 
 // --- Define Payment Details & Calculate Deposit/Balance ---
-$gcash_qr_path = 'g.png.jpg'; 
+$gcash_qr_path = 'g.png.jpg';
+$gcash_emv_base_payload = '00020101021127830012com.p2pqrpay0111GXCHPHM2XXX02089996440303152170200000006560417DWQM4TK3JDO7CBK0B5204601653036085802PH5910NO****A G.6007Glamang61041234630489FE';
+$gcash_name = '';
+$gcash_number = '';
 $deposit_percentage = 0.50; // 50% deposit
+
+// Load admin-configured payment settings (Admin > Payment Settings); defaults above are the fallback.
+try {
+    $stmt = $pdo->query("SELECT gcash_name, gcash_number, qr_image_path, emv_payload, deposit_percentage FROM payment_settings WHERE id = 1");
+    if ($ps = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        if (!empty($ps['qr_image_path'])) $gcash_qr_path = $ps['qr_image_path'];
+        // Only use the payload when it is set — an empty payload means the admin
+        // intentionally disabled the amount-locked QR (static image shown instead).
+        $gcash_emv_base_payload = $ps['emv_payload'];
+        if (isset($ps['deposit_percentage']) && (float)$ps['deposit_percentage'] > 0) {
+            $deposit_percentage = (float)$ps['deposit_percentage'] / 100;
+        }
+        $gcash_name = $ps['gcash_name'] ?? '';
+        $gcash_number = $ps['gcash_number'] ?? '';
+    }
+} catch (PDOException $e) {
+    error_log('payment_settings lookup failed: ' . $e->getMessage());
+}
+
 $deposit_amount = round($total_price * $deposit_percentage, 2);
 $remaining_balance = round($total_price - $deposit_amount, 2);
+$deposit_pct_label = rtrim(rtrim(number_format($deposit_percentage * 100, 2, '.', ''), '0'), '.');
+// Amount-locked QR only renders when a payload is configured; otherwise the
+// static image is shown and the customer types the amount themselves.
+$gcash_locked_payload = !empty($gcash_emv_base_payload)
+    ? gcash_locked_amount_payload($gcash_emv_base_payload, number_format($deposit_amount, 2, '.', ''))
+    : null;
+
+// Rebuilds the QR Ph payload with a locked Transaction Amount (tag 54), marks it
+// dynamic (tag 01 = '12'), and recomputes the CRC-16/CCITT checksum (tag 63).
+function gcash_locked_amount_payload(string $base_payload, string $amount): string {
+    $body = substr($base_payload, 0, -8); // strip existing tag 63 (id + len + CRC)
+
+    // Tag 01 Point of Initiation Method: '11' (static) -> '12' (dynamic, fixed amount)
+    $poi_pos = strpos($body, '010211');
+    if ($poi_pos !== false) {
+        $body = substr_replace($body, '010212', $poi_pos, 6);
+    }
+
+    // Insert tag 54 Transaction Amount right after tag 53 Transaction Currency
+    $field54 = '54' . str_pad((string) strlen($amount), 2, '0', STR_PAD_LEFT) . $amount;
+    $pos = 0;
+    $insert_at = strlen($body);
+    while ($pos + 4 <= strlen($body)) {
+        $tag = substr($body, $pos, 2);
+        $pos += 4 + (int) substr($body, $pos + 2, 2);
+        if ($tag === '53') { $insert_at = $pos; break; }
+    }
+    $body = substr($body, 0, $insert_at) . $field54 . substr($body, $insert_at);
+
+    // Recompute CRC-16/CCITT-FALSE (poly 0x1021, init 0xFFFF) over body + '6304'
+    $data = $body . '6304';
+    $crc = 0xFFFF;
+    for ($i = 0, $n = strlen($data); $i < $n; $i++) {
+        $crc ^= ord($data[$i]) << 8;
+        for ($b = 0; $b < 8; $b++) {
+            $crc = ($crc & 0x8000) ? (($crc << 1) ^ 0x1021) & 0xFFFF : ($crc << 1) & 0xFFFF;
+        }
+    }
+    return $body . '6304' . strtoupper(str_pad(dechex($crc), 4, '0', STR_PAD_LEFT));
+}
 
 
 // -------------------------------------------------------------------------------------------------
@@ -194,9 +256,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
     if ($payment_method === 'gcash') {
         $transaction_ref_manual = $_POST['transaction_ref_manual'] ?? null;
         
-        // Server-side validation for the 10-digit number
-        if (empty($transaction_ref_manual) || !preg_match('/^\d{10}$/', $transaction_ref_manual)) {
-             header("Location: confirm_payment.php?error_msg=" . urlencode("❌ Please enter exactly 10 numeric digits for the GCash Transaction Reference Number."));
+        // Server-side validation for the 13-digit number
+        if (empty($transaction_ref_manual) || !preg_match('/^\d{13}$/', $transaction_ref_manual)) {
+             header("Location: confirm_payment.php?error_msg=" . urlencode("❌ Please enter exactly 13 numeric digits for the GCash Transaction Reference Number."));
              exit;
         }
     }
@@ -213,7 +275,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
         $booking_status = 'deposit_submitted'; 
         $payment_transaction_type = 'deposit';
         $payment_status_for_table = 'pending'; // Deposit status is pending until admin verifies receipt
-        $success_message = "✅ Deposit Receipt Uploaded! Your booking slot is confirmed. Your 50% deposit will be verified by admin shortly.";
+        $success_message = "✅ Deposit Receipt Uploaded! Your booking slot is confirmed. Your {$deposit_pct_label}% deposit will be verified by admin shortly.";
     }
     
     // --- Validation and File Handling for GCASH (Unchanged and working) ---
@@ -234,10 +296,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
         }
         
         $file_extension = strtolower(pathinfo($_FILES['receipt_image']['name'], PATHINFO_EXTENSION));
-        $allowed_ext = ['jpg', 'jpeg', 'png', 'pdf'];
+        $allowed_ext = ['jpg', 'jpeg', 'png'];
 
         if (!in_array($file_extension, $allowed_ext)) {
-               header("Location: confirm_payment.php?error_msg=" . urlencode("❌ Invalid file type. Only JPG, JPEG, PNG, and PDF are allowed."));
+               header("Location: confirm_payment.php?error_msg=" . urlencode("❌ Invalid file type. Only JPG, JPEG, and PNG receipt images are allowed."));
                exit;
         }
 
@@ -253,6 +315,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
         }
         
         $receipt_path = $target_file; 
+    }
+
+    // --- Receipt authenticity analysis (OCR + forensics). Non-fatal:
+    // if Python/OCR is unavailable the booking proceeds without a verdict.
+    // The browser pre-check caches its verdict in the session keyed by file
+    // hash, so identical uploads skip a second OCR pass and only run ELA.
+    $receipt_analysis_json = null;
+    if ($payment_method === 'gcash' && $receipt_path) {
+        try {
+            $pdo->exec("ALTER TABLE payments ADD COLUMN receipt_analysis TEXT NULL");
+        } catch (PDOException $e) { /* column already exists */ }
+        try {
+            $script = __DIR__ . '/scripts/receipt_check.py';
+            $md5 = md5_file($receipt_path);
+            $cached = $_SESSION['receipt_analysis'][$md5] ?? null;
+            unset($_SESSION['receipt_analysis'][$md5]);
+            if (is_array($cached)) {
+                $receipt_analysis_json = json_encode($cached);
+                // Fast ELA-only pass so the admin still gets edit forensics.
+                $ela_raw = shell_exec('python ' . escapeshellarg($script)
+                    . ' --image ' . escapeshellarg($receipt_path)
+                    . ' --ela-dir ' . escapeshellarg($target_dir)
+                    . ' --ela-only 2>&1');
+                $ela = $ela_raw ? json_decode(trim($ela_raw), true) : null;
+                if (is_array($ela) && isset($ela['ela'])) {
+                    $cached['ela'] = $ela['ela'];
+                    $receipt_analysis_json = json_encode($cached);
+                }
+            } else {
+                $raw = shell_exec('python ' . escapeshellarg($script)
+                    . ' --image ' . escapeshellarg($receipt_path)
+                    . ' --amount ' . escapeshellarg((string) $deposit_amount)
+                    . ' --ref ' . escapeshellarg((string) $transaction_ref_manual)
+                    . ' --ela-dir ' . escapeshellarg($target_dir)
+                    . ' 2>&1');
+                if ($raw && is_array(json_decode(trim($raw), true))) {
+                    $receipt_analysis_json = trim($raw);
+                }
+            }
+        } catch (Throwable $e) {
+            error_log('Receipt analysis failed: ' . $e->getMessage());
+        }
     }
 
     // --- Database Insertion (Wrapped in Transaction) ---
@@ -306,9 +410,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
         $stmt_payment = $pdo->prepare("
             INSERT INTO payments (
                 booking_id, amount, payment_method, transaction_type, 
-                receipt_path, status, transaction_ref
+                receipt_path, status, transaction_ref, receipt_analysis
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ");
         
         $stmt_payment->execute([
@@ -318,7 +422,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
             $payment_transaction_type,   
             $receipt_path,               
             $payment_status_for_table,   
-            $transaction_ref_for_db      
+            $transaction_ref_for_db,
+            $receipt_analysis_json
         ]);
 
 
@@ -598,7 +703,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
             font-size: 1.75rem;
             font-weight: 700;
             margin: 0;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
             line-height: 1.2;
         }
 
@@ -930,8 +1034,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
             justify-content: center;
             width: 1.5rem;
             height: 1.5rem;
-            background: var(--primary-color);
-            color: white;
+            background: none;
+            color: var(--accent-color);
             border-radius: 50%;
             font-size: 0.7rem;
             font-weight: 700;
@@ -941,14 +1045,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
         .booking-illustration {
             width: 90px;
             height: 90px;
-            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            background: none;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2.5rem;
             color: var(--accent-color);
-            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+            box-shadow: none;
             flex-shrink: 0;
         }
         .booking-illustration i {
@@ -975,7 +1079,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
             gap: 0.5rem;
         }
         .total-amount {
-            background: #fff7ed;
+            background: transparent;
             border: none;
             border-radius: 8px;
             padding: 10px 14px;
@@ -1099,6 +1203,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
             border-color: #172A46;
             color: white;
         }
+        .btn-check-availability:disabled {
+            background: #eef1f6;
+            border: 1px dashed #b6bfcd;
+            color: #8491a5;
+            opacity: 1;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        #finalize_hint {
+            font-size: 0.72rem;
+            color: #b45309;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+        }
         .btn-outline-accent {
             color: var(--accent-color);
             border-color: var(--accent-color);
@@ -1184,6 +1303,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
             border: 4px solid #fff;
             box-shadow: 0 6px 20px rgba(0,0,0,0.12);
             border-radius: 12px;
+        }
+
+        #gcash_qr_code img {
+            max-width: 150px;
+            height: auto;
+            border: 4px solid #fff;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .amount-locked-badge {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(255, 255, 255, 0.5) 100%);
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            color: #047857;
         }
 
         .receipt-upload .form-control {
@@ -1401,10 +1536,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
                                     <input class="form-check-input mt-1" type="radio" name="payment_method" id="paymentGcash" value="gcash" required>
                                     <div class="flex-grow-1">
                                         <label class="form-check-label fw-bold d-flex align-items-center justify-content-between w-100" for="paymentGcash">
-                                            <span><i class="bi bi-phone-fill me-1 text-accent"></i> GCash Advance Payment (50% Deposit)</span>
+                                            <span><i class="bi bi-phone-fill me-1 text-accent"></i> GCash Advance Payment (<?= $deposit_pct_label ?>% Deposit)</span>
                                             <span class="badge bg-primary">GCash</span>
                                         </label>
-                                        <p class="small text-muted mb-0">Pay a 50% deposit now to instantly reserve your slot.</p>
+                                        <p class="small text-muted mb-0">Pay a <?= $deposit_pct_label ?>% deposit now to instantly reserve your slot.</p>
                                     </div>
                                 </div>
                             </div>
@@ -1417,7 +1552,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
                                     <span class="badge rounded-pill bg-light text-success border border-success">SELECTED</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                    <span class="text-uppercase small fw-bold text-secondary">REQUIRED 50% DEPOSIT NOW</span>
+                                    <span class="text-uppercase small fw-bold text-secondary">REQUIRED <?= $deposit_pct_label ?>% DEPOSIT NOW</span>
                                     <p class="deposit-amount">₱<?= number_format($deposit_amount, 2) ?></p>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
@@ -1431,17 +1566,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
                                     <p class="summary-title mb-0"><i class="bi bi-qr-code me-2"></i> Scan to Pay Deposit</p>
                                     <span class="badge rounded-pill bg-light text-dark border border-secondary"><i class="bi bi-clock me-1"></i> Expires in <?= date('h:i A', strtotime('+15 minutes')) ?></span>
                                 </div>
-                                <p class="text-muted small mb-3">Open GCash app and scan the QR code to pay</p>
+                                <?php if ($gcash_locked_payload !== null): ?>
+                                <div class="amount-locked-badge d-flex align-items-center gap-2 py-2 px-3 mb-3">
+                                    <i class="bi bi-lock-fill"></i>
+                                    <span class="small fw-bold">Amount locked: ₱<?= number_format($deposit_amount, 2) ?></span>
+                                </div>
+                                <?php endif; ?>
+                                <?php if (!empty($gcash_name) || !empty($gcash_number)): ?>
+                                <div class="d-flex justify-content-between align-items-center border rounded-3 px-3 py-2 mb-3" style="background: rgba(59,130,246,0.06);">
+                                    <span class="small text-muted">Pay to</span>
+                                    <span class="small fw-bold text-dark"><?= htmlspecialchars(trim($gcash_name . ' ' . $gcash_number)) ?></span>
+                                </div>
+                                <?php endif; ?>
+                                <p class="text-muted small mb-3">Open GCash app and scan the QR code<?= $gcash_locked_payload !== null ? ' — the exact deposit amount is already filled in.' : ', then enter ₱' . number_format($deposit_amount, 2) . ' as the amount.' ?></p>
                                 <div class="row g-3 align-items-center">
                                     <div class="col-12 col-md-5 text-center">
-                                        <img src="<?= htmlspecialchars($gcash_qr_path) ?>" alt="GCash QR Code" class="img-fluid rounded-3">
+                                        <div id="gcash_qr_code" class="d-inline-block">
+                                            <img id="gcash_qr_fallback" src="<?= htmlspecialchars($gcash_qr_path) ?>" alt="GCash QR Code" class="img-fluid rounded-3">
+                                        </div>
                                     </div>
                                     <div class="col-12 col-md-7 text-start">
                                         <ol class="list-group list-group-numbered small">
                                             <li class="list-group-item border-0 py-1 px-0 bg-transparent">Open your GCash app</li>
                                             <li class="list-group-item border-0 py-1 px-0 bg-transparent">Tap "Scan QR"</li>
                                             <li class="list-group-item border-0 py-1 px-0 bg-transparent">Scan the QR code</li>
-                                            <li class="list-group-item border-0 py-1 px-0 bg-transparent">Confirm payment of ₱<?= number_format($deposit_amount, 2) ?></li>
+                                            <?php if ($gcash_locked_payload !== null): ?>
+                                            <li class="list-group-item border-0 py-1 px-0 bg-transparent">The amount <span class="fw-bold">₱<?= number_format($deposit_amount, 2) ?></span> is pre-filled and locked</li>
+                                            <?php else: ?>
+                                            <li class="list-group-item border-0 py-1 px-0 bg-transparent">Enter exactly <span class="fw-bold">₱<?= number_format($deposit_amount, 2) ?></span> as the amount</li>
+                                            <?php endif; ?>
                                             <li class="list-group-item border-0 py-1 px-0 bg-transparent">Take a screenshot of your payment receipt</li>
                                         </ol>
                                     </div>
@@ -1459,18 +1612,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
                                     type="text" 
                                     id="transaction_ref_manual" 
                                     name="transaction_ref_manual" 
-                                    placeholder="Enter the 10-digit GCash reference number" 
-                                    maxlength="10" 
-                                    pattern="\d{10}"
+                                    placeholder="Enter the 13-digit GCash reference number" 
+                                    maxlength="13" 
+                                    pattern="\d{13}"
                                     inputmode="numeric"
-                                    title="Please enter exactly 10 numeric digits." 
+                                    title="Please enter exactly 13 numeric digits." 
                                 >
                             </div>
 
                             <div class="mb-2 receipt-upload">
-                                <label for="receipt_image" class="form-label fw-bold">Receipt Image/PDF (Required)</label>
-                                <input class="form-control" type="file" id="receipt_image" name="receipt_image" accept=".jpg,.jpeg,.png,.pdf">
-                                <div class="form-text">Upload a screenshot or photo of your GCash payment confirmation.</div>
+                                <label for="receipt_image" class="form-label fw-bold">Receipt Image (Required)</label>
+                                <input class="form-control" type="file" id="receipt_image" name="receipt_image" accept=".jpg,.jpeg,.png">
+                                <div class="form-text">Upload a screenshot or photo of your GCash payment confirmation. It will be verified automatically.</div>
+                                <div id="receipt_check_status" class="mt-2" style="display:none;"></div>
                             </div>
                         </div>
                             </div>
@@ -1481,12 +1635,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
                             <a href="view_availability.php" class="btn btn-back">
                                 <i class="bi bi-arrow-left me-2"></i> Back
                             </a>
-                            <button 
-                                type="submit" 
-                                name="confirm_booking_final" 
-                                class="btn btn-check-availability">
-                                <i class="bi bi-check-circle-fill me-2"></i> Finalize Booking
-                            </button>
+                            <div class="d-flex align-items-center gap-2">
+                                <span id="finalize_hint"><i class="bi bi-lock-fill me-1"></i><span id="finalize_hint_text">Verify your GCash receipt to continue</span></span>
+                                <button 
+                                    type="submit" 
+                                    name="confirm_booking_final" 
+                                    id="finalize_btn"
+                                    class="btn btn-check-availability">
+                                    <i class="bi bi-check-circle-fill me-2" id="finalize_icon"></i> Finalize Booking
+                                </button>
+                            </div>
                         </div>
 
                     </form>
@@ -1496,6 +1654,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
     </div>
 </div>
 
+<script src="assets/js/qrcode.min.js"></script>
+<script>
+    // Render the amount-locked GCash QR. Falls back to the static QR image
+    // (customer types the amount manually) if no payload is configured or the QR library fails.
+    const gcashQrPayload = <?= json_encode($gcash_locked_payload) ?>;
+    const gcashQrContainer = document.getElementById('gcash_qr_code');
+    if (gcashQrContainer && gcashQrPayload && typeof QRCode !== 'undefined') {
+        try {
+            new QRCode(gcashQrContainer, {
+                text: gcashQrPayload,
+                width: 150,
+                height: 150,
+                correctLevel: QRCode.CorrectLevel.M
+            });
+            if (gcashQrContainer.querySelector('canvas')) {
+                const fallbackImg = document.getElementById('gcash_qr_fallback');
+                if (fallbackImg) fallbackImg.remove();
+            }
+        } catch (e) {
+            // keep the static fallback image
+        }
+    }
+</script>
 <script>
     const gcashRadio = document.getElementById('paymentGcash');
     const cashRadio = document.getElementById('paymentCash');
@@ -1527,6 +1708,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
                 card.classList.remove('active');
             }
         });
+
+        // GCash needs a verified receipt before Finalize unlocks. Only clear
+        // state when switching AWAY to cash — re-clicking GCash must not wipe
+        // a passing verification (same file won't re-fire 'change').
+        if (!gcashRadio.checked) {
+            receiptVerified = { file: null, ref: null };
+            receiptStatus.style.display = 'none';
+        }
+        updateFinalize();
     }
 
     // --- NEW JAVASCRIPT BLOCK TO BLOCK NON-DIGIT INPUT IN REAL-TIME ---
@@ -1558,6 +1748,131 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking_final
     });
     // --- END NEW JAVASCRIPT BLOCK ---
 
+
+    // --- Receipt authenticity pre-check (GCash only) ---
+    const DEPOSIT_AMOUNT = <?= json_encode((float) $deposit_amount) ?>;
+    const DEPOSIT_DISPLAY = '<?= number_format($deposit_amount, 2) ?>';
+    const receiptStatus = document.getElementById('receipt_check_status');
+    const bookingForm = document.querySelector('form');
+    const finalizeBtn = document.getElementById('finalize_btn');
+    // Tracks which (file, ref) combo already passed verification
+    let receiptVerified = { file: null, ref: null };
+    let refRecheckTimer = null;
+
+    function setReceiptStatus(html) {
+        receiptStatus.style.display = 'block';
+        receiptStatus.innerHTML = html;
+    }
+
+    function isVerified(file, refDigits) {
+        return receiptVerified.file === file && receiptVerified.ref === refDigits;
+    }
+
+    const finalizeIcon = document.getElementById('finalize_icon');
+    const finalizeHint = document.getElementById('finalize_hint');
+    const finalizeHintText = document.getElementById('finalize_hint_text');
+
+    function setFinalizeLocked(locked, hintText) {
+        finalizeBtn.disabled = locked;
+        finalizeIcon.className = locked ? 'bi bi-lock-fill me-2' : 'bi bi-check-circle-fill me-2';
+        finalizeBtn.title = locked ? 'Upload a receipt and wait for verification first.' : '';
+        finalizeHint.style.display = locked ? 'inline-flex' : 'none';
+        if (hintText) finalizeHintText.textContent = hintText;
+    }
+
+    // Finalize stays locked while GCash is selected until the receipt verifies.
+    function updateFinalize() {
+        if (!finalizeBtn) return;
+        if (!gcashRadio.checked) { setFinalizeLocked(false); return; }
+        const file = receiptInput.files[0];
+        const refDigits = manualRefInput.value.replace(/\D/g, '');
+        const locked = !isVerified(file, refDigits);
+        setFinalizeLocked(locked, file ? 'Waiting for receipt verification' : 'Verify your GCash receipt to continue');
+    }
+
+    function showVerifying() {
+        setReceiptStatus('<span class="spinner-border spinner-border-sm text-primary me-2"></span><span class="small text-muted">Verifying receipt…</span>');
+        if (finalizeBtn && gcashRadio.checked) setFinalizeLocked(true, 'Verifying receipt…');
+    }
+
+    function evaluateReceipt(res, refDigits) {
+        // Fail-open only when the analysis service itself is unavailable — the
+        // admin still sees the stored analysis before approving the deposit.
+        if (!res || res.verdict === 'error' || res.verdict === 'skipped') {
+            return { ok: true, neutral: true, msg: 'Receipt uploaded — it will be verified by the admin.' };
+        }
+        const c = res.checks || {};
+        if (res.verdict === 'unreadable' || !c.gcash_brand) return { ok: false, msg: 'Receipt rejected: this does not look like a GCash receipt.' };
+        if (!c.amount_match) return { ok: false, msg: 'Receipt rejected: the amount on this receipt does not match the required ₱' + DEPOSIT_DISPLAY + ' deposit.' };
+        if (refDigits && !c.ref_match) return { ok: false, msg: 'Receipt rejected: reference no. ' + refDigits + ' was not found on this receipt.' };
+        return { ok: true, msg: 'Receipt verified — thank you!' };
+    }
+
+    async function analyzeReceipt(file, refDigits) {
+        const fd = new FormData();
+        fd.append('receipt', file);
+        fd.append('amount', DEPOSIT_AMOUNT);
+        fd.append('ref', refDigits);
+        try {
+            const resp = await fetch('ajax_check_receipt.php', { method: 'POST', body: fd });
+            return await resp.json();
+        } catch (e) {
+            return { verdict: 'error', error: 'network' };
+        }
+    }
+
+    async function runCheck(file, refDigits, clearOnFail) {
+        showVerifying();
+        const res = await analyzeReceipt(file, refDigits);
+        const verdict = evaluateReceipt(res, refDigits);
+        if (verdict.ok) {
+            setReceiptStatus('<i class="bi bi-check-circle-fill ' + (verdict.neutral ? 'text-secondary' : 'text-success') + ' me-1"></i><span class="small ' + (verdict.neutral ? 'text-muted' : 'text-success') + ' fw-bold">' + verdict.msg + '</span>');
+            receiptVerified = { file: file, ref: refDigits };
+        } else {
+            setReceiptStatus('<i class="bi bi-x-circle-fill text-danger me-1"></i><span class="small text-danger fw-bold">' + verdict.msg + '</span>');
+            receiptVerified = { file: null, ref: null };
+            if (clearOnFail) receiptInput.value = '';
+        }
+        updateFinalize();
+        return verdict.ok;
+    }
+
+    receiptInput.addEventListener('change', function () {
+        receiptVerified = { file: null, ref: null };
+        const file = receiptInput.files[0];
+        if (!file || !gcashRadio.checked) { receiptStatus.style.display = 'none'; updateFinalize(); return; }
+        runCheck(file, manualRefInput.value.replace(/\D/g, ''), true);
+    });
+
+    // Ref edited after verification — re-check automatically once typing pauses.
+    manualRefInput.addEventListener('input', function () {
+        if (!gcashRadio.checked) return;
+        const refDigits = manualRefInput.value.replace(/\D/g, '');
+        if (receiptVerified.ref === refDigits) { updateFinalize(); return; }
+        receiptVerified = { file: null, ref: null };
+        updateFinalize();
+        const file = receiptInput.files[0];
+        clearTimeout(refRecheckTimer);
+        if (file && refDigits.length === 13) {
+            refRecheckTimer = setTimeout(() => runCheck(file, refDigits, false), 600);
+        }
+    });
+
+    // Final safety net: re-verify on submit if the file/ref changed after the
+    // last check (e.g. check still running when the button was enabled).
+    bookingForm.addEventListener('submit', async function (e) {
+        if (!gcashRadio.checked) return;
+        const file = receiptInput.files[0];
+        if (!file) return; // 'required' attribute handles empty input
+        const refDigits = manualRefInput.value.replace(/\D/g, '');
+        if (isVerified(file, refDigits)) return;
+        e.preventDefault();
+        if (await runCheck(file, refDigits, false)) {
+            // requestSubmit keeps confirm_booking_final in POST (form.submit() drops it)
+            bookingForm.requestSubmit(finalizeBtn);
+        }
+    });
+    // --- END receipt pre-check ---
 
     // Attach listeners
     gcashRadio.addEventListener('change', toggleGcashDetails);

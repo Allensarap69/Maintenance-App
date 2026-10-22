@@ -430,7 +430,7 @@ if (isset($_GET['action'], $_GET['id'])) {
 // ----------------------------------------------------------------------
 $bookings = $pdo->query("SELECT 
     b.id, b.service_ids, b.package_ids, b.schedule_date, b.schedule_start_time, b.schedule_end_time, b.total_price, b.status, b.mechanic_id,
-    p.amount AS deposit_amount, p.payment_method, p.receipt_path, p.status AS payment_status, p.transaction_ref,
+    p.amount AS deposit_amount, p.payment_method, p.receipt_path, p.status AS payment_status, p.transaction_ref, p.receipt_analysis,
     u.username, u.name AS customer_name, u.email AS customer_email, u.phone AS customer_phone,
     v.brand, v.model, v.year_model, v.plate_number,
     m.name AS mechanic_name
@@ -925,7 +925,7 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
         left: 0;
         right: 0;
         height: 2px;
-        background: linear-gradient(90deg, #3b82f6 0%, #FACC15 100%);
+        background: #FACC15;
     }
 
     .glass-modal .btn-close {
@@ -934,42 +934,70 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
     }
 
     .glass-modal-body {
-        padding: 1.25rem;
+        padding: 0.85rem;
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.55rem;
     }
 
     .modal-detail-card {
         background: #f1f5f9;
         border: 1px solid var(--card-border);
         border-radius: 12px;
-        padding: 0.85rem;
+        padding: 0.6rem;
     }
 
     .modal-detail-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
+        gap: 0.45rem;
     }
 
     .modal-detail-item {
         display: flex;
         flex-direction: column;
-        gap: 0.1rem;
+        gap: 0.05rem;
     }
 
     .modal-detail-label {
-        font-size: 0.68rem;
+        font-size: 0.62rem;
         font-weight: 700;
         text-transform: uppercase;
         color: var(--text-muted);
     }
 
     .modal-detail-val {
-        font-size: 0.88rem;
+        font-size: 0.82rem;
         font-weight: 600;
         color: var(--text-main);
+    }
+
+    .mb-receipt-thumb {
+        width: 104px;
+        height: 150px;
+        object-fit: cover;
+        object-position: top;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        display: block;
+        background: #fff;
+    }
+
+    .mb-receipt-pdf {
+        width: 104px;
+        height: 150px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: #1d4ed8;
+        text-decoration: none;
     }
 
     /* ===== Dark mode overrides ===== */
@@ -1086,6 +1114,11 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
                          data-mechanic="<?= htmlspecialchars($mechanic_name_list) ?>"
                          data-payment-method="<?= strtoupper($b['payment_method'] ?? 'CASH') ?>"
                          data-total-price="₱<?= number_format($b['total_price'], 2) ?>"
+                         data-deposit-amount="<?= isset($b['deposit_amount']) ? '₱' . number_format($b['deposit_amount'], 2) : '' ?>"
+                         data-transaction-ref="<?= htmlspecialchars($b['transaction_ref'] ?? '') ?>"
+                         data-payment-status="<?= htmlspecialchars($b['payment_status'] ?? '') ?>"
+                         data-receipt-path="<?= htmlspecialchars($b['receipt_path'] ?? '') ?>"
+                         data-analysis="<?= htmlspecialchars($b['receipt_analysis'] ?? '') ?>"
                          data-status-display="<?= $display_status ?>"
                          data-status-class="<?= $status_class ?>">
                          
@@ -1142,6 +1175,11 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
                                     <span style="color:var(--accent-orange); font-weight:700;">Verify Deposit</span>
                                     <span style="font-weight:800;">₱<?= number_format($b['deposit_amount'] ?? 0, 2) ?></span>
                                 </div>
+                                <?php if (!empty($b['receipt_path'])): ?>
+                                <a href="<?= htmlspecialchars($b['receipt_path']) ?>" target="_blank" style="font-size:0.7rem; font-weight:600; color:#1d4ed8; text-decoration:none;">
+                                    <i data-lucide="image" style="width:11px;"></i> View receipt<?= !empty($b['transaction_ref']) ? ' · Ref ' . htmlspecialchars($b['transaction_ref']) : '' ?>
+                                </a>
+                                <?php endif; ?>
                                 <div class="d-flex gap-1 mt-1">
                                     <a href="?action=deposit_approved&id=<?= $b['id'] ?>" class="mb-action-btn success"><i data-lucide="check" style="width:12px;"></i> Approve</a>
                                     <a href="?action=deposit_rejected&id=<?= $b['id'] ?>" class="mb-action-btn danger"><i data-lucide="x" style="width:12px;"></i> Reject</a>
@@ -1177,7 +1215,7 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
 
 <!-- Dynamic Modal -->
 <div class="modal fade" id="viewBookingModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content glass-modal">
             <div class="modal-header glass-modal-header d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-2">
@@ -1255,6 +1293,34 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
                         <div class="text-end">
                             <span class="modal-detail-label">Total Amount</span>
                             <div class="modal-detail-val" id="modalTotalPrice" style="font-size: 1.2rem; font-weight: 800; color: #047857;">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GCash Deposit Section (hidden unless GCash) -->
+                <div class="modal-detail-card" id="modalGcashSection" style="display:none; background: rgba(59, 130, 246, 0.05); border-color: rgba(59, 130, 246, 0.2);">
+                    <div class="d-flex gap-3 align-items-start">
+                        <div style="flex: 0 0 104px;">
+                            <span class="modal-detail-label">Receipt</span>
+                            <div id="modalReceiptContent" class="mt-1"></div>
+                        </div>
+                        <div class="modal-detail-grid" style="flex: 1; min-width: 0;">
+                            <div class="modal-detail-item">
+                                <span class="modal-detail-label">Deposit Amount</span>
+                                <span class="modal-detail-val" id="modalDepositAmount" style="font-weight: 700;">-</span>
+                            </div>
+                            <div class="modal-detail-item">
+                                <span class="modal-detail-label">Deposit Status</span>
+                                <span class="modal-detail-val"><span id="modalPaymentStatus" class="mb-status-badge">-</span></span>
+                            </div>
+                            <div class="modal-detail-item" style="grid-column: span 2;">
+                                <span class="modal-detail-label">GCash Reference No.</span>
+                                <span class="modal-detail-val" id="modalTransactionRef" style="font-family: monospace;">-</span>
+                            </div>
+                            <div class="modal-detail-item" style="grid-column: span 2;">
+                                <span class="modal-detail-label">Receipt AI Check</span>
+                                <div id="modalReceiptAnalysis"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1354,6 +1420,73 @@ $serviceList = $pdo->query("SELECT service_name FROM services ORDER BY service_n
 
             document.getElementById('modalPaymentMethod').innerText = card.dataset.paymentMethod;
             document.getElementById('modalTotalPrice').innerText = card.dataset.totalPrice;
+
+            // GCash deposit details (receipt + reference) — only for GCash bookings
+            const gcashSection = document.getElementById('modalGcashSection');
+            const receiptPath = card.dataset.receiptPath || '';
+            const txnRef = card.dataset.transactionRef || '';
+            const payStatus = (card.dataset.paymentStatus || 'pending').toLowerCase();
+            const depAmt = card.dataset.depositAmount || '';
+            const isGcash = (card.dataset.paymentMethod || '').toUpperCase() === 'GCASH';
+
+            if (isGcash && (receiptPath || txnRef || depAmt)) {
+                gcashSection.style.display = 'block';
+                document.getElementById('modalDepositAmount').innerText = depAmt || '—';
+                const psBadge = document.getElementById('modalPaymentStatus');
+                psBadge.innerText = payStatus.toUpperCase();
+                psBadge.className = 'mb-status-badge ' + ({
+                    verified: 'status-completed',
+                    failed: 'status-rejected',
+                    pending: 'status-awaiting-deposit'
+                }[payStatus] || 'status-default');
+                document.getElementById('modalTransactionRef').innerText = txnRef || '—';
+                const rc = document.getElementById('modalReceiptContent');
+                if (receiptPath) {
+                    if (/\.pdf$/i.test(receiptPath)) {
+                        rc.innerHTML = '<a href="' + receiptPath + '" target="_blank" class="mb-receipt-pdf"><i data-lucide="file-text" style="width:22px;height:22px;"></i>View PDF</a>';
+                    } else {
+                        rc.innerHTML = '<a href="' + receiptPath + '" target="_blank" title="Open full size"><img src="' + receiptPath + '" alt="GCash receipt" class="mb-receipt-thumb"></a>';
+                    }
+                } else {
+                    rc.innerHTML = '<span class="modal-detail-val" style="font-weight:400;font-size:0.72rem;">No receipt uploaded.</span>';
+                }
+
+                // Receipt AI analysis (OCR + forensics run at upload)
+                const raBox = document.getElementById('modalReceiptAnalysis');
+                let analysis = null;
+                try { analysis = JSON.parse(card.dataset.analysis || 'null'); } catch (e) { analysis = null; }
+                if (analysis && analysis.checks) {
+                    const c = analysis.checks;
+                    const verdictMap = {
+                        likely_genuine: ['status-completed', 'LIKELY GENUINE'],
+                        suspicious: ['status-rejected', 'SUSPICIOUS — REVIEW MANUALLY'],
+                        unreadable: ['status-pending', 'UNREADABLE IMAGE'],
+                        skipped: ['status-default', 'NOT ANALYZED']
+                    };
+                    const [vClass, vText] = verdictMap[analysis.verdict] || ['status-default', (analysis.verdict || '?').toUpperCase()];
+                    const chip = (ok, label) =>
+                        '<span class="mb-status-badge ' + (ok ? 'status-completed' : 'status-rejected') + '" style="font-size:0.62rem;">' +
+                        (ok ? '✓ ' : '✗ ') + label + '</span>';
+                    let html = '<div class="mb-1"><span class="mb-status-badge ' + vClass + '">' + vText + '</span></div>';
+                    html += '<div class="d-flex flex-wrap gap-1 mb-1">';
+                    html += chip(c.gcash_brand, 'GCash markers');
+                    html += chip(c.amount_match, 'Amount matches');
+                    html += chip(c.ref_match, 'Ref no. matches');
+                    html += chip(c.date_present, 'Date found');
+                    html += '</div>';
+                    if (Array.isArray(c.amounts_seen) && c.amounts_seen.length) {
+                        html += '<div style="font-size:0.7rem;color:#64748b;">Amounts seen on receipt: ' + c.amounts_seen.slice(0, 6).join(', ') + '</div>';
+                    }
+                    if (analysis.ela && analysis.ela.image) {
+                        html += '<a href="uploads/receipts/' + analysis.ela.image + '" target="_blank" style="font-size:0.7rem;color:#1d4ed8;">View edit-forensics (ELA)' + (analysis.ela.flag ? ' — hotspots detected' : '') + '</a>';
+                    }
+                    raBox.innerHTML = html;
+                } else {
+                    raBox.innerHTML = '<span class="modal-detail-val" style="font-weight:400;">No analysis available — verify the receipt manually.</span>';
+                }
+            } else {
+                gcashSection.style.display = 'none';
+            }
 
             modal.show();
             setTimeout(() => lucide.createIcons(), 100);

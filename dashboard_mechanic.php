@@ -117,11 +117,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if (!empty($sms_result['success'])) {
                             $msg .= " SMS sent.";
                         } else {
-                            $msg .= " SMS failed: " . ($sms_result['message'] ?? 'unknown error');
+                            $msg .= " SMS could not be sent (" . ($sms_result['message'] ?? 'unknown error') . ").";
+                            $msg_type = "warning";
                         }
                     } catch (Throwable $e) {
                         error_log("Start SMS error for booking #{$booking_id}: " . $e->getMessage());
                         $msg .= " SMS could not be sent.";
+                        $msg_type = "warning";
                     }
                 }
             } else {
@@ -187,11 +189,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if (!empty($sms_result['success']) && empty($sms_result['error_code'])) {
                             $msg .= " SMS sent.";
                         } else {
-                            $msg .= " SMS failed: " . ($sms_result['message'] ?? 'unknown error');
+                            $msg .= " SMS could not be sent (" . ($sms_result['message'] ?? 'unknown error') . ").";
+                            $msg_type = "warning";
                         }
                     } catch (Throwable $e) {
                         error_log("Completion SMS error for booking #{$booking_id}: " . $e->getMessage());
                         $msg .= " SMS could not be sent.";
+                        $msg_type = "warning";
                     }
                 }
             } else {
@@ -716,6 +720,7 @@ $activity_items = array_slice($activity_items, 0, 5);
     .dash-header-meta i { width:15px; height:15px; color:#9CA3AF; }
     .dash-alert { background:#fff; border:1px solid var(--card-border); border-radius:10px; padding:0.6rem 1rem; font-size:0.85rem; margin-bottom:1.25rem; }
     .dash-alert.success { border-left:3px solid #10b981; }
+    .dash-alert.warning { border-left:3px solid #eab308; }
     .dash-alert.error { border-left:3px solid #ef4444; }
 
     /* ---- Stat cards ---- */
@@ -869,7 +874,7 @@ $activity_items = array_slice($activity_items, 0, 5);
     </div>
 
     <?php if ($msg): ?>
-        <div class="dash-alert <?= $msg_type === 'success' ? 'success' : 'error' ?>"><?= $msg ?></div>
+        <div class="dash-alert <?= $msg_type === 'success' ? 'success' : ($msg_type === 'warning' ? 'warning' : 'error') ?>"><?= $msg ?></div>
     <?php endif; ?>
 
     <div class="stat-grid">

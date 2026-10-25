@@ -534,7 +534,7 @@ function notify_customer_pending_parts($pdo, $booking_id) {
         $stmt->execute([(int)$booking_id]);
         $cust = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$cust) return ['ok' => false, 'msg' => 'Customer not found.'];
-        if (empty($cust['phone'])) return ['ok' => false, 'msg' => 'Customer has no phone number on file.'];
+        if (empty($cust['phone'])) return ['ok' => true, 'type' => 'warning', 'msg' => 'Customer has no phone number on file — they can still see and approve the pending parts in My Bookings.'];
 
         $items = array_map(fn($r) => (int)$r['quantity'] . 'x ' . $r['name'], $rows);
         $list = implode(', ', $items);
@@ -546,7 +546,7 @@ function notify_customer_pending_parts($pdo, $booking_id) {
         $message = $greet . "this is Mindanao Eversure Motor Maintenance. Parts added to your Booking #{$booking_id} need your approval: {$list} (total PHP " . number_format($total, 2) . "). Please check My Bookings to approve or decline. Thank you.";
         $message = preg_replace('/[^\x20-\x7E]/', '', $message);
 
-        if (!file_exists(__DIR__ . '/sms_helper.php')) return ['ok' => false, 'msg' => 'SMS not configured.'];
+        if (!file_exists(__DIR__ . '/sms_helper.php')) return ['ok' => true, 'type' => 'warning', 'msg' => 'SMS is not configured — the parts remain pending and the customer can still approve them in My Bookings.'];
         require_once __DIR__ . '/sms_helper.php';
         $res = (new SMSHelper())->sendSMS($cust['phone'], $message, 'PART_APPROVAL', [
             'booking_id' => (int)$booking_id,
@@ -558,12 +558,19 @@ function notify_customer_pending_parts($pdo, $booking_id) {
             return ['ok' => true, 'msg' => 'Customer was already notified about these parts.'];
         }
 
-        log_audit($pdo, 'parts_notify_sent', 'booking', $booking_id, count($rows) . ' pending part(s), ₱' . number_format($total, 2));
-        return $res['success']
-            ? ['ok' => true, 'msg' => 'Customer notified via SMS — ' . count($rows) . ' part(s) awaiting approval.']
-            : ['ok' => false, 'msg' => 'SMS not sent: ' . ($res['message'] ?? 'unknown error')];
+        if ($res['success']) {
+            log_audit($pdo, 'parts_notify_sent', 'booking', $booking_id, count($rows) . ' pending part(s), ₱' . number_format($total, 2));
+            return ['ok' => true, 'msg' => 'Customer notified via SMS — ' . count($rows) . ' part(s) awaiting approval.'];
+        }
+
+        // SMS is best-effort: the parts stay pending and the customer can still
+        // approve them from My Bookings even when the text can't be sent.
+        log_audit($pdo, 'parts_notify_sms_failed', 'booking', $booking_id, $res['message'] ?? 'unknown error');
+        return ['ok' => true, 'type' => 'warning',
+                'msg' => 'SMS could not be sent (' . ($res['message'] ?? 'unknown error') . '). The parts remain pending — the customer can still approve them in My Bookings.'];
     } catch (Throwable $e) {
-        return ['ok' => false, 'msg' => 'SMS failed: ' . $e->getMessage()];
+        return ['ok' => true, 'type' => 'warning',
+                'msg' => 'SMS could not be sent (' . $e->getMessage() . '). The parts remain pending — the customer can still approve them in My Bookings.'];
     }
 }
 

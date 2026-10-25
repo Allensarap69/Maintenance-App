@@ -40,27 +40,27 @@ $msg = "";
 $msg_type = "";
 if (isset($_GET['msg'], $_GET['type'])) {
     $msg = urldecode($_GET['msg']);
-    $msg_type = $_GET['type'] === 'success' ? 'success' : 'error';
+    $msg_type = in_array($_GET['type'], ['success', 'warning'], true) ? $_GET['type'] : 'error';
 }
 
 // --- Add a part ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_part'])) {
     $r = record_booking_part($pdo, $booking_id, (int)($_POST['part_id'] ?? 0), (int)($_POST['quantity'] ?? 1));
-    header("Location: booking_parts.php?booking_id=$booking_id&msg=" . urlencode($r['msg']) . "&type=" . ($r['ok'] ? 'success' : 'error'));
+    header("Location: booking_parts.php?booking_id=$booking_id&msg=" . urlencode($r['msg']) . "&type=" . urlencode($r['type'] ?? ($r['ok'] ? 'success' : 'error')));
     exit;
 }
 
 // --- Notify customer about pending parts ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['notify_customer'])) {
     $r = notify_customer_pending_parts($pdo, $booking_id);
-    header("Location: booking_parts.php?booking_id=$booking_id&msg=" . urlencode($r['msg']) . "&type=" . ($r['ok'] ? 'success' : 'error'));
+    header("Location: booking_parts.php?booking_id=$booking_id&msg=" . urlencode($r['msg']) . "&type=" . urlencode($r['type'] ?? ($r['ok'] ? 'success' : 'error')));
     exit;
 }
 
 // --- Remove a part ---
 if (isset($_GET['remove']) && is_numeric($_GET['remove'])) {
     $r = remove_booking_part($pdo, (int)$_GET['remove']);
-    header("Location: booking_parts.php?booking_id=$booking_id&msg=" . urlencode($r['msg']) . "&type=" . ($r['ok'] ? 'success' : 'error'));
+    header("Location: booking_parts.php?booking_id=$booking_id&msg=" . urlencode($r['msg']) . "&type=" . urlencode($r['type'] ?? ($r['ok'] ? 'success' : 'error')));
     exit;
 }
 
@@ -125,7 +125,7 @@ if ($role === 'admin') {
 ?>
 
     <?php if ($msg): ?>
-    <div class="alert alert-<?= $msg_type === 'success' ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
+    <div class="alert alert-<?= $msg_type === 'success' ? 'success' : ($msg_type === 'warning' ? 'warning' : 'danger') ?> alert-dismissible fade show" role="alert">
         <?= $msg ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>

@@ -105,11 +105,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if (!empty($sms_result['success'])) {
                             $msg .= " SMS sent.";
                         } else {
-                            $msg .= " SMS failed: " . ($sms_result['message'] ?? 'unknown error');
+                            $msg .= " SMS could not be sent (" . ($sms_result['message'] ?? 'unknown error') . ").";
+                            $msg_type = "warning";
                         }
                     } catch (Throwable $e) {
                         error_log("Start SMS error for booking #{$booking_id}: " . $e->getMessage());
                         $msg .= " SMS could not be sent.";
+                        $msg_type = "warning";
                     }
                 }
             } else {
@@ -176,11 +178,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if (!empty($sms_result['success']) && empty($sms_result['error_code'])) {
                             $msg .= " SMS sent.";
                         } else {
-                            $msg .= " SMS failed: " . ($sms_result['message'] ?? 'unknown error');
+                            $msg .= " SMS could not be sent (" . ($sms_result['message'] ?? 'unknown error') . ").";
+                            $msg_type = "warning";
                         }
                     } catch (Throwable $e) {
                         error_log("Completion SMS error for booking #{$booking_id}: " . $e->getMessage());
                         $msg .= " SMS could not be sent.";
+                        $msg_type = "warning";
                     }
                 }
             } else {
@@ -547,7 +551,7 @@ include 'mechanic_sidebar.php';
         <h2 class="fw-bold mb-4"><i class="bi bi-calendar-check me-2 text-warning-custom"></i>My Bookings</h2>
 
         <?php if ($msg): ?>
-            <div class="alert alert-<?= $msg_type === 'success' ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
+            <div class="alert alert-<?= $msg_type === 'success' ? 'success' : ($msg_type === 'warning' ? 'warning' : 'danger') ?> alert-dismissible fade show" role="alert">
                 <?= $msg ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>

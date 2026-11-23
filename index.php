@@ -1265,7 +1265,7 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
     // --- Inline field validation for the login/register forms ---
     const EMAIL_RE = /^[A-Za-z0-9.!#$%&'*+\/=?^_`{|}~-]+@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9]$/;
     const FIELD_RULES = {
-        loginEmail: (v) => !v.trim() ? 'Enter your email address.' : (!EMAIL_RE.test(v.trim()) ? 'Enter a valid email (e.g. you@example.com).' : ''),
+            loginEmail: (v) => !v.trim() ? 'Enter your email address.' : (!/^[^@\s]+@[^@\s]+$/.test(v.trim()) ? 'Enter a valid email (e.g. you@example.com).' : ''),
         loginPassword: (v) => v ? '' : 'Enter your password.',
         regUsername: (v) => v.trim().length >= 2 ? '' : 'Enter your full name.',
         regEmail: (v) => !v.trim() ? 'Enter your email address.' : (!EMAIL_RE.test(v.trim()) ? 'Enter a valid email (e.g. you@example.com).' : ''),

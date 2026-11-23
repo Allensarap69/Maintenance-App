@@ -214,7 +214,7 @@ html[data-theme="dark"] {
 .ux-error-card__btn { display: inline-flex; align-items: center; gap: 6px; }
 .ux-error-card__btn svg { width: 16px; height: 16px; }
 .ux-modal-error { border-radius: 16px; overflow: hidden; }
-.ux-modal-error .ux-error-card { margin: 0; border: 0; border-radius: 0; position: relative; padding-right: 44px; }
+.ux-modal-error .ux-error-card { max-width: none; margin: 0; border: 0; border-radius: 0; position: relative; padding-right: 44px; }
 .ux-error-card__close { position: absolute; top: 12px; right: 12px; }
 .ux-offline-banner {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 10500;

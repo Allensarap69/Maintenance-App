@@ -9,7 +9,7 @@
 // serve the build output from inside the PHP project folder so the
 // relative defaults work.
 export const API_BASE = import.meta.env.VITE_API_BASE || '/api';
-// demo.html sets window.MEV_PHP_APP_BASE = '' so redirects stay on the demo.
+// demo.html sets window.MEV_PHP_APP_BASE = '.' so redirects stay in the demo's folder.
 export const PHP_APP_BASE = window.MEV_PHP_APP_BASE
   ?? (import.meta.env.VITE_PHP_APP_BASE || 'http://localhost/Advance_Database-System');
 

@@ -1,1 +1,0 @@
-import{b as r,j as e,R as t,T as o,E as s,A as a}from"./App-JpKMo7hQ.js";r(document.getElementById("root")).render(e.jsx(t.StrictMode,{children:e.jsx(o,{children:e.jsx(s,{title:"The page couldn’t load",children:e.jsx(a,{})})})}));

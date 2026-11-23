@@ -1,5 +1,7 @@
 // In-browser stand-in for api/*.php so the demo runs without Apache/MySQL.
 // Responses mirror the PHP endpoints' JSON shapes.
+import { API_BASE } from '../config';
+
 export const settings = { serverDown: false, latency: 700 };
 
 export const DEMO_PASSWORD = 'Rider@123';
@@ -78,7 +80,7 @@ export function installMockApi() {
   const realFetch = window.fetch.bind(window);
   window.fetch = async (input, init = {}) => {
     const url = typeof input === 'string' ? input : input.url;
-    const match = url.match(/\/api\/([a-z_]+)\.php/);
+    const match = url.startsWith(`${API_BASE}/`) && url.slice(API_BASE.length).match(/^\/([a-z_]+)\.php/);
     if (!match) return realFetch(input, init);
     const endpoint = match[1];
     const params = new URLSearchParams(init.body ? String(init.body) : '');

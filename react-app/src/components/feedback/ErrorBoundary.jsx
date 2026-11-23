@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { RefreshCw, TriangleAlert, X } from 'lucide-react';
+import { RefreshCw, TriangleAlert } from 'lucide-react';
 import { allowLazyRetry } from './lazyWithRetry';
 
 // Catches render errors and failed lazy-chunk downloads so one broken
@@ -50,9 +50,7 @@ export default class ErrorBoundary extends Component {
           <RefreshCw /> {reload ? 'Reload page' : 'Try again'}
         </button>
         {this.props.onClose && (
-          <button type="button" className="btn-close ux-error-card__close" aria-label="Close" onClick={this.props.onClose}>
-            <X />
-          </button>
+          <button type="button" className="btn-close ux-error-card__close" aria-label="Close" onClick={this.props.onClose} />
         )}
       </div>
     );

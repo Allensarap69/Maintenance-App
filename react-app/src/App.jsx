@@ -140,7 +140,7 @@ export default function App() {
       <ScrollTop />
 
       {modal && (
-        <ErrorBoundary title="Couldn’t open this form">
+        <ErrorBoundary key={modal} title="Couldn’t open this form" onClose={closeModal}>
           <Suspense fallback={<ModalSkeleton />}>
             {modal === 'login' && (
               <LoginModal

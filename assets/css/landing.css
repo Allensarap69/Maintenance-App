@@ -2050,3 +2050,11 @@
         @media (max-width: 991px) {
             html[data-theme="dark"] .navbar-collapse { background: #111a2e; border-color: #22304a; }
         }
+
+        /* Inline feedback in the auth modals */
+        .auth-field-error { margin-top: 4px; font-size: 0.75rem; color: #dc2626; }
+        .auth-caps { margin-top: 4px; font-size: 0.75rem; color: #b45309; font-weight: 600; }
+        .modal-blur-effect .input-group .form-control.is-invalid { border-color: #ef4444; box-shadow: none; background-image: none; }
+        .modal-blur-effect .alert .alert-action { display: inline-block; margin-left: 4px; }
+        html[data-theme="dark"] .auth-field-error { color: #f87171; }
+        html[data-theme="dark"] .auth-caps { color: #fbbf24; }

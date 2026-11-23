@@ -41,7 +41,7 @@ export default function Reminders({ onLogin }) {
             </div>
             <div className="col-lg-6">
               <div className="cta-card" data-reveal data-delay="140">
-                <img src="MOTOR.jpg" alt="" className="cta-img" aria-hidden="true" />
+                <img src="MOTOR.jpg" alt="" className="cta-img" aria-hidden="true" loading="lazy" decoding="async" />
                 <div className="cta-content">
                   <h3 className="cta-title">Ready to Take Better Care of Your Motorcycle?</h3>
                   <p className="cta-subtitle">Schedule your next service and keep your motorcycle running smoothly.</p>

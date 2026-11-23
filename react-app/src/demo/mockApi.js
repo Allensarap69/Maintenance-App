@@ -12,6 +12,7 @@ export const ACCOUNTS = {
   taken: 'taken@eversure.ph',
 };
 
+const registered = new Map();
 let failedAttempts = 0;
 let csrfExpiredOnce = false;
 
@@ -28,7 +29,7 @@ const wait = (ms, signal) => new Promise((resolve, reject) => {
 });
 
 function login(p) {
-  const email = (p.get('email') || '').toLowerCase();
+  const email = (p.get('email') || '').trim().toLowerCase();
   if (email === ACCOUNTS.crash) return fatal();
   if (email === ACCOUNTS.expired && !csrfExpiredOnce) {
     csrfExpiredOnce = true;
@@ -41,7 +42,8 @@ function login(p) {
       delay: { delay: 8, locked: false, attempts: 4, remaining: 1 },
     });
   }
-  if (Object.values(ACCOUNTS).includes(email) && p.get('password') === DEMO_PASSWORD) {
+  const password = registered.get(email) ?? (Object.values(ACCOUNTS).includes(email) ? DEMO_PASSWORD : null);
+  if (password !== null && p.get('password') === password) {
     failedAttempts = 0;
     return json({ success: true, redirect: 'demo.html?signedin=1' });
   }
@@ -58,11 +60,12 @@ function login(p) {
 }
 
 function register(p) {
-  const email = (p.get('reg_email') || '').toLowerCase();
+  const email = (p.get('reg_email') || '').trim().toLowerCase();
   if (email === ACCOUNTS.crash) return fatal();
-  if (email === ACCOUNTS.taken || email === ACCOUNTS.ok) {
+  if (email === ACCOUNTS.taken || email === ACCOUNTS.ok || registered.has(email)) {
     return json({ success: false, message: 'Email already registered. Please use a different email or login.' });
   }
+  registered.set(email, p.get('reg_password') || '');
   return json({ success: true, message: 'Registration successful! You can now login.' });
 }
 

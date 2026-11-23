@@ -34,6 +34,7 @@ export default function LoginModal({ initialEmail = '', onClose, onSwitchToRegis
   const [status, setStatus] = useState('idle'); // idle | loading | success
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
+  const submitRef = useRef(null);
   const busy = status !== 'idle';
 
   useEffect(() => {
@@ -104,6 +105,8 @@ export default function LoginModal({ initialEmail = '', onClose, onSwitchToRegis
     }
   };
 
+  submitRef.current = submit;
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!busy) submit();
@@ -153,7 +156,7 @@ export default function LoginModal({ initialEmail = '', onClose, onSwitchToRegis
                 variant={alert.variant}
                 title={alert.title}
                 shakeKey={alert.variant === 'error' ? alert.n : undefined}
-                action={alert.retry && !busy ? { label: 'Try again', onClick: alert.retry } : undefined}
+                action={alert.retry && !busy ? { label: 'Try again', onClick: () => submitRef.current() } : undefined}
                 onDismiss={() => setAlert(null)}
                 className="mb-3"
               >

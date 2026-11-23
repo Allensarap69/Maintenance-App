@@ -74,6 +74,7 @@ export default function RegisterModal({ onClose, onSwitchToLogin, onRegistered }
   const [status, setStatus] = useState('idle'); // idle | loading | success
   const [doneEmail, setDoneEmail] = useState('');
   const refs = useRef({});
+  const submitRef = useRef(null);
   const busy = status === 'loading';
 
   const errors = validate(form);
@@ -112,20 +113,23 @@ export default function RegisterModal({ onClose, onSwitchToLogin, onRegistered }
       setStatus('idle');
       if (data.csrf_error) {
         resetCsrfToken();
-        showAlert('warning', 'Your session expired.', 'We refreshed it — press Create Account again.', { label: 'Try again', onClick: submit });
+        showAlert('warning', 'Your session expired.', 'We refreshed it — press Create Account again.', { label: 'Try again', onClick: retry });
       } else if (/already registered/i.test(data.message || '')) {
         refs.current.reg_email?.focus();
         showAlert('warning', 'This email already has an account.', 'Sign in instead, or use a different email.',
           { label: 'Sign in instead', onClick: onSwitchToLogin });
       } else {
         showAlert('error', data.message || 'Registration failed.', data.server_error ? 'Please try again in a moment.' : undefined,
-          data.server_error ? { label: 'Try again', onClick: submit } : undefined);
+          data.server_error ? { label: 'Try again', onClick: retry } : undefined);
       }
     } catch (err) {
       setStatus('idle');
-      showAlert('error', 'Connection problem', err.message, { label: 'Try again', onClick: submit });
+      showAlert('error', 'Connection problem', err.message, { label: 'Try again', onClick: retry });
     }
   };
+
+  submitRef.current = submit;
+  const retry = () => submitRef.current();
 
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { RefreshCw, TriangleAlert } from 'lucide-react';
+import { RefreshCw, TriangleAlert, X } from 'lucide-react';
 import { allowLazyRetry } from './lazyWithRetry';
 
 // Catches render errors and failed lazy-chunk downloads so one broken
@@ -29,7 +29,10 @@ export default class ErrorBoundary extends Component {
     }
     if (this.props.fallback) return this.props.fallback(this.retry);
     const chunkFailed = /dynamically imported module|Loading chunk|Failed to fetch/i.test(String(this.state.error?.message));
-    return (
+    // Some browsers cache a failed module fetch, so a second chunk failure
+    // offers a full reload instead of another in-place retry.
+    const reload = chunkFailed && this.state.attempt > 0;
+    const card = (
       <div className="ux-error-card" role="alert">
         <span className="ux-error-card__icon"><TriangleAlert /></span>
         <div>
@@ -40,10 +43,29 @@ export default class ErrorBoundary extends Component {
               : 'Something went wrong on our side. Try again, or refresh the page if it keeps happening.'}
           </p>
         </div>
-        <button type="button" className="btn btn-cta-outline ux-error-card__btn" onClick={this.retry}>
-          <RefreshCw /> Try again
+        <button
+          type="button" className="btn btn-cta-outline ux-error-card__btn"
+          onClick={reload ? () => window.location.reload() : this.retry}
+        >
+          <RefreshCw /> {reload ? 'Reload page' : 'Try again'}
         </button>
+        {this.props.onClose && (
+          <button type="button" className="btn-close ux-error-card__close" aria-label="Close" onClick={this.props.onClose}>
+            <X />
+          </button>
+        )}
       </div>
+    );
+    if (!this.props.onClose) return card;
+    return (
+      <>
+        <div className="modal fade show modal-blur-effect" style={{ display: 'block' }} role="dialog" aria-modal="true">
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content ux-modal-error">{card}</div>
+          </div>
+        </div>
+        <div className="modal-backdrop fade show" />
+      </>
     );
   }
 }

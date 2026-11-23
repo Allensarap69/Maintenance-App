@@ -37,7 +37,8 @@ function passwordStrength(v) {
 
 const EMPTY_FORM = { reg_username: '', reg_email: '', reg_password: '', reg_phone: '', reg_address: '' };
 const FIELD_ORDER = ['reg_username', 'reg_email', 'reg_password', 'reg_phone', 'reg_address'];
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+// Only characters PHP's FILTER_SANITIZE_EMAIL keeps, so login.php finds the stored address.
+const EMAIL_RE = /^[A-Za-z0-9.!#$%&'*+\/=?^_`{|}~-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 
 const PW_RULES = [
   { test: (v) => v.length >= 8, label: '8+ characters' },

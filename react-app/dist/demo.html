@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" class="public-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mindanao Eversure — Motorcycle Service Scheduling & Monitoring System. Book services, track maintenance, monitor motorcycle health, and get smart reminders.">
+    <meta name="theme-color" content="#ffffff">
+    <script>
+        (function () {
+            var t = localStorage.getItem('theme');
+            if (localStorage.getItem('themeManual') !== '1' || (t !== 'dark' && t !== 'light')) {
+                t = 'light';
+            }
+            localStorage.setItem('theme', t);
+            document.documentElement.setAttribute('data-theme', t);
+            var meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.setAttribute('content', t === 'dark' ? '#0b1220' : '#ffffff');
+        })();
+    </script>
+    <title>Mindanao Eversure | UX Scenario Demo</title>
+    <script>window.MEV_PHP_APP_BASE = '';</script>
+    <link rel="icon" type="image/png" href="eversure-logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <noscript><style>[data-reveal]{opacity:1!important;transform:none!important}.bar-fill{width:var(--w)!important}</style></noscript>
+  <script type="module" crossorigin src="/assets/demo-J_9BTNQq.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/App-JpKMo7hQ.js">
+  <link rel="stylesheet" crossorigin href="/assets/App-tEscZ1cb.css">
+  <link rel="stylesheet" crossorigin href="/assets/demo-jPdgADlQ.css">
+</head>
+<body class="mev-landing">
+    <div id="root"></div>
+</body>
+</html>

@@ -9,6 +9,12 @@ const PHP_PROJECT = process.env.PHP_PROJECT || 'http://localhost/Advance_Databas
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      // demo.html: the landing page on a mocked API with a scenario panel.
+      input: { main: 'index.html', demo: 'demo.html' },
+    },
+  },
   server: {
     port: 5173,
     proxy: {

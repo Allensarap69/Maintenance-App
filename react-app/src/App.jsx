@@ -78,10 +78,14 @@ export default function App() {
 
   // One-time onboarding tip for first-time visitors.
   useEffect(() => {
-    if (localStorage.getItem(WELCOME_TIP_KEY)) return undefined;
+    try {
+      if (localStorage.getItem(WELCOME_TIP_KEY)) return undefined;
+    } catch {
+      return undefined;
+    }
     const t = setTimeout(() => {
       if (redirecting.current) return;
-      localStorage.setItem(WELCOME_TIP_KEY, '1');
+      try { localStorage.setItem(WELCOME_TIP_KEY, '1'); } catch { /* storage blocked */ }
       toast.tip('New to Mindanao Eversure?', {
         message: 'Create a free account to book services and get maintenance reminders.',
         action: { label: 'Create account', onClick: () => setModal('register') },

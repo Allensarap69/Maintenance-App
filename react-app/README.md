@@ -42,3 +42,7 @@ see `src/config.js`.
 - `src/styles/` — copies of the project's existing CSS (landing, app,
   ui, mobile, fonts) — edit the originals under `assets/css/` and
   re-copy, or convert these into the source of truth
+
+## UX scenario demo
+
+`npm run dev`, then open `/demo.html`: the same landing page on an in-browser mock API (no PHP/MySQL), with a **UX Scenarios** panel that triggers each state: sign-in success / errors / security delay, registration results, server down, offline, slow or failed lazy sections, welcome tip and every toast variant. Demo password: `Rider@123`. Code lives in `src/demo/`.

@@ -53,10 +53,16 @@ export function useRevealAnimations() {
       el.querySelectorAll('[data-count]').forEach(animateCount);
     };
 
-    const els = document.querySelectorAll('[data-reveal]');
+    const observe = (root, io) => {
+      const els = [];
+      if (root.matches?.('[data-reveal]')) els.push(root);
+      root.querySelectorAll?.('[data-reveal]:not(.revealed)').forEach((el) => els.push(el));
+      els.forEach((el) => (io ? io.observe(el) : revealEl(el)));
+    };
+
     if (!('IntersectionObserver' in window)) {
-      els.forEach(revealEl);
-      return;
+      observe(document.body, null);
+      return undefined;
     }
     const io = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -66,8 +72,17 @@ export function useRevealAnimations() {
         }
       });
     }, { threshold: 0.15 });
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    observe(document.body, io);
+
+    // Lazy-loaded sections mount after first render; pick up their elements too.
+    const mo = new MutationObserver((mutations) => {
+      mutations.forEach((m) => m.addedNodes.forEach((n) => n.nodeType === 1 && observe(n, io)));
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+    return () => {
+      io.disconnect();
+      mo.disconnect();
+    };
   }, []);
 }
 

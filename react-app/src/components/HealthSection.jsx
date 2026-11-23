@@ -14,7 +14,7 @@ export default function HealthSection({ onLogin }) {
         <div className="row align-items-center g-5">
           <div className="col-lg-5">
             <div className="health-bike-wrap" data-reveal>
-              <img src="moto_hero.jpg" alt="Motorcycle health monitoring" className="health-bike" />
+              <img src="moto_hero.jpg" alt="Motorcycle health monitoring" className="health-bike" loading="lazy" decoding="async" />
             </div>
           </div>
           <div className="col-lg-7">

@@ -41,6 +41,10 @@ $msg = "";
 $login_attempt = false;
 $register_attempt = false;
 $registration_success = false;
+// Drives the inline alert style/actions: error | warning | success
+$msg_type = 'error';
+$msg_action = '';          // '' | 'refresh' | 'signin'
+$registered_email = '';
 
 // Variables for registration form
 $reg_username = $_POST['reg_username'] ?? '';
@@ -68,6 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
     // Verify CSRF token
     if (!verify_csrf_token()) {
         $msg = "Security validation failed. Please refresh the page and try again.";
+        $msg_type = 'warning';
+        $msg_action = 'refresh';
     } else {
         $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
         $password = $_POST['password'] ?? '';
@@ -78,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
         // If account is locked or delayed, do not process credentials
         if ($delay_info['locked'] || $delay_info['delay'] > 0) {
             $msg = $delay_info['message'];
+            $msg_type = 'warning';
         } elseif (empty($_POST['email']) || empty($_POST['password'])) {
             $msg = "Please enter both email and password.";
         } else {
@@ -112,6 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
                     $_SESSION['role']    = $user['role'];
                     $_SESSION['username'] = $user['username'];
                     $_SESSION['last_login'] = time();
+                    $_SESSION['flash_toast'] = ['msg' => 'Welcome back, ' . $user['username'] . '!', 'type' => 'success'];
 
                     log_audit($pdo, 'login_success', 'user', $user['id'], $email);
 
@@ -132,6 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
                     
                     if ($delay_info['delay'] > 0) {
                         $msg = "Invalid credentials. " . $delay_info['message'];
+                        $msg_type = 'warning';
                     } else {
                         $msg = "Invalid email or password.";
                     }
@@ -152,6 +161,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submit'])) {
     // Verify CSRF token
     if (!verify_csrf_token()) {
         $msg = "Security validation failed. Please refresh the page and try again.";
+        $msg_type = 'warning';
+        $msg_action = 'refresh';
     } elseif (empty($_POST['reg_password']) || empty($_POST['reg_username']) || empty($_POST['reg_email']) || empty($_POST['reg_phone']) || empty($_POST['reg_address'])) {
         $msg = "Please fill in all required fields.";
     } else {
@@ -171,6 +182,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submit'])) {
 
             if ($check->rowCount() > 0) {
                 $msg = "Email already registered. Please use a different email or login.";
+                $msg_type = 'warning';
+                $msg_action = 'signin';
             } else {
                 $stmt = $pdo->prepare("INSERT INTO users (username,email,password,phone,address,role) VALUES (?,?,?,?,?,'customer')");
                 $stmt->execute([$username, $email, $password, $phone, $address]);
@@ -178,6 +191,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_submit'])) {
 
                 $msg = "Registration successful! You can now login.";
                 $registration_success = true;
+                $msg_type = 'success';
+                $msg_action = 'signin';
+                $registered_email = $email;
                 
                 // Clear values on success
                 $reg_username = $reg_email = $reg_phone = $reg_address = '';
@@ -552,7 +568,7 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
         <div class="row align-items-center g-5">
             <div class="col-lg-5">
                 <div class="health-bike-wrap" data-reveal>
-                    <img src="moto_hero.jpg" alt="Motorcycle health monitoring" class="health-bike">
+                    <img loading="lazy" decoding="async" src="moto_hero.jpg" alt="Motorcycle health monitoring" class="health-bike">
                 </div>
             </div>
             <div class="col-lg-7">
@@ -706,7 +722,7 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
             </div>
             <div class="col-lg-6">
                 <div class="cta-card" data-reveal data-delay="140">
-                    <img src="MOTOR.jpg" alt="" class="cta-img" aria-hidden="true">
+                    <img loading="lazy" decoding="async" src="MOTOR.jpg" alt="" class="cta-img" aria-hidden="true">
                     <div class="cta-content">
                         <h3 class="cta-title">Ready to Take Better Care of Your Motorcycle?</h3>
                         <p class="cta-subtitle">Schedule your next service and keep your motorcycle running smoothly.</p>
@@ -805,13 +821,16 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
             </div>
 
             <?php if ($msg && $login_attempt): ?>
-                <div class="alert alert-danger alert-dismissible fade show mb-3 py-2 px-2" role="alert">
+                <div class="alert alert-<?= $msg_type === 'warning' ? 'warning' : 'danger' ?> alert-dismissible fade show mb-3 py-2 px-2" role="alert">
                     <?= htmlspecialchars($msg) ?>
+                    <?php if ($msg_action === 'refresh'): ?>
+                        <a href="index.php" class="alert-action">Refresh page →</a>
+                    <?php endif; ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 2px 6px; font-size: 0.7rem;"></button>
                 </div>
             <?php endif; ?>
 
-            <form method="post" action="index.php">
+            <form method="post" action="index.php" novalidate>
                 <input type="hidden" name="login_submit" value="1">
                 <?= csrf_field() ?>
 
@@ -832,10 +851,11 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
                         <input type="password" class="form-control" id="loginPassword" name="password" required
                                    autocomplete="current-password" placeholder="Enter your password">
                         <span class="input-group-text password-toggle" role="button" tabindex="0"
-                              onclick="togglePassword('loginPassword')" aria-label="Show password">
+                              onclick="togglePassword('loginPassword')" aria-label="Show password" aria-pressed="false">
                             <i data-lucide="eye" class="input-icon"></i>
                         </span>
                     </div>
+                    <div class="auth-caps" id="loginCaps" hidden>Caps Lock is on</div>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center remember-row">
@@ -893,16 +913,19 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
             </div>
 
             <?php if ($msg && $register_attempt): ?>
-                <div class="alert alert-<?= $registration_success ? 'success' : 'danger' ?> alert-dismissible fade show mb-3 py-2 px-2" role="alert">
+                <div class="alert alert-<?= $msg_type === 'error' ? 'danger' : $msg_type ?> alert-dismissible fade show mb-3 py-2 px-2" role="alert">
                     <?= htmlspecialchars($msg) ?>
-                    <?php if ($registration_success): ?>
-                        <a href="#" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#loginModal">Login →</a>
+                    <?php if ($msg_action === 'signin'): ?>
+                        <a href="#" class="alert-action" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#loginModal"
+                           data-prefill-email="<?= htmlspecialchars($registration_success ? $registered_email : $reg_email) ?>"><?= $registration_success ? 'Login →' : 'Sign in instead →' ?></a>
+                    <?php elseif ($msg_action === 'refresh'): ?>
+                        <a href="index.php" class="alert-action">Refresh page →</a>
                     <?php endif; ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 2px 6px; font-size: 0.7rem;"></button>
                 </div>
             <?php endif; ?>
 
-            <form method="post" action="index.php">
+            <form method="post" action="index.php" novalidate>
                 <input type="hidden" name="register_submit" value="1">
                 <?= csrf_field() ?>
 
@@ -932,10 +955,11 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
                             <input type="password" class="form-control" id="regPassword" name="reg_password" required
                                        autocomplete="new-password" placeholder="Create a password">
                             <span class="input-group-text password-toggle" role="button" tabindex="0"
-                                  onclick="togglePassword('regPassword')" aria-label="Show password">
+                                  onclick="togglePassword('regPassword')" aria-label="Show password" aria-pressed="false">
                                 <i data-lucide="eye" class="input-icon"></i>
                             </span>
                         </div>
+                        <div class="auth-caps" id="regCaps" hidden>Caps Lock is on</div>
                         <div class="pw-meter" id="pwMeter"><span></span></div>
                         <div class="pw-hint" id="pwHint">Password strength: <strong id="pwLabel"></strong></div>
                     </div>
@@ -976,6 +1000,7 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<?php include __DIR__ . '/floating_toast.php'; ?>
 
 <!-- Scroll to Top Button -->
 <button class="scroll-top" id="scrollTop" onclick="scrollToTop()" aria-label="Scroll to top">
@@ -1007,7 +1032,14 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
         // passes; on failure the server re-renders the page with the
         // button reset, on success the page navigates away.
         document.querySelectorAll('#loginModal form, #registerModal form').forEach(function (form) {
-            form.addEventListener('submit', function () {
+            form.addEventListener('input', function (e) { clearFieldError(e.target); });
+            form.addEventListener('submit', function (e) {
+                if (!validateAuthForm(form)) { e.preventDefault(); return; }
+                if (navigator.onLine === false) {
+                    e.preventDefault();
+                    showToast('Reconnect to the internet, then try again.', 'warning', { title: 'You’re offline' });
+                    return;
+                }
                 var btn = form.querySelector('.auth-submit');
                 if (!btn || btn.disabled) return;
                 var label = form.closest('#registerModal') ? 'Creating account…' : 'Signing in…';
@@ -1015,6 +1047,57 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>' + label;
             });
         });
+
+        // Caps Lock hint on password fields
+        [['loginPassword', 'loginCaps'], ['regPassword', 'regCaps']].forEach(function (pair) {
+            var input = document.getElementById(pair[0]);
+            var hint = document.getElementById(pair[1]);
+            if (!input || !hint) return;
+            var check = function (e) {
+                if (e.getModifierState) hint.hidden = !e.getModifierState('CapsLock');
+            };
+            input.addEventListener('keydown', check);
+            input.addEventListener('keyup', check);
+            input.addEventListener('blur', function () { hint.hidden = true; });
+        });
+
+        // "Sign in instead" / "Login →" opens the login form with the email filled in
+        document.querySelectorAll('[data-prefill-email]').forEach(function (link) {
+            link.addEventListener('click', function () {
+                var email = document.getElementById('loginEmail');
+                if (email && link.dataset.prefillEmail) email.value = link.dataset.prefillEmail;
+                document.getElementById('loginModal').addEventListener('shown.bs.modal', function () {
+                    var target = email && email.value ? document.getElementById('loginPassword') : email;
+                    if (target) target.focus();
+                }, { once: true });
+            });
+        });
+
+        // Forgot password: accounts are reset by the shop admin
+        var forgot = document.querySelector('.forgot-link');
+        if (forgot) {
+            forgot.addEventListener('click', function (e) {
+                e.preventDefault();
+                showToast('Contact Mindanao Eversure or visit the shop — an admin can reset your password.', 'info', { title: 'Forgot your password?' });
+            });
+        }
+
+        // One-time welcome tip for first-time visitors
+        <?php if (!$msg): ?>
+        (function () {
+            var seen;
+            try { seen = localStorage.getItem('mevWelcomeTip'); } catch (err) { return; }
+            if (seen) return;
+            setTimeout(function () {
+                if (document.querySelector('.modal.show')) return;
+                showToast('Create a free account to book services and get maintenance reminders for your motorcycle.', 'tip', {
+                    title: 'New here?',
+                    action: { label: 'Get started', onClick: function () { bootstrap.Modal.getOrCreateInstance(document.getElementById('registerModal')).show(); } }
+                });
+                try { localStorage.setItem('mevWelcomeTip', '1'); } catch (err) { /* storage blocked */ }
+            }, 2500);
+        })();
+        <?php endif; ?>
 
         // Dark mode toggle
         const themeToggle = document.getElementById('themeToggle');
@@ -1167,7 +1250,68 @@ if ($delay_info['delay'] > 0 && $login_attempt) {
 
     function togglePassword(id) {
         const input = document.getElementById(id);
-        if (input) input.type = input.type === 'password' ? 'text' : 'password';
+        if (!input) return;
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        const toggle = input.parentElement.querySelector('.password-toggle');
+        if (toggle) {
+            toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+            toggle.setAttribute('aria-pressed', show ? 'true' : 'false');
+            toggle.innerHTML = '<i data-lucide="' + (show ? 'eye-off' : 'eye') + '" class="input-icon"></i>';
+            lucide.createIcons();
+        }
+    }
+
+    // --- Inline field validation for the login/register forms ---
+    const EMAIL_RE = /^[A-Za-z0-9.!#$%&'*+\/=?^_`{|}~-]+@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9]$/;
+    const FIELD_RULES = {
+        loginEmail: (v) => !v.trim() ? 'Enter your email address.' : (!EMAIL_RE.test(v.trim()) ? 'Enter a valid email (e.g. you@example.com).' : ''),
+        loginPassword: (v) => v ? '' : 'Enter your password.',
+        regUsername: (v) => v.trim().length >= 2 ? '' : 'Enter your full name.',
+        regEmail: (v) => !v.trim() ? 'Enter your email address.' : (!EMAIL_RE.test(v.trim()) ? 'Enter a valid email (e.g. you@example.com).' : ''),
+        regPassword: (v) => !v ? 'Create a password.' : (v.length < 6 ? 'Use at least 6 characters.' : ''),
+        regPhone: (v) => /^09\d{9}$/.test(v.replace(/\D/g, '')) ? '' : 'Enter an 11-digit mobile number starting with 09 (e.g. 0917 123 4567).',
+        regAddress: (v) => v.trim() ? '' : 'Enter your address.'
+    };
+
+    function fieldErrorEl(input) {
+        const field = input.closest('.auth-field');
+        let el = field && field.querySelector('.auth-field-error');
+        if (!el && field) {
+            el = document.createElement('div');
+            el.className = 'auth-field-error';
+            el.id = input.id + 'Error';
+            input.closest('.input-group').insertAdjacentElement('afterend', el);
+        }
+        return el;
+    }
+
+    function setFieldError(input, message) {
+        const el = fieldErrorEl(input);
+        input.classList.toggle('is-invalid', !!message);
+        input.setAttribute('aria-invalid', message ? 'true' : 'false');
+        if (message) input.setAttribute('aria-describedby', el.id); else input.removeAttribute('aria-describedby');
+        if (el) { el.textContent = message; el.hidden = !message; }
+    }
+
+    function clearFieldError(input) {
+        if (input && input.classList && input.classList.contains('is-invalid')) {
+            const rule = FIELD_RULES[input.id];
+            if (rule && !rule(input.value)) setFieldError(input, '');
+        }
+    }
+
+    function validateAuthForm(form) {
+        let first = null;
+        form.querySelectorAll('input[id]').forEach(function (input) {
+            const rule = FIELD_RULES[input.id];
+            if (!rule) return;
+            const message = rule(input.value);
+            setFieldError(input, message);
+            if (message && !first) first = input;
+        });
+        if (first) first.focus();
+        return !first;
     }
 </script>
 </body>
